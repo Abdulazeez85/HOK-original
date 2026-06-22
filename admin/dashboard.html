@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Dashboard — HOK Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/admin/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div id="sidebar-mount"></div>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div><h1 class="page-title">Dashboard</h1><p class="page-sub">Overview of your store performance</p></div>
+      <div class="topbar-actions">
+        <a href="/admin/products" class="btn btn-accent">+ Add Product</a>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid" id="statsGrid"><div style="color:var(--text-2);font-size:0.82rem">Loading stats…</div></div>
+
+    <!-- TOP PRODUCTS + PENDING REVIEWS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px">
+      <div class="card">
+        <p class="card-title">🔥 Most Enquired Products</p>
+        <div id="topProductsList"><div style="color:var(--text-2);font-size:0.82rem;font-weight:300">No enquiries yet.</div></div>
+      </div>
+      <div class="card">
+        <p class="card-title">⏳ Pending Reviews</p>
+        <div id="pendingReviewsList"><div style="color:var(--text-2);font-size:0.82rem;font-weight:300">No pending reviews.</div></div>
+      </div>
+    </div>
+
+    <!-- RECENT PRODUCTS -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <p class="card-title" style="margin:0">Recent Products</p>
+        <a href="/admin/products" class="btn btn-ghost btn-sm">Manage All</a>
+      </div>
+      <div class="table-wrap" id="recentProducts"><div style="color:var(--text-2);font-size:0.82rem">Loading…</div></div>
+    </div>
+  </main>
+</div>
+<script src="/admin/admin.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const ok = await checkAuth(); if (!ok) return;
+  document.getElementById('sidebar-mount').innerHTML = getSidebarHTML('dashboard');
+
+  const [statsRes, reviewsRes, productsRes, enquiriesRes] = await Promise.all([
+    fetch('/api/admin/stats'), fetch('/api/admin/reviews'),
+    fetch('/api/admin/products'), fetch('/api/admin/enquiries')
+  ]);
+  const stats = await statsRes.json();
+  const reviews = await reviewsRes.json();
+  const products = await productsRes.json();
+  const enquiries = await enquiriesRes.json();
+
+  // Render stats
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card accent"><div class="stat-card-icon">🖥️</div><div class="stat-card-num">${stats.totalProducts}</div><div class="stat-card-label">Total Products</div></div>
+    <div class="stat-card"><div class="stat-card-icon">✅</div><div class="stat-card-num">${stats.inStock}</div><div class="stat-card-label">In Stock</div></div>
+    <div class="stat-card warn"><div class="stat-card-icon">⚠️</div><div class="stat-card-num">${stats.limitedStock}</div><div class="stat-card-label">Limited Stock</div></div>
+    <div class="stat-card danger"><div class="stat-card-icon">❌</div><div class="stat-card-num">${stats.outOfStock}</div><div class="stat-card-label">Out of Stock</div></div>
+    <div class="stat-card warn"><div class="stat-card-icon">⏳</div><div class="stat-card-num">${stats.pendingReviews}</div><div class="stat-card-label">Pending Reviews</div></div>
+    <div class="stat-card accent"><div class="stat-card-icon">⭐</div><div class="stat-card-num">${stats.approvedReviews}</div><div class="stat-card-label">Approved Reviews</div></div>
+    <div class="stat-card"><div class="stat-card-icon">📊</div><div class="stat-card-num">${stats.totalEnquiries}</div><div class="stat-card-label">WhatsApp Clicks</div></div>
+    <div class="stat-card"><div class="stat-card-icon">🔔</div><div class="stat-card-num">${stats.notifyRequests}</div><div class="stat-card-label">Notify Requests</div></div>`;
+
+  // Top enquired
+  if (stats.topProducts?.length) {
+    document.getElementById('topProductsList').innerHTML = stats.topProducts.map((p,i) => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:0.82rem;color:var(--text-1)">${i+1}. ${p.productName}</span>
+        <span class="badge badge-green">${p.totalClicks} clicks</span>
+      </div>`).join('');
+  }
+
+  // Pending reviews
+  const pending = reviews.filter(r => r.status === 'pending').slice(0,5);
+  if (pending.length) {
+    document.getElementById('pendingReviewsList').innerHTML = pending.map(r => `
+      <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:0.82rem;color:var(--text-1);font-weight:500">${r.name}</span>
+          <span style="color:#f59e0b;font-size:0.75rem">${'★'.repeat(r.rating)}</span>
+        </div>
+        <div style="font-size:0.75rem;color:var(--text-2);font-weight:300;margin-top:2px">${r.product}</div>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button class="btn btn-accent btn-sm" onclick="approveReview('${r.id}')">Approve</button>
+          <button class="btn btn-danger btn-sm" onclick="rejectReview('${r.id}')">Reject</button>
+        </div>
+      </div>`).join('');
+  }
+
+  // Recent products
+  const recent = products.slice(-5).reverse();
+  document.getElementById('recentProducts').innerHTML = recent.length ? `
+    <table><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th></tr></thead>
+    <tbody>${recent.map(p => `
+      <tr>
+        <td class="td-name">${p.name}</td>
+        <td>${p.category}</td>
+        <td class="td-price">${fmt(p.price)}</td>
+        <td><span class="badge ${p.stock==='In Stock'?'badge-green':p.stock==='Limited Stock'?'badge-yellow':'badge-red'}">${p.stock}</span></td>
+      </tr>`).join('')}
+    </tbody></table>` : '<div class="empty-state"><span>📦</span><p>No products yet.</p></div>';
+});
+
+async function approveReview(id) {
+  await fetch(`/api/admin/reviews/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ status:'approved' }) });
+  toast('Review approved!'); location.reload();
+}
+async function rejectReview(id) {
+  await fetch(`/api/admin/reviews/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ status:'rejected' }) });
+  toast('Review rejected.'); location.reload();
+}
+</script>
+</body>
+</html>

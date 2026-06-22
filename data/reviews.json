@@ -1,0 +1,35 @@
+[
+  {
+    "id": "rev_001",
+    "name": "Ibrahim Yusuf",
+    "phone": "08012345678",
+    "rating": 5,
+    "message": "Bought a HP EliteBook from HOK Computers and it's been working perfectly for 3 months. Fast delivery, great condition. Highly recommend!",
+    "product": "HP EliteBook 840 G9",
+    "status": "approved",
+    "verifiedBuyer": true,
+    "submittedAt": "2025-01-10T10:00:00.000Z"
+  },
+  {
+    "id": "rev_002",
+    "name": "Fatima Abdullahi",
+    "phone": "08098765432",
+    "rating": 5,
+    "message": "Got my iPhone 14 from HOK. Original product, sealed box, warranty included. Adeyemi is very trustworthy. Will buy again!",
+    "product": "iPhone 14",
+    "status": "approved",
+    "verifiedBuyer": true,
+    "submittedAt": "2025-01-12T14:00:00.000Z"
+  },
+  {
+    "id": "rev_003",
+    "name": "Musa Aliyu",
+    "phone": "07034567890",
+    "rating": 4,
+    "message": "Good experience buying my laptop. The installment plan was very helpful. Laptop works great for my studies at UNILORIN.",
+    "product": "ThinkPad X1 Carbon",
+    "status": "approved",
+    "verifiedBuyer": true,
+    "submittedAt": "2025-01-15T09:00:00.000Z"
+  }
+]

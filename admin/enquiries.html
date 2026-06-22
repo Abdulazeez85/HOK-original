@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Enquiries — HOK Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/admin/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div id="sidebar-mount"></div>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div><h1 class="page-title">Enquiries</h1><p class="page-sub">WhatsApp button clicks per product — your demand intelligence</p></div>
+    </div>
+    <div class="stats-grid" id="enquiryStats"></div>
+    <div class="card">
+      <p class="card-title">Product Demand Ranking</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Rank</th><th>Product</th><th>Total Clicks</th><th>Last Enquiry</th><th>Demand</th></tr></thead>
+          <tbody id="enquiryTable"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="emptyEnquiries" style="display:none"><span>📊</span><p>No enquiries yet. Clicks will appear here as customers interact with your products.</p></div>
+    </div>
+  </main>
+</div>
+<script src="/admin/admin.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const ok = await checkAuth(); if (!ok) return;
+  document.getElementById('sidebar-mount').innerHTML = getSidebarHTML('enquiries');
+  const res = await fetch('/api/admin/enquiries');
+  const data = await res.json();
+  const { summary, raw } = data;
+
+  document.getElementById('enquiryStats').innerHTML = `
+    <div class="stat-card accent"><div class="stat-card-icon">📊</div><div class="stat-card-num">${raw.length}</div><div class="stat-card-label">Total Clicks</div></div>
+    <div class="stat-card"><div class="stat-card-icon">📦</div><div class="stat-card-num">${summary.length}</div><div class="stat-card-label">Products Enquired</div></div>
+    <div class="stat-card accent"><div class="stat-card-icon">🔥</div><div class="stat-card-num">${summary[0]?.totalClicks || 0}</div><div class="stat-card-label">Most Clicked</div></div>`;
+
+  if (!summary.length) { document.getElementById('emptyEnquiries').style.display = 'block'; return; }
+
+  const max = summary[0]?.totalClicks || 1;
+  document.getElementById('enquiryTable').innerHTML = summary.map((p, i) => {
+    const pct = Math.round(p.totalClicks / max * 100);
+    const demand = pct > 70 ? 'High' : pct > 30 ? 'Medium' : 'Low';
+    const badgeClass = pct > 70 ? 'badge-green' : pct > 30 ? 'badge-yellow' : 'badge-red';
+    return `<tr>
+      <td style="font-weight:600;color:${i<3?'var(--accent)':'var(--text-2)'}">#${i+1}</td>
+      <td class="td-name">${p.productName}</td>
+      <td><strong style="color:var(--accent)">${p.totalClicks}</strong></td>
+      <td>${new Date(p.lastEnquiry).toLocaleDateString('en-NG')}</td>
+      <td><span class="badge ${badgeClass}">${demand}</span></td>
+    </tr>`;}).join('');
+});
+</script>
+</body>
+</html>

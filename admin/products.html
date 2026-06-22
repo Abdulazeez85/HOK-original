@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Products — HOK Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/admin/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div id="sidebar-mount"></div>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div><h1 class="page-title">Products</h1><p class="page-sub" id="productCount">Loading…</p></div>
+      <div class="topbar-actions">
+        <div class="search-bar"><input type="text" id="searchInput" placeholder="Search products…" oninput="renderTable()"/></div>
+        <button class="btn btn-accent" onclick="openModal()">+ Add Product</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Featured</th><th>New</th><th>Actions</th></tr></thead>
+          <tbody id="productsTable"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="emptyState" style="display:none"><span>📦</span><p>No products yet. Add your first product.</p></div>
+    </div>
+  </main>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-bg" id="productModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalTitle">Add Product</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="form-section">
+      <div class="form-row-2">
+        <div class="f-group"><label class="f-label">Brand *</label><input class="f-input" id="fBrand" placeholder="e.g. HP"/></div>
+        <div class="f-group"><label class="f-label">Category *</label>
+          <select class="f-select" id="fCategory"><option value="laptop">Laptop</option><option value="phone">Phone</option><option value="accessory">Accessory</option></select>
+        </div>
+      </div>
+      <div class="f-group"><label class="f-label">Product Name *</label><input class="f-input" id="fName" placeholder="e.g. HP EliteBook 840 G9"/></div>
+      <div class="form-row-2">
+        <div class="f-group"><label class="f-label">Price (₦) *</label><input class="f-input" type="number" id="fPrice" placeholder="385000"/></div>
+        <div class="f-group"><label class="f-label">Warranty</label><input class="f-input" id="fWarranty" placeholder="e.g. 6 Months"/></div>
+      </div>
+      <div class="f-group"><label class="f-label">Image URL</label><input class="f-input" id="fImage" placeholder="https://…"/></div>
+      <p style="font-size:0.75rem;color:var(--text-3);font-weight:300">Specs</p>
+      <div class="form-row-2">
+        <div class="f-group"><label class="f-label">CPU</label><input class="f-input" id="fCpu" placeholder="Intel Core i5-1235U"/></div>
+        <div class="f-group"><label class="f-label">RAM</label><input class="f-input" id="fRam" placeholder="8GB"/></div>
+      </div>
+      <div class="form-row-2">
+        <div class="f-group"><label class="f-label">Storage</label><input class="f-input" id="fStorage" placeholder="256GB SSD"/></div>
+        <div class="f-group"><label class="f-label">Display</label><input class="f-input" id="fDisplay" placeholder='14" FHD IPS'/></div>
+      </div>
+      <div class="form-row-2">
+        <div class="f-group"><label class="f-label">Condition</label>
+          <select class="f-select" id="fCondition"><option value="New">New</option><option value="UK Used">UK Used</option></select>
+        </div>
+        <div class="f-group"><label class="f-label">Stock Status</label>
+          <select class="f-select" id="fStock"><option value="In Stock">In Stock</option><option value="Limited Stock">Limited Stock</option><option value="Out of Stock">Out of Stock</option></select>
+        </div>
+      </div>
+      <div class="f-group"><label class="f-label">Badge</label>
+        <select class="f-select" id="fBadge"><option value="">None</option><option value="new">New</option><option value="hot">Hot</option><option value="used">UK Used</option></select>
+      </div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap">
+        <label class="f-checkbox"><input type="checkbox" id="fFeatured"/> Featured on Homepage</label>
+        <label class="f-checkbox"><input type="checkbox" id="fNewArrival"/> New Arrival</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-accent" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<script src="/admin/admin.js"></script>
+<script>
+let products = [];
+let editingId = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const ok = await checkAuth(); if (!ok) return;
+  document.getElementById('sidebar-mount').innerHTML = getSidebarHTML('products');
+  await loadProducts();
+});
+
+async function loadProducts() {
+  const res = await fetch('/api/admin/products');
+  products = await res.json();
+  document.getElementById('productCount').textContent = `${products.length} product${products.length !== 1 ? 's' : ''}`;
+  renderTable();
+}
+
+function renderTable() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = search ? products.filter(p => p.name.toLowerCase().includes(search) || p.brand.toLowerCase().includes(search)) : products;
+  const tbody = document.getElementById('productsTable');
+  const empty = document.getElementById('emptyState');
+  if (!filtered.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  tbody.innerHTML = filtered.map(p => `
+    <tr>
+      <td><img class="td-img" src="${p.image || 'https://via.placeholder.com/44'}" alt="${p.name}"/></td>
+      <td class="td-name">${p.name}<br/><span style="font-size:0.72rem;color:var(--text-3);font-weight:300">${p.brand}</span></td>
+      <td><span class="badge badge-blue">${p.category}</span></td>
+      <td class="td-price">${fmt(p.price)}</td>
+      <td><span class="badge ${p.stock==='In Stock'?'badge-green':p.stock==='Limited Stock'?'badge-yellow':'badge-red'}">${p.stock}</span></td>
+      <td><span style="color:${p.featured?'var(--accent)':'var(--text-3)'}">${p.featured?'✅':'—'}</span></td>
+      <td><span style="color:${p.newArrival?'var(--accent)':'var(--text-3)'}">${p.newArrival?'✅':'—'}</span></td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-sm" onclick="editProduct('${p.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}','${p.name}')">Delete</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function openModal(id = null) {
+  editingId = id;
+  document.getElementById('modalTitle').textContent = id ? 'Edit Product' : 'Add Product';
+  if (!id) {
+    ['fBrand','fName','fPrice','fWarranty','fImage','fCpu','fRam','fStorage','fDisplay'].forEach(i => document.getElementById(i).value = '');
+    document.getElementById('fCategory').value = 'laptop';
+    document.getElementById('fCondition').value = 'New';
+    document.getElementById('fStock').value = 'In Stock';
+    document.getElementById('fBadge').value = '';
+    document.getElementById('fFeatured').checked = false;
+    document.getElementById('fNewArrival').checked = false;
+  }
+  document.getElementById('productModal').classList.add('open');
+}
+
+function editProduct(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('fBrand').value = p.brand || '';
+  document.getElementById('fName').value = p.name || '';
+  document.getElementById('fPrice').value = p.price || '';
+  document.getElementById('fWarranty').value = p.warranty || '';
+  document.getElementById('fImage').value = p.image || '';
+  document.getElementById('fCategory').value = p.category || 'laptop';
+  document.getElementById('fCpu').value = p.specs?.cpu || '';
+  document.getElementById('fRam').value = p.specs?.ram || '';
+  document.getElementById('fStorage').value = p.specs?.storage || '';
+  document.getElementById('fDisplay').value = p.specs?.display || '';
+  document.getElementById('fCondition').value = p.specs?.condition || 'New';
+  document.getElementById('fStock').value = p.stock || 'In Stock';
+  document.getElementById('fBadge').value = p.badge || '';
+  document.getElementById('fFeatured').checked = p.featured || false;
+  document.getElementById('fNewArrival').checked = p.newArrival || false;
+  openModal(id);
+}
+
+function closeModal() { document.getElementById('productModal').classList.remove('open'); editingId = null; }
+
+async function saveProduct() {
+  const brand = document.getElementById('fBrand').value.trim();
+  const name = document.getElementById('fName').value.trim();
+  const price = document.getElementById('fPrice').value;
+  const category = document.getElementById('fCategory').value;
+  if (!brand || !name || !price) { toast('Brand, name and price are required.', 'error'); return; }
+
+  const payload = {
+    brand, name, price, category,
+    warranty: document.getElementById('fWarranty').value.trim() || '6 Months',
+    image: document.getElementById('fImage').value.trim(),
+    specs: {
+      cpu: document.getElementById('fCpu').value.trim(),
+      ram: document.getElementById('fRam').value.trim(),
+      storage: document.getElementById('fStorage').value.trim(),
+      display: document.getElementById('fDisplay').value.trim(),
+      condition: document.getElementById('fCondition').value
+    },
+    stock: document.getElementById('fStock').value,
+    badge: document.getElementById('fBadge').value || null,
+    featured: document.getElementById('fFeatured').checked,
+    newArrival: document.getElementById('fNewArrival').checked
+  };
+
+  const url = editingId ? `/api/admin/products/${editingId}` : '/api/admin/products';
+  const method = editingId ? 'PUT' : 'POST';
+  const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+  const data = await res.json();
+  if (data.success) {
+    toast(editingId ? 'Product updated!' : 'Product added!');
+    closeModal(); await loadProducts();
+  } else { toast('Error: ' + (data.error || 'Unknown error'), 'error'); }
+}
+
+async function deleteProduct(id, name) {
+  confirmDelete(`Delete "${name}"? This cannot be undone.`, async () => {
+    await fetch(`/api/admin/products/${id}`, { method: 'DELETE' });
+    toast('Product deleted.'); await loadProducts();
+  });
+}
+</script>
+</body>
+</html>

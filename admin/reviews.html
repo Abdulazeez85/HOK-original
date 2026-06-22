@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Reviews — HOK Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/admin/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div id="sidebar-mount"></div>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div><h1 class="page-title">Reviews</h1><p class="page-sub">Moderate customer reviews before they go live</p></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('pending',this)">Pending <span id="pendingCount" style="color:var(--warn)"></span></button>
+      <button class="tab" onclick="switchTab('approved',this)">Approved</button>
+      <button class="tab" onclick="switchTab('rejected',this)">Rejected</button>
+    </div>
+
+    <div class="card">
+      <div id="reviewsContainer"><div style="color:var(--text-2);font-size:0.82rem">Loading…</div></div>
+    </div>
+  </main>
+</div>
+
+<script src="/admin/admin.js"></script>
+<script>
+let allReviews = [];
+let activeTab = 'pending';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const ok = await checkAuth(); if (!ok) return;
+  document.getElementById('sidebar-mount').innerHTML = getSidebarHTML('reviews');
+  await loadReviews();
+});
+
+async function loadReviews() {
+  const res = await fetch('/api/admin/reviews');
+  allReviews = await res.json();
+  const pending = allReviews.filter(r => r.status === 'pending').length;
+  document.getElementById('pendingCount').textContent = pending ? `(${pending})` : '';
+  renderReviews();
+}
+
+function switchTab(tab, btn) {
+  activeTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderReviews();
+}
+
+function renderReviews() {
+  const filtered = allReviews.filter(r => r.status === activeTab);
+  const container = document.getElementById('reviewsContainer');
+  if (!filtered.length) {
+    container.innerHTML = `<div class="empty-state"><span>⭐</span><p>No ${activeTab} reviews.</p></div>`;
+    return;
+  }
+  container.innerHTML = `<div style="display:flex;flex-direction:column;gap:16px">
+    ${filtered.map(r => `
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:10px;padding:18px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:0.9rem;font-weight:600;color:var(--text-1)">${r.name}</span>
+              ${r.verifiedBuyer ? '<span class="badge badge-green">✅ Verified</span>' : ''}
+            </div>
+            <div style="font-size:0.75rem;color:var(--text-3);margin-top:2px">${r.product} · ${new Date(r.submittedAt).toLocaleDateString('en-NG')}</div>
+            <div style="color:#f59e0b;margin-top:4px">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            ${r.status === 'pending' ? `
+              <button class="btn btn-accent btn-sm" onclick="updateReview('${r.id}','approved')">✓ Approve</button>
+              <button class="btn btn-danger btn-sm" onclick="updateReview('${r.id}','rejected')">✕ Reject</button>
+            ` : ''}
+            ${r.status === 'approved' ? `
+              <button class="btn btn-ghost btn-sm" onclick="toggleVerified('${r.id}',${!r.verifiedBuyer})">${r.verifiedBuyer ? 'Unverify' : '✅ Mark Verified'}</button>
+              <button class="btn btn-danger btn-sm" onclick="updateReview('${r.id}','rejected')">Reject</button>
+            ` : ''}
+            ${r.status === 'rejected' ? `
+              <button class="btn btn-accent btn-sm" onclick="updateReview('${r.id}','approved')">Restore</button>
+            ` : ''}
+            <button class="btn btn-danger btn-sm" onclick="deleteReview('${r.id}')">Delete</button>
+          </div>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-2);margin-top:12px;line-height:1.6;font-weight:300;font-style:italic">"${r.message}"</p>
+        <div style="font-size:0.72rem;color:var(--text-3);margin-top:8px">📞 ${r.phone}</div>
+      </div>`).join('')}
+  </div>`;
+}
+
+async function updateReview(id, status) {
+  await fetch(`/api/admin/reviews/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ status }) });
+  toast(status === 'approved' ? 'Review approved!' : 'Review rejected.');
+  await loadReviews();
+}
+
+async function toggleVerified(id, val) {
+  await fetch(`/api/admin/reviews/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ verifiedBuyer: val }) });
+  toast(val ? 'Marked as verified buyer!' : 'Verified badge removed.');
+  await loadReviews();
+}
+
+async function deleteReview(id) {
+  confirmDelete('Delete this review permanently?', async () => {
+    await fetch(`/api/admin/reviews/${id}`, { method: 'DELETE' });
+    toast('Review deleted.'); await loadReviews();
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Admin Login — HOK Computers</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/admin/admin.css"/>
+  <style>
+    body{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);}
+    .login-box{background:var(--card-bg);border:1px solid var(--card-border);border-radius:16px;padding:40px;width:min(380px,94vw);}
+    .login-logo{display:flex;align-items:center;gap:10px;margin-bottom:32px;}
+    .login-logo span{font-size:1rem;font-weight:600;color:var(--text-1);}
+    .login-logo em{display:block;font-size:0.65rem;font-style:normal;color:var(--text-2);}
+    h1{font-size:1.2rem;font-weight:500;color:var(--text-1);margin-bottom:6px;}
+    p{font-size:0.82rem;color:var(--text-2);font-weight:300;margin-bottom:28px;}
+    .btn-login{width:100%;padding:11px;background:var(--accent);color:#000;border:none;border-radius:var(--r-sm);font-size:0.88rem;font-weight:600;cursor:pointer;transition:all 0.2s;margin-top:4px;}
+    .btn-login:hover{background:var(--accent-dim);}
+    .error-msg{font-size:0.78rem;color:var(--danger);margin-top:8px;display:none;}
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <div class="login-logo">
+      <svg viewBox="0 0 40 40" fill="none" width="32" height="32"><rect width="40" height="40" rx="6" fill="#0d1f14"/><path d="M10 10H16V18H24V10H30V30H24V22H16V30H10V10Z" fill="#25d466"/></svg>
+      <div><span>HOK Computers</span><em>Admin Panel</em></div>
+    </div>
+    <h1>Welcome back</h1>
+    <p>Sign in to manage your store.</p>
+    <div class="form-section">
+      <div class="f-group">
+        <label class="f-label">Username</label>
+        <input class="f-input" type="text" id="username" placeholder="Enter username" autocomplete="username"/>
+      </div>
+      <div class="f-group">
+        <label class="f-label">Password</label>
+        <input class="f-input" type="password" id="password" placeholder="Enter password" autocomplete="current-password"/>
+      </div>
+      <p class="error-msg" id="errorMsg">Invalid username or password.</p>
+      <button class="btn-login" onclick="doLogin()">Sign In</button>
+    </div>
+  </div>
+<script>
+async function doLogin() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const err = document.getElementById('errorMsg');
+  err.style.display = 'none';
+  if (!username || !password) { err.textContent = 'Please fill in all fields.'; err.style.display = 'block'; return; }
+  try {
+    const res = await fetch('/api/admin/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (data.success) window.location.href = '/admin/dashboard';
+    else { err.textContent = 'Invalid username or password.'; err.style.display = 'block'; }
+  } catch { err.textContent = 'Network error. Try again.'; err.style.display = 'block'; }
+}
+document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+</script>
+</body>
+</html>

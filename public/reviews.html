@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Reviews — HOK Computers | Ilorin, Nigeria</title>
+  <meta name="description" content="Read real customer reviews for HOK Computers in Ilorin. Verified buyers share their experience with our laptops, phones and accessories."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/styles.css"/>
+</head>
+<body>
+<div id="navbar-mount"></div>
+
+<div class="reviews-page">
+  <div class="container">
+    <div class="page-hero" style="padding:100px 0 36px;border:none;">
+      <p class="breadcrumb"><a href="/">Home</a> / Reviews</p>
+      <h1>Customer Reviews</h1>
+      <p class="page-hero-sub">Real feedback from verified HOK Computers customers across Kwara State.</p>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="reviews-summary" id="reviewsSummary">
+      <div class="loading">Loading…</div>
+    </div>
+
+    <!-- REVIEWS GRID -->
+    <div class="reviews-grid" id="reviewsGrid">
+      <div class="loading">Loading reviews…</div>
+    </div>
+
+    <!-- SUBMIT FORM -->
+    <div class="review-form-section" id="submitReview">
+      <h3>Leave a Review</h3>
+      <p>Bought from us? Share your experience and help others make better decisions.</p>
+      <div class="form-row">
+        <div class="form-group"><label>Full Name</label><input type="text" id="rvName" placeholder="Your name"/></div>
+        <div class="form-group"><label>Phone Number</label><input type="tel" id="rvPhone" placeholder="08012345678"/></div>
+      </div>
+      <div class="form-group"><label>Product Purchased</label><input type="text" id="rvProduct" placeholder="e.g. HP EliteBook 840 G9"/></div>
+      <div class="form-group">
+        <label>Your Rating</label>
+        <div class="star-picker" id="starPicker">
+          <button class="star-btn" data-val="1" onclick="setRating(1)">★</button>
+          <button class="star-btn" data-val="2" onclick="setRating(2)">★</button>
+          <button class="star-btn" data-val="3" onclick="setRating(3)">★</button>
+          <button class="star-btn" data-val="4" onclick="setRating(4)">★</button>
+          <button class="star-btn" data-val="5" onclick="setRating(5)">★</button>
+        </div>
+      </div>
+      <div class="form-group"><label>Your Review</label><textarea id="rvMessage" rows="4" placeholder="Share your honest experience…"></textarea></div>
+      <button class="btn-primary" style="border:none;cursor:pointer" onclick="submitReview()">Submit Review</button>
+    </div>
+  </div>
+</div>
+
+<div id="footer-mount"></div>
+<div id="modals-mount"></div>
+
+<script src="/app.js"></script>
+<script>
+let selectedRating = 0;
+
+function setRating(val) {
+  selectedRating = val;
+  document.querySelectorAll('.star-btn').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.val) <= val);
+  });
+}
+
+async function submitReview() {
+  const name = document.getElementById('rvName').value.trim();
+  const phone = document.getElementById('rvPhone').value.trim();
+  const product = document.getElementById('rvProduct').value.trim();
+  const message = document.getElementById('rvMessage').value.trim();
+  if (!name || !phone || !product || !message || !selectedRating) {
+    showToast('Please fill in all fields and select a rating.'); return;
+  }
+  try {
+    const res = await fetch('/api/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, phone, product, message, rating: selectedRating })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('✅ Review submitted! Pending approval.');
+      ['rvName','rvPhone','rvProduct','rvMessage'].forEach(id => document.getElementById(id).value = '');
+      selectedRating = 0;
+      document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('active'));
+    } else { showToast('Something went wrong. Try again.'); }
+  } catch { showToast('Network error. Try again.'); }
+}
+
+function renderSummary(reviews) {
+  const total = reviews.length;
+  if (!total) {
+    document.getElementById('reviewsSummary').innerHTML = '<p style="color:var(--text-2);padding:20px">No reviews yet. Be the first!</p>';
+    return;
+  }
+  const avg = (reviews.reduce((s,r) => s + r.rating, 0) / total).toFixed(1);
+  const counts = [5,4,3,2,1].map(n => ({ n, c: reviews.filter(r => r.rating === n).length }));
+  document.getElementById('reviewsSummary').innerHTML = `
+    <div class="rating-big">
+      <div class="rating-number">${avg}</div>
+      <div class="rating-stars">${'★'.repeat(Math.round(avg))}${'☆'.repeat(5-Math.round(avg))}</div>
+      <div class="rating-count">${total} review${total !== 1 ? 's' : ''}</div>
+    </div>
+    <div class="rating-bars">
+      ${counts.map(({n,c}) => `
+        <div class="rating-bar-row">
+          <span>${n}★</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${total ? (c/total*100) : 0}%"></div></div>
+          <span class="bar-count">${c}</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderReviews(reviews) {
+  if (!reviews.length) {
+    document.getElementById('reviewsGrid').innerHTML = '<p style="color:var(--text-2);padding:20px 0">No approved reviews yet.</p>';
+    return;
+  }
+  document.getElementById('reviewsGrid').innerHTML = reviews.map(r => `
+    <div class="review-card reveal">
+      <div class="rc-header">
+        <div class="rc-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+        <div class="rc-date">${new Date(r.submittedAt).toLocaleDateString('en-NG', {day:'numeric',month:'short',year:'numeric'})}</div>
+      </div>
+      <p class="rc-text">"${r.message}"</p>
+      <div class="rc-footer">
+        <div>
+          <div class="rc-name">${r.name}</div>
+          <div class="rc-product">${r.product}</div>
+        </div>
+        ${r.verifiedBuyer ? '<span class="verified-badge">✅ Verified Buyer</span>' : ''}
+      </div>
+    </div>`).join('');
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById('navbar-mount').innerHTML = getNavHTML('reviews');
+  document.getElementById('footer-mount').innerHTML = getFooterHTML();
+  document.getElementById('modals-mount').innerHTML = getCartDrawerHTML() + getModalsHTML();
+  await loadSettings();
+  initCommon();
+
+  const res = await fetch('/api/reviews/approved');
+  const reviews = await res.json();
+  renderSummary(reviews);
+  renderReviews(reviews);
+  initScrollReveal();
+});
+</script>
+</body>
+</html>

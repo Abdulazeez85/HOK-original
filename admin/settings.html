@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Settings — HOK Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/admin/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div id="sidebar-mount"></div>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div><h1 class="page-title">Settings</h1><p class="page-sub">Update your business information — changes reflect on the live site</p></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+      <!-- Business Info -->
+      <div class="card">
+        <p class="card-title">Business Information</p>
+        <div class="form-section">
+          <div class="f-group"><label class="f-label">Business Name</label><input class="f-input" id="sName" placeholder="HOK Computers"/></div>
+          <div class="f-group"><label class="f-label">WhatsApp Number</label><input class="f-input" id="sWhatsapp" placeholder="2348000000000"/><span style="font-size:0.72rem;color:var(--text-3);margin-top:3px">Include country code, no + or spaces</span></div>
+          <div class="f-group"><label class="f-label">Email</label><input class="f-input" id="sEmail" placeholder="info@hokcomputers.com"/></div>
+          <div class="f-group"><label class="f-label">Business Hours</label><input class="f-input" id="sHours" placeholder="Monday - Saturday, 9AM - 6PM"/></div>
+          <div class="f-group"><label class="f-label">Location</label><input class="f-input" id="sLocation" placeholder="Ilorin, Kwara State, Nigeria"/></div>
+          <button class="btn btn-accent" onclick="saveSettings()">Save Changes</button>
+        </div>
+      </div>
+
+      <!-- Delivery Info -->
+      <div class="card">
+        <p class="card-title">Delivery Information</p>
+        <div class="form-section">
+          <div class="f-group"><label class="f-label">Local (Ilorin)</label><input class="f-input" id="sDeliveryLocal" placeholder="Ilorin — Same Day"/></div>
+          <div class="f-group"><label class="f-label">State-wide</label><input class="f-input" id="sDeliveryState" placeholder="Other Kwara — Next Day"/></div>
+          <div class="f-group"><label class="f-label">National</label><input class="f-input" id="sDeliveryNational" placeholder="Outside Kwara — 2-3 Days"/></div>
+          <button class="btn btn-accent" onclick="saveSettings()">Save Changes</button>
+        </div>
+
+        <!-- Quick Links -->
+        <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border)">
+          <p class="card-title">Quick Actions</p>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <a href="/" target="_blank" class="btn btn-ghost" style="justify-content:flex-start">🌐 View Live Site</a>
+            <a href="/products" target="_blank" class="btn btn-ghost" style="justify-content:flex-start">🖥️ View Products Page</a>
+            <a href="/reviews" target="_blank" class="btn btn-ghost" style="justify-content:flex-start">⭐ View Reviews Page</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="/admin/admin.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const ok = await checkAuth(); if (!ok) return;
+  document.getElementById('sidebar-mount').innerHTML = getSidebarHTML('settings');
+  const res = await fetch('/api/admin/settings');
+  const s = await res.json();
+  document.getElementById('sName').value = s.businessName || '';
+  document.getElementById('sWhatsapp').value = s.whatsappNumber || '';
+  document.getElementById('sEmail').value = s.businessEmail || '';
+  document.getElementById('sHours').value = s.businessHours || '';
+  document.getElementById('sLocation').value = s.location || '';
+  document.getElementById('sDeliveryLocal').value = s.delivery?.local || '';
+  document.getElementById('sDeliveryState').value = s.delivery?.state || '';
+  document.getElementById('sDeliveryNational').value = s.delivery?.national || '';
+});
+
+async function saveSettings() {
+  const payload = {
+    businessName: document.getElementById('sName').value.trim(),
+    whatsappNumber: document.getElementById('sWhatsapp').value.trim(),
+    businessEmail: document.getElementById('sEmail').value.trim(),
+    businessHours: document.getElementById('sHours').value.trim(),
+    location: document.getElementById('sLocation').value.trim(),
+    delivery: {
+      local: document.getElementById('sDeliveryLocal').value.trim(),
+      state: document.getElementById('sDeliveryState').value.trim(),
+      national: document.getElementById('sDeliveryNational').value.trim()
+    }
+  };
+  const res = await fetch('/api/admin/settings', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+  const data = await res.json();
+  if (data.success) toast('Settings saved successfully!');
+  else toast('Error saving settings.', 'error');
+}
+</script>
+</body>
+</html>

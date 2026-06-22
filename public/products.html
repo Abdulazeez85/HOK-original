@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Products — HOK Computers | Laptops & Phones in Ilorin</title>
+  <meta name="description" content="Shop laptops, phones and accessories in Ilorin. HP, Dell, Lenovo, Apple — new and UK-used. Filter by price, RAM, storage."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/styles.css"/>
+</head>
+<body>
+<div id="navbar-mount"></div>
+
+<div class="page-hero">
+  <div class="container">
+    <p class="breadcrumb"><a href="/">Home</a> / Products</p>
+    <h1>Laptops, Phones & Accessories</h1>
+    <p class="page-hero-sub">All verified. All priced in Naira. WhatsApp ordering available.</p>
+  </div>
+</div>
+
+<div class="products-page">
+  <div class="container products-layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-section">
+        <h4>Category</h4>
+        <label class="radio-label"><input type="radio" name="cat" value="all" checked onchange="applyFilters()"> All Products</label>
+        <label class="radio-label"><input type="radio" name="cat" value="laptop" onchange="applyFilters()"> Laptops</label>
+        <label class="radio-label"><input type="radio" name="cat" value="phone" onchange="applyFilters()"> Phones</label>
+        <label class="radio-label"><input type="radio" name="cat" value="accessory" onchange="applyFilters()"> Accessories</label>
+      </div>
+      <div class="sidebar-section">
+        <h4>Condition</h4>
+        <label class="radio-label"><input type="radio" name="cond" value="" checked onchange="applyFilters()"> Any</label>
+        <label class="radio-label"><input type="radio" name="cond" value="New" onchange="applyFilters()"> New</label>
+        <label class="radio-label"><input type="radio" name="cond" value="UK Used" onchange="applyFilters()"> UK Used</label>
+      </div>
+      <div class="sidebar-section">
+        <h4>RAM</h4>
+        <label class="radio-label"><input type="radio" name="ram" value="" checked onchange="applyFilters()"> Any</label>
+        <label class="radio-label"><input type="radio" name="ram" value="8GB" onchange="applyFilters()"> 8GB</label>
+        <label class="radio-label"><input type="radio" name="ram" value="16GB" onchange="applyFilters()"> 16GB</label>
+        <label class="radio-label"><input type="radio" name="ram" value="32GB" onchange="applyFilters()"> 32GB</label>
+      </div>
+      <div class="sidebar-section">
+        <h4>Storage</h4>
+        <label class="radio-label"><input type="radio" name="stor" value="" checked onchange="applyFilters()"> Any</label>
+        <label class="radio-label"><input type="radio" name="stor" value="256GB" onchange="applyFilters()"> 256GB</label>
+        <label class="radio-label"><input type="radio" name="stor" value="512GB" onchange="applyFilters()"> 512GB</label>
+        <label class="radio-label"><input type="radio" name="stor" value="1TB" onchange="applyFilters()"> 1TB</label>
+      </div>
+      <div class="sidebar-section">
+        <h4>Max Price: <span id="priceVal">₦1,000,000</span></h4>
+        <input type="range" id="priceRange" min="20000" max="1000000" step="10000" value="1000000" oninput="onPrice(this.value)"/>
+      </div>
+      <button class="btn-reset" onclick="resetFilters()">Clear All Filters</button>
+    </aside>
+
+    <main class="products-main">
+      <div class="products-toolbar">
+        <div class="search-field">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="searchInput" placeholder="Search products, brands, specs…" oninput="applyFilters()" autocomplete="off"/>
+        </div>
+        <div class="toolbar-right">
+          <span class="result-count" id="resultCount"></span>
+          <select id="sortSelect" class="sort-select" onchange="applyFilters()">
+            <option value="default">Sort: Default</option>
+            <option value="price-asc">Price: Low → High</option>
+            <option value="price-desc">Price: High → Low</option>
+          </select>
+          <button class="filter-toggle-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">⚙ Filters</button>
+        </div>
+      </div>
+      <div class="products-grid" id="productsGrid"><div class="loading">Loading products…</div></div>
+      <div class="no-results" id="noResults" style="display:none">
+        <p>No products found for your filters.</p>
+        <button onclick="resetFilters()">Clear Filters</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div id="footer-mount"></div>
+<div id="modals-mount"></div>
+
+<script src="/app.js"></script>
+<script>
+let allProducts = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById('navbar-mount').innerHTML = getNavHTML('products');
+  document.getElementById('footer-mount').innerHTML = getFooterHTML();
+  document.getElementById('modals-mount').innerHTML = getCartDrawerHTML() + getModalsHTML();
+  await loadSettings();
+  initCommon();
+
+  // Read URL param
+  const cat = new URLSearchParams(window.location.search).get('cat');
+  if (cat) {
+    const r = document.querySelector(`input[name="cat"][value="${cat}"]`);
+    if (r) r.checked = true;
+  }
+
+  const res = await fetch('/api/products');
+  allProducts = await res.json();
+  _allProducts = allProducts;
+  applyFilters();
+});
+
+function onPrice(val) {
+  document.getElementById('priceVal').textContent = '₦' + parseInt(val).toLocaleString('en-NG');
+  applyFilters();
+}
+
+function applyFilters() {
+  const cat = document.querySelector('input[name="cat"]:checked')?.value || 'all';
+  const cond = document.querySelector('input[name="cond"]:checked')?.value || '';
+  const ram = document.querySelector('input[name="ram"]:checked')?.value || '';
+  const stor = document.querySelector('input[name="stor"]:checked')?.value || '';
+  const maxPrice = parseInt(document.getElementById('priceRange').value);
+  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  const sort = document.getElementById('sortSelect').value;
+
+  let result = [...allProducts];
+  if (cat !== 'all') result = result.filter(p => p.category === cat);
+  if (cond) result = result.filter(p => p.specs?.condition === cond);
+  if (ram) result = result.filter(p => p.specs?.ram === ram);
+  if (stor) result = result.filter(p => p.specs?.storage?.includes(stor));
+  result = result.filter(p => p.price <= maxPrice);
+  if (search) result = result.filter(p =>
+    p.name.toLowerCase().includes(search) ||
+    p.brand.toLowerCase().includes(search) ||
+    Object.values(p.specs || {}).some(v => String(v).toLowerCase().includes(search))
+  );
+  if (sort === 'price-asc') result.sort((a,b) => a.price - b.price);
+  if (sort === 'price-desc') result.sort((a,b) => b.price - a.price);
+
+  const grid = document.getElementById('productsGrid');
+  const noRes = document.getElementById('noResults');
+  document.getElementById('resultCount').textContent = `${result.length} product${result.length !== 1 ? 's' : ''}`;
+
+  if (!result.length) { grid.innerHTML = ''; noRes.style.display = 'block'; return; }
+  noRes.style.display = 'none';
+  grid.innerHTML = result.map((p,i) => buildCard(p,i)).join('');
+  requestAnimationFrame(() => grid.querySelectorAll('.reveal').forEach(el => el.classList.add('visible')));
+}
+
+function resetFilters() {
+  document.querySelector('input[name="cat"][value="all"]').checked = true;
+  document.querySelector('input[name="cond"][value=""]').checked = true;
+  document.querySelector('input[name="ram"][value=""]').checked = true;
+  document.querySelector('input[name="stor"][value=""]').checked = true;
+  document.getElementById('priceRange').value = 1000000;
+  document.getElementById('priceVal').textContent = '₦1,000,000';
+  document.getElementById('searchInput').value = '';
+  document.getElementById('sortSelect').value = 'default';
+  applyFilters();
+}
+</script>
+</body>
+</html>

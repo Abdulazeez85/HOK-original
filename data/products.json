@@ -1,0 +1,197 @@
+[
+  {
+    "id": "prod_001",
+    "brand": "HP",
+    "category": "laptop",
+    "name": "Elitebook 840 G6",
+    "price": 485000,
+    "image": "https://res.cloudinary.com/da7jzmy2g/image/upload/v1780627919/840_G6_gxjryc.jpg",
+    "specs": {
+      "cpu": "Intel Core i5",
+      "ram": "16GB",
+      "storage": "256GB SSD",
+      "display": "14\" Liquid Retina XDR",
+      "condition": "UK Used"
+    },
+    "warranty": "1 Year",
+    "stock": "Limited Stock",
+    "badge": "hot",
+    "featured": true,
+    "newArrival": true,
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2026-06-22T18:56:04.121Z"
+  },
+  {
+    "id": "prod_002",
+    "brand": "HP",
+    "category": "laptop",
+    "name": "HP Revolve 810 G2",
+    "price": 250000,
+    "image": "https://res.cloudinary.com/da7jzmy2g/image/upload/v1780628167/hp_revolve_seebqb.jpg",
+    "specs": {
+      "cpu": "Intel Core i7-12700H",
+      "ram": "8GB",
+      "storage": "256GB SSD",
+      "display": "15.6\" OLED Touch",
+      "condition": "UK Used"
+    },
+    "warranty": "1 Year",
+    "stock": "Limited Stock",
+    "badge": "hot",
+    "featured": true,
+    "newArrival": true,
+    "createdAt": "2025-01-02T00:00:00.000Z",
+    "updatedAt": "2026-06-22T19:00:11.646Z"
+  },
+  {
+    "id": "prod_003",
+    "brand": "HP",
+    "category": "laptop",
+    "name": "HP EliteBook 840 G3",
+    "price": 265000,
+    "image": "https://res.cloudinary.com/da7jzmy2g/image/upload/v1780628496/G3_l5acuq.jpg",
+    "specs": {
+      "cpu": "Intel Core i5-1235U",
+      "ram": "8GB",
+      "storage": "256GB SSD",
+      "display": "14\" FHD IPS",
+      "condition": "UK Used"
+    },
+    "warranty": "1 Year",
+    "stock": "Limited Stock",
+    "badge": "used",
+    "featured": true,
+    "newArrival": false,
+    "createdAt": "2025-01-03T00:00:00.000Z",
+    "updatedAt": "2026-06-22T19:03:15.201Z"
+  },
+  {
+    "id": "prod_004",
+    "brand": "Lenovo",
+    "category": "laptop",
+    "name": "Ideapad",
+    "price": 220000,
+    "image": "https://res.cloudinary.com/da7jzmy2g/image/upload/v1780660911/lenovo_eowxmr.jpg",
+    "specs": {
+      "cpu": "Intel Core i5-1255U",
+      "ram": "4GB",
+      "storage": "128GB SSD",
+      "display": "14\" 2K IPS",
+      "condition": "UK Used"
+    },
+    "warranty": "6 Months",
+    "stock": "Limited Stock",
+    "badge": "used",
+    "featured": true,
+    "newArrival": false,
+    "createdAt": "2025-01-04T00:00:00.000Z",
+    "updatedAt": "2026-06-22T19:12:55.340Z"
+  },
+  {
+    "id": "prod_005",
+    "brand": "Apple",
+    "category": "phone",
+    "name": "iPhone 12 Pro Max",
+    "price": 500000,
+    "image": "https://res.cloudinary.com/da7jzmy2g/image/upload/v1780662136/iphone_12_pro_max_fplaha.jpg",
+    "specs": {
+      "cpu": "",
+      "ram": "",
+      "storage": "",
+      "display": "6.7\" Super Retina XDR",
+      "condition": "New"
+    },
+    "warranty": "1 Year",
+    "stock": "Limited Stock",
+    "badge": "hot",
+    "featured": true,
+    "newArrival": true,
+    "createdAt": "2025-01-05T00:00:00.000Z",
+    "updatedAt": "2026-06-22T19:17:21.486Z"
+  },
+  {
+    "id": "prod_006",
+    "brand": "Samsung",
+    "category": "phone",
+    "name": "Galaxy S8 Plus",
+    "price": 90000,
+    "image": "https://res.cloudinary.com/da7jzmy2g/image/upload/v1780661647/S8PLUS_p7qxhp.jpg",
+    "specs": {
+      "cpu": "",
+      "ram": "4GB",
+      "storage": "64GB",
+      "display": "",
+      "condition": "New"
+    },
+    "warranty": "1 Year",
+    "stock": "Limited Stock",
+    "badge": "new",
+    "featured": true,
+    "newArrival": true,
+    "createdAt": "2025-01-06T00:00:00.000Z",
+    "updatedAt": "2026-06-22T19:19:26.281Z"
+  },
+  {
+    "id": "prod_41c66d10",
+    "brand": "HP",
+    "category": "laptop",
+    "name": "HP Probook 11 G1",
+    "price": 165000,
+    "image": "https://res.cloudinary.com/da7jzmy2g/image/upload/v1780660797/11g1_vkurk0.jpg",
+    "specs": {
+      "cpu": "Intel pentium",
+      "ram": "8GB",
+      "storage": "128GB SSD",
+      "display": "",
+      "condition": "New"
+    },
+    "warranty": "1 Year",
+    "stock": "Limited Stock",
+    "badge": "hot",
+    "featured": false,
+    "newArrival": false,
+    "createdAt": "2026-06-22T19:08:51.761Z"
+  },
+  {
+    "id": "prod_f41c8a22",
+    "brand": "Apple",
+    "category": "laptop",
+    "name": "MacBook pro 2017",
+    "price": 450000,
+    "image": "https://res.cloudinary.com/da7jzmy2g/image/upload/v1780661922/macbook_pro_2017_leczzp.jpg",
+    "specs": {
+      "cpu": "Apple A15 Bionic",
+      "ram": "8GB",
+      "storage": "256GB SSD",
+      "display": "",
+      "condition": "New"
+    },
+    "warranty": "1 Year",
+    "stock": "Limited Stock",
+    "badge": "used",
+    "featured": false,
+    "newArrival": false,
+    "createdAt": "2026-06-22T19:15:51.154Z"
+  },
+  {
+    "id": "prod_1755418b",
+    "brand": "HP",
+    "category": "laptop",
+    "name": "Elitebook 840 G6",
+    "price": 222,
+    "image": "",
+    "specs": {
+      "cpu": "",
+      "ram": "",
+      "storage": "",
+      "display": "",
+      "condition": "New"
+    },
+    "warranty": "6 Months",
+    "stock": "In Stock",
+    "badge": null,
+    "featured": false,
+    "newArrival": false,
+    "createdAt": "2026-06-22T19:23:27.815Z"
+  }
+]

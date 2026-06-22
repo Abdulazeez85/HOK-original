@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Page Not Found — HOK Computers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/styles.css"/>
+</head>
+<body>
+<div id="navbar-mount"></div>
+<div style="min-height:80vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px 24px">
+  <div>
+    <div style="font-size:5rem;margin-bottom:20px">📦</div>
+    <p class="eyebrow">404 Error</p>
+    <h1 style="font-size:2rem;font-weight:300;letter-spacing:-1px;color:var(--text-1);margin-bottom:12px">Page Not Found</h1>
+    <p style="color:var(--text-2);font-size:0.9rem;margin-bottom:32px;font-weight:300">The page you're looking for doesn't exist or has been moved.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a href="/" class="btn-primary">Go Home</a>
+      <a href="/products" class="btn-ghost">Browse Products</a>
+    </div>
+  </div>
+</div>
+<div id="footer-mount"></div>
+<script src="/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById('navbar-mount').innerHTML = getNavHTML('');
+  document.getElementById('footer-mount').innerHTML = getFooterHTML();
+  await loadSettings(); initCommon();
+});
+</script>
+</body>
+</html>
