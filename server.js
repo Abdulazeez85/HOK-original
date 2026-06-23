@@ -13,7 +13,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ── MIDDLEWARE ────────────────────────────────────────────
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({ origin: true, credentials: true ,methods: ['GET', 'POST', 'PUT', 'DELETE'] ,allowedHeaders: ['Content-Type', 'Authorization'] }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -22,7 +22,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'hok_fallback_secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
+  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 ,httpOnly: true ,sameSite: 'lax'}
 }));
 
 // ── FILE HELPERS ──────────────────────────────────────────

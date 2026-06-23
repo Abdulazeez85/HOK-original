@@ -49,8 +49,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('sidebar-mount').innerHTML = getSidebarHTML('dashboard');
 
   const [statsRes, reviewsRes, productsRes, enquiriesRes] = await Promise.all([
-    fetch('/api/admin/stats'), fetch('/api/admin/reviews'),
-    fetch('/api/admin/products'), fetch('/api/admin/enquiries')
+    adminFetch('/api/adminstats'), adminFetch('/api/adminreviews'),
+    adminFetch('/api/adminproducts'), adminFetch('/api/adminenquiries')
   ]);
   const stats = await statsRes.json();
   const reviews = await reviewsRes.json();

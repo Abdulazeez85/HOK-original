@@ -31,7 +31,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const ok = await checkAuth(); if (!ok) return;
   document.getElementById('sidebar-mount').innerHTML = getSidebarHTML('enquiries');
-  const res = await fetch('/api/admin/enquiries');
+  const res = await adminFetch('/api/adminenquiries');
   const data = await res.json();
   const { summary, raw } = data;
 

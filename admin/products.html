@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadProducts() {
-  const res = await fetch('/api/admin/products');
+  const res = await adminFetch('/api/adminproducts');
   products = await res.json();
   document.getElementById('productCount').textContent = `${products.length} product${products.length !== 1 ? 's' : ''}`;
   renderTable();

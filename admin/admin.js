@@ -1,11 +1,13 @@
 'use strict';
 
 const fmt = n => '₦' + parseInt(n).toLocaleString('en-NG');
+// Wrap all admin fetches to always include credentials
+const adminFetch = (url, options = {}) => fetch(url, { ...options, credentials: 'include', headers: { 'Content-Type': 'application/json', ...(options.headers || {}) } });
 
 // ── AUTH CHECK ────────────────────────────────────────────
 async function checkAuth() {
   try {
-    const res = await fetch('/api/admin/check');
+    const res = await adminadminFetch('/api/admincheck');
     if (!res.ok) { window.location.href = '/admin'; return false; }
     return true;
   } catch { window.location.href = '/admin'; return false; }
@@ -22,7 +24,7 @@ function toast(msg, type = 'success') {
 
 // ── LOGOUT ────────────────────────────────────────────────
 async function logout() {
-  await fetch('/api/admin/logout', { method: 'POST' });
+  await adminFetch('/api/adminlogout', { method: 'POST' });
   window.location.href = '/admin';
 }
 

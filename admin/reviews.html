@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadReviews() {
-  const res = await fetch('/api/admin/reviews');
+  const res = await adminFetch('/api/adminreviews');
   allReviews = await res.json();
   const pending = allReviews.filter(r => r.status === 'pending').length;
   document.getElementById('pendingCount').textContent = pending ? `(${pending})` : '';

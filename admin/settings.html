@@ -56,7 +56,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const ok = await checkAuth(); if (!ok) return;
   document.getElementById('sidebar-mount').innerHTML = getSidebarHTML('settings');
-  const res = await fetch('/api/admin/settings');
+  const res = await adminFetch('/api/adminsettings');
   const s = await res.json();
   document.getElementById('sName').value = s.businessName || '';
   document.getElementById('sWhatsapp').value = s.whatsappNumber || '';
@@ -81,7 +81,7 @@ async function saveSettings() {
       national: document.getElementById('sDeliveryNational').value.trim()
     }
   };
-  const res = await fetch('/api/admin/settings', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+  const res = await adminFetch('/api/adminsettings', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
   const data = await res.json();
   if (data.success) toast('Settings saved successfully!');
   else toast('Error saving settings.', 'error');

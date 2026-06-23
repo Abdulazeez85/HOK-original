@@ -47,8 +47,8 @@ async function doLogin() {
   err.style.display = 'none';
   if (!username || !password) { err.textContent = 'Please fill in all fields.'; err.style.display = 'block'; return; }
   try {
-    const res = await fetch('/api/admin/login', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+    const res = await fetch('/api/adminlogin', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
       body: JSON.stringify({ username, password })
     });
     const data = await res.json();

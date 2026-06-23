@@ -174,11 +174,11 @@
     "createdAt": "2026-06-22T19:15:51.154Z"
   },
   {
-    "id": "prod_1755418b",
+    "id": "prod_4022ea1b",
     "brand": "HP",
     "category": "laptop",
     "name": "Elitebook 840 G6",
-    "price": 222,
+    "price": 6666,
     "image": "",
     "specs": {
       "cpu": "",
@@ -192,6 +192,6 @@
     "badge": null,
     "featured": false,
     "newArrival": false,
-    "createdAt": "2026-06-22T19:23:27.815Z"
+    "createdAt": "2026-06-22T19:30:31.980Z"
   }
 ]
