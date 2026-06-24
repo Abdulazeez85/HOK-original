@@ -1,21 +1,21 @@
 [
   {
     "id": "rev_001",
-    "name": "Ibrahim Yusuf",
-    "phone": "08012345678",
+    "name": "Adesina Abdurraheem",
+    "phone": "",
     "rating": 5,
-    "message": "Bought a HP EliteBook from HOK Computers and it's been working perfectly for 3 months. Fast delivery, great condition. Highly recommend!",
-    "product": "HP EliteBook 840 G9",
+    "message": "Baraka Llahu feekum! Everything I can say about Home of Khayr Computer is Ma sha Allah! Especially timeliness, it's a so swift and topnotch. I really got what I ordered for. May Allah subhaanahu-wa-ta'lla continue bless their business.",
+    "product": "",
     "status": "approved",
     "verifiedBuyer": true,
     "submittedAt": "2025-01-10T10:00:00.000Z"
   },
   {
     "id": "rev_002",
-    "name": "Fatima Abdullahi",
-    "phone": "08098765432",
+    "name": "Ibrahim Jamiu Akeem ",
+    "phone": "",
     "rating": 5,
-    "message": "Got my iPhone 14 from HOK. Original product, sealed box, warranty included. Adeyemi is very trustworthy. Will buy again!",
+    "message": "Baraka Llahu feekum! Everything I can say about Home of Khayr Computer is Ma sha Allah! Especially timeliness, it's a so swift and topnotch. I really got what I ordered for. May Allah subhaanahu-wa-ta'lla continue bless their business.",
     "product": "iPhone 14",
     "status": "approved",
     "verifiedBuyer": true,
@@ -23,13 +23,24 @@
   },
   {
     "id": "rev_003",
-    "name": "Musa Aliyu",
-    "phone": "07034567890",
+    "name": "Taiye Zubair ",
+    "phone": "",
     "rating": 4,
-    "message": "Good experience buying my laptop. The installment plan was very helpful. Laptop works great for my studies at UNILORIN.",
-    "product": "ThinkPad X1 Carbon",
+    "message": "Hok computers is trustworthy, because I paid in installment for almost three months, and as I completed the payment they delivered the system to me.The system is neat and the battery is durable plus free delivery ",
+    "product": "DELL",
     "status": "approved",
     "verifiedBuyer": true,
     "submittedAt": "2025-01-15T09:00:00.000Z"
+  },
+  {
+    "id": "rev_02e2912c",
+    "name": "szfdghjk",
+    "phone": "1234567",
+    "rating": 5,
+    "message": "xxfcgvhbjnkm",
+    "product": "dfghj",
+    "status": "pending",
+    "verifiedBuyer": false,
+    "submittedAt": "2026-06-23T18:35:42.601Z"
   }
 ]

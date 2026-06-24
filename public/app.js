@@ -2,7 +2,7 @@
 
 // ── CONFIG ────────────────────────────────────────────────
 const API = '';  // empty = same origin
-const WA_NUM = '2348000000000'; // updated dynamically from settings
+const WA_NUM = '2348114550145'; // updated dynamically from settings
 
 // ── UTILS ─────────────────────────────────────────────────
 const fmt = n => '₦' + parseInt(n).toLocaleString('en-NG');
@@ -414,28 +414,41 @@ function getModalsHTML() {
 function getFooterHTML() {
   return `
     <footer class="footer">
-      <div class="container">
-        <div class="footer-top">
-          <div class="footer-brand">
-            <div class="footer-logo">
-              <svg viewBox="0 0 40 40" fill="none" width="30" height="30"><rect width="40" height="40" rx="6" fill="#0d1f14"/><path d="M10 10H16V18H24V10H30V30H24V22H16V30H10V10Z" fill="#25d466"/></svg>
-              <span>HOK Computers</span>
-            </div>
-            <p>Home of Khayr — Ilorin's premier tech store. CAC Registered since 2020.</p>
-            <div class="socials"><a href="#" title="Instagram">📸</a><a href="#" title="Facebook">📘</a><a href="#" title="Twitter">🐦</a><a href="https://wa.me/2348000000000" title="WhatsApp">💬</a></div>
-          </div>
-          <div class="footer-cols">
-            <div class="footer-col"><h5>Products</h5><a href="/products?cat=laptop">Laptops</a><a href="/products?cat=phone">Phones</a><a href="/products?cat=accessory">Accessories</a></div>
-            <div class="footer-col"><h5>Services</h5><a href="/#services">Repairs</a><a href="/#services">Software</a><a href="/#services">Web Dev</a></div>
-            <div class="footer-col"><h5>Company</h5><a href="/about">About HOK</a><a href="/#contact">Contact</a><a href="https://wa.me/2348000000000">WhatsApp</a></div>
-          </div>
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <img src="https://res.cloudinary.com/da7jzmy2g/image/upload/v1780626286/hokp_lzhjha.jpg" alt="HOK logo" class="logo-img" width="32" height="32" border-radius="50%">
+          <span>HOK Computers</span>
         </div>
-        <div class="footer-bottom">
-          <p>© 2025 HOK Computers. Ilorin, Kwara State, Nigeria.</p>
-          <p>Built by <a href="https://wa.me/2348000000000">The Quantum Developer</a></p>
+        <p>Home of Khayr — Ilorin's premier tech store. CAC Registered since 2020.</p>
+        <div class="socials">
+          <a href="https://web.facebook.com/homeofkhayr/?_rdc=1&_rdr#" aria-label="Facebook" target="_blank" rel="noreferrer noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12a10 10 0 10-11.5 9.9v-7H8.5v-2.9h2v-2.2c0-2 1.2-3.1 3-3.1.9 0 1.8.1 1.8.1v2h-1c-1 0-1.3.6-1.3 1.2v1.7h2.3l-.4 2.9h-1.9v7A10 10 0 0022 12z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/hokcomputers/" aria-label="Instagram" target="_blank" rel="noreferrer noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M16.5 7.5h.01"/><path d="M7.5 7.5h9v9h-9z"/></svg>
+          </a>
+          <a href="https://ng.linkedin.com/company/home-of-khayr" aria-label="LinkedIn" target="_blank" rel="noreferrer noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5A2.5 2.5 0 002.5 6v12a2.5 2.5 0 002.48 2.5h.02A2.5 2.5 0 007.5 18V6a2.5 2.5 0 00-2.52-2.5zM4.5 8.75h1.5V18H4.5V8.75zm4.5 0H10.5v1.35c.2-.35.8-.88 1.75-.88 1.85 0 2.25 1.22 2.25 2.8V18H13.5v-4.75c0-1.14-.02-2.6-1.6-2.6-1.6 0-1.85 1.26-1.85 2.54V18H9V8.75zM5.25 4.5h1.5v1.25h-1.5V4.5z"/></svg>
+          </a>
+          <a href="https://wa.me/2348114550145" aria-label="WhatsApp" target="_blank" rel="noreferrer noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 3.5A10.5 10.5 0 003.99 20.16L2 22l1.84-1.19A10.5 10.5 0 1020.5 3.5zm-8.1 15.2a8.7 8.7 0 01-4.66-1.36l-.33-.2-2.76.71.74-2.69-.21-.34A8.7 8.7 0 1112.4 18.7zm3.63-4.85c-.2-.1-1.15-.57-1.32-.64-.18-.08-.31-.12-.44.1-.13.22-.5.64-.61.77-.12.13-.24.14-.45.05-.2-.1-.84-.31-1.6-.99-.59-.52-.98-1.16-1.1-1.38-.12-.22-.01-.34.09-.45.09-.1.2-.23.3-.34.1-.12.14-.2.21-.34.08-.13.04-.24-.02-.34-.07-.1-.5-.98-.69-1.35-.18-.36-.35-.31-.48-.32-.13-.01-.28-.01-.43-.01-.15 0-.34.07-.52.33-.18.26-.7.89-.7 2.16 0 1.27.58 2.04.66 2.18.08.14 1.4 2.14 3.4 2.99.47.2.86.31 1.15.4.48.15.9.13 1.24.08.38-.06 1.15-.44 1.31-.94.15-.5.15-.93.11-1.02-.05-.09-.19-.15-.4-.26z"/></svg>
+          </a>
         </div>
       </div>
-    </footer>`;
+      <div class="footer-cols">
+        <div class="footer-col"><h5>Products</h5><a href="products.html?cat=laptop">Laptops</a><a href="products.html?cat=phone">Phones</a><a href="products.html?cat=accessory">Accessories</a></div>
+        <div class="footer-col"><h5>Services</h5><a href="#services">Repairs</a><a href="#services">Software</a><a href="#services">Web Dev</a></div>
+        <div class="footer-col"><h5>Company</h5><a href="#home">About HOK</a><a href="#contact">Contact</a><a href="https://wa.me/2348114550145">WhatsApp</a></div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 HOK Computers. Ilorin, Kwara State, Nigeria.</p>
+      <p>Built by <a href="https://my-personal-portfolio-the-quantum-c.vercel.app/">The Quantum Developer</a></p>
+    </div>
+  </div>
+</footer>`;
 }
 
 // ── INIT COMMON ───────────────────────────────────────────
