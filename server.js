@@ -45,12 +45,14 @@ function writeData(file, data) {
 async function seedAdmin() {
   const admin = readData('admin.json');
   if (!admin.username) {
-    const hashed = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'hokcomputers2025', 10);
+    const hashed = await bcrypt.hash('hokcomputers2025', 10);
     writeData('admin.json', {
-      username: process.env.ADMIN_USERNAME || 'hokadmin',
+      username: 'hokadmin',
       password: hashed
     });
     console.log('✅ Admin credentials created.');
+  } else {
+    console.log('✅ Admin already exists:', admin.username);
   }
 }
 
@@ -171,7 +173,7 @@ app.get('/api/settings', (req, res) => {
 // ADMIN AUTH
 // ════════════════════════════════════════════════════════
 
-app.post('/api/admin/login', async (req, res) => {
+/*app.post('/api/admin/login', async (req, res) => {
   const { username, password } = req.body;
   const admin = readData('admin.json');
   if (!admin.username || username !== admin.username) {
@@ -191,7 +193,32 @@ app.post('/api/admin/logout', (req, res) => {
 app.get('/api/admin/check', requireAuth, (req, res) => {
   res.json({ authenticated: true });
 });
+*/ 
+app.post('/api/adminlogin', async (req, res) => {
+  const { username, password } = req.body;
+  const admin = readData('admin.json');
+  console.log('Login attempt:', username);
+  console.log('Admin in file:', admin.username);
+  console.log('Password received:', password);
+  if (!admin.username || username !== admin.username) {
+    console.log('Username mismatch');
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
+  const match = await bcrypt.compare(password, admin.password);
+  console.log('Password match:', match);
+  if (!match) return res.status(401).json({ error: 'Invalid credentials' });
+  req.session.isAdmin = true;
+  res.json({ success: true });
+});
 
+app.post('/api/adminlogout', (req, res) => {
+  req.session.destroy();
+  res.json({ success: true });
+});
+
+app.get('/api/admincheck', requireAuth, (req, res) => {
+  res.json({ authenticated: true });
+});
 // ════════════════════════════════════════════════════════
 // ADMIN — STATS
 // ════════════════════════════════════════════════════════
@@ -341,6 +368,140 @@ app.get('/api/admin/settings', requireAuth, (req, res) => {
 });
 
 app.put('/api/admin/settings', requireAuth, (req, res) => {
+  const current = readData('settings.json');
+  const updated = { ...current, ...req.body };
+  writeData('settings.json', updated);
+  res.json({ success: true, settings: updated });
+});
+
+// ════════════════════════════════════════════════════════
+// ADMIN API ALIASES (for compatibility with admin pages)
+// ════════════════════════════════════════════════════════
+app.get('/api/adminstats', requireAuth, (req, res) => {
+  const products = readData('products.json');
+  const reviews = readData('reviews.json');
+  const enquiries = readData('enquiries.json');
+  const notify = readData('notify.json');
+  const summary = {};
+  enquiries.forEach(e => {
+    if (!summary[e.productId]) {
+      summary[e.productId] = { productName: e.productName, totalClicks: 0 };
+    }
+    summary[e.productId].totalClicks++;
+  });
+  const topProducts = Object.values(summary)
+    .sort((a, b) => b.totalClicks - a.totalClicks)
+    .slice(0, 5);
+  res.json({
+    totalProducts: products.length,
+    inStock: products.filter(p => p.stock === 'In Stock').length,
+    limitedStock: products.filter(p => p.stock === 'Limited Stock').length,
+    outOfStock: products.filter(p => p.stock === 'Out of Stock').length,
+    pendingReviews: reviews.filter(r => r.status === 'pending').length,
+    approvedReviews: reviews.filter(r => r.status === 'approved').length,
+    totalEnquiries: enquiries.length,
+    notifyRequests: notify.length,
+    topProducts
+  });
+});
+
+app.get('/api/adminproducts', requireAuth, (req, res) => {
+  res.json(readData('products.json'));
+});
+
+app.post('/api/adminproducts', requireAuth, (req, res) => {
+  const { brand, category, name, price, image, specs, warranty, stock, badge, featured, newArrival } = req.body;
+  if (!brand || !name || !price || !category) {
+    return res.status(400).json({ error: 'Brand, name, price and category are required' });
+  }
+  const products = readData('products.json');
+  const newProduct = {
+    id: 'prod_' + uuidv4().slice(0, 8),
+    brand: brand.trim(),
+    category,
+    name: name.trim(),
+    price: parseInt(price),
+    image: image || '',
+    specs: typeof specs === 'object' ? specs : {},
+    warranty: warranty || '6 Months',
+    stock: stock || 'In Stock',
+    badge: badge || null,
+    featured: featured === true || featured === 'true',
+    newArrival: newArrival === true || newArrival === 'true',
+    createdAt: new Date().toISOString()
+  };
+  products.push(newProduct);
+  writeData('products.json', products);
+  res.json({ success: true, product: newProduct });
+});
+
+app.put('/api/adminproducts/:id', requireAuth, (req, res) => {
+  const products = readData('products.json');
+  const index = products.findIndex(p => p.id === req.params.id);
+  if (index === -1) return res.status(404).json({ error: 'Product not found' });
+  products[index] = {
+    ...products[index],
+    ...req.body,
+    id: products[index].id,
+    price: parseInt(req.body.price) || products[index].price,
+    featured: req.body.featured === true || req.body.featured === 'true',
+    newArrival: req.body.newArrival === true || req.body.newArrival === 'true',
+    updatedAt: new Date().toISOString()
+  };
+  writeData('products.json', products);
+  res.json({ success: true, product: products[index] });
+});
+
+app.delete('/api/adminproducts/:id', requireAuth, (req, res) => {
+  let products = readData('products.json');
+  const exists = products.find(p => p.id === req.params.id);
+  if (!exists) return res.status(404).json({ error: 'Product not found' });
+  products = products.filter(p => p.id !== req.params.id);
+  writeData('products.json', products);
+  res.json({ success: true });
+});
+
+app.get('/api/adminreviews', requireAuth, (req, res) => {
+  res.json(readData('reviews.json'));
+});
+
+app.put('/api/adminreviews/:id', requireAuth, (req, res) => {
+  const reviews = readData('reviews.json');
+  const index = reviews.findIndex(r => r.id === req.params.id);
+  if (index === -1) return res.status(404).json({ error: 'Review not found' });
+  reviews[index] = { ...reviews[index], ...req.body };
+  writeData('reviews.json', reviews);
+  res.json({ success: true, review: reviews[index] });
+});
+
+app.delete('/api/adminreviews/:id', requireAuth, (req, res) => {
+  let reviews = readData('reviews.json');
+  const exists = reviews.find(r => r.id === req.params.id);
+  if (!exists) return res.status(404).json({ error: 'Review not found' });
+  reviews = reviews.filter(r => r.id !== req.params.id);
+  writeData('reviews.json', reviews);
+  res.json({ success: true });
+});
+
+app.get('/api/adminenquiries', requireAuth, (req, res) => {
+  const enquiries = readData('enquiries.json');
+  const summary = {};
+  enquiries.forEach(e => {
+    if (!summary[e.productId]) {
+      summary[e.productId] = { productId: e.productId, productName: e.productName, totalClicks: 0, lastEnquiry: e.timestamp };
+    }
+    summary[e.productId].totalClicks++;
+    if (e.timestamp > summary[e.productId].lastEnquiry) summary[e.productId].lastEnquiry = e.timestamp;
+  });
+  const sorted = Object.values(summary).sort((a, b) => b.totalClicks - a.totalClicks);
+  res.json({ raw: enquiries, summary: sorted });
+});
+
+app.get('/api/adminsettings', requireAuth, (req, res) => {
+  res.json(readData('settings.json'));
+});
+
+app.put('/api/adminsettings', requireAuth, (req, res) => {
   const current = readData('settings.json');
   const updated = { ...current, ...req.body };
   writeData('settings.json', updated);

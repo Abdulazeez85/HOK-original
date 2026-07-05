@@ -109,11 +109,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function approveReview(id) {
-  await fetch(`/api/admin/reviews/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ status:'approved' }) });
+  await adminFetch(`/api/adminreviews/${id}`, { method:'PUT', body: JSON.stringify({ status:'approved' }) });
   toast('Review approved!'); location.reload();
 }
 async function rejectReview(id) {
-  await fetch(`/api/admin/reviews/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ status:'rejected' }) });
+  await adminFetch(`/api/adminreviews/${id}`, { method:'PUT', body: JSON.stringify({ status:'rejected' }) });
   toast('Review rejected.'); location.reload();
 }
 </script>

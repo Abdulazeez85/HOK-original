@@ -172,26 +172,5 @@
     "featured": false,
     "newArrival": false,
     "createdAt": "2026-06-22T19:15:51.154Z"
-  },
-  {
-    "id": "prod_4022ea1b",
-    "brand": "HP",
-    "category": "laptop",
-    "name": "Elitebook 840 G6",
-    "price": 6666,
-    "image": "",
-    "specs": {
-      "cpu": "",
-      "ram": "",
-      "storage": "",
-      "display": "",
-      "condition": "New"
-    },
-    "warranty": "6 Months",
-    "stock": "In Stock",
-    "badge": null,
-    "featured": false,
-    "newArrival": false,
-    "createdAt": "2026-06-22T19:30:31.980Z"
   }
 ]

@@ -93,20 +93,20 @@ function renderReviews() {
 }
 
 async function updateReview(id, status) {
-  await fetch(`/api/admin/reviews/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ status }) });
+  await adminFetch(`/api/adminreviews/${id}`, { method:'PUT', body: JSON.stringify({ status }) });
   toast(status === 'approved' ? 'Review approved!' : 'Review rejected.');
   await loadReviews();
 }
 
 async function toggleVerified(id, val) {
-  await fetch(`/api/admin/reviews/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ verifiedBuyer: val }) });
+  await adminFetch(`/api/adminreviews/${id}`, { method:'PUT', body: JSON.stringify({ verifiedBuyer: val }) });
   toast(val ? 'Marked as verified buyer!' : 'Verified badge removed.');
   await loadReviews();
 }
 
 async function deleteReview(id) {
   confirmDelete('Delete this review permanently?', async () => {
-    await fetch(`/api/admin/reviews/${id}`, { method: 'DELETE' });
+    await adminFetch(`/api/adminreviews/${id}`, { method: 'DELETE' });
     toast('Review deleted.'); await loadReviews();
   });
 }

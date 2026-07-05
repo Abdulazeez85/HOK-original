@@ -7,7 +7,7 @@ const adminFetch = (url, options = {}) => fetch(url, { ...options, credentials: 
 // ── AUTH CHECK ────────────────────────────────────────────
 async function checkAuth() {
   try {
-    const res = await adminadminFetch('/api/admincheck');
+    const res = await adminFetch('/api/admincheck');
     if (!res.ok) { window.location.href = '/admin'; return false; }
     return true;
   } catch { window.location.href = '/admin'; return false; }

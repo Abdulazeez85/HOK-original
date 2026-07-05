@@ -187,9 +187,9 @@ async function saveProduct() {
     newArrival: document.getElementById('fNewArrival').checked
   };
 
-  const url = editingId ? `/api/admin/products/${editingId}` : '/api/admin/products';
+  const url = editingId ? `/api/adminproducts/${editingId}` : '/api/adminproducts';
   const method = editingId ? 'PUT' : 'POST';
-  const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+  const res = await adminFetch(url, { method, body: JSON.stringify(payload) });
   const data = await res.json();
   if (data.success) {
     toast(editingId ? 'Product updated!' : 'Product added!');
@@ -199,7 +199,7 @@ async function saveProduct() {
 
 async function deleteProduct(id, name) {
   confirmDelete(`Delete "${name}"? This cannot be undone.`, async () => {
-    await fetch(`/api/admin/products/${id}`, { method: 'DELETE' });
+    await adminFetch(`/api/adminproducts/${id}`, { method: 'DELETE' });
     toast('Product deleted.'); await loadProducts();
   });
 }

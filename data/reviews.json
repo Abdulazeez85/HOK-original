@@ -39,8 +39,19 @@
     "rating": 5,
     "message": "xxfcgvhbjnkm",
     "product": "dfghj",
-    "status": "pending",
+    "status": "approved",
     "verifiedBuyer": false,
     "submittedAt": "2026-06-23T18:35:42.601Z"
+  },
+  {
+    "id": "rev_3739542f",
+    "name": "Abdulazeez Oluwaseun Abdukadir",
+    "phone": "08061158652",
+    "rating": 5,
+    "message": "Am testing this as am the developer behind this",
+    "product": "Web developer",
+    "status": "approved",
+    "verifiedBuyer": false,
+    "submittedAt": "2026-07-05T16:41:53.319Z"
   }
 ]
