@@ -172,5 +172,215 @@
     "featured": false,
     "newArrival": false,
     "createdAt": "2026-06-22T19:15:51.154Z"
+  },
+  {
+    "id": "prod_cfdcdf9e",
+    "brand": "HP",
+    "category": "laptop",
+    "name": "Hp elitebook 840 G6",
+    "price": 435000,
+    "image": "",
+    "specs": {
+      "cpu": "Intel Core I7",
+      "ram": "16gb",
+      "storage": "256GB",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": "hot",
+    "featured": false,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:06:12.936Z"
+  },
+  {
+    "id": "prod_b67c4e62",
+    "brand": "Hp",
+    "category": "laptop",
+    "name": "Hp Probook 640 G1",
+    "price": 190000,
+    "image": "",
+    "specs": {
+      "cpu": "Intel Core I5",
+      "ram": "8GB",
+      "storage": "500GB HDD",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": null,
+    "featured": true,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:08:58.323Z"
+  },
+  {
+    "id": "prod_802f52c0",
+    "brand": "Hp",
+    "category": "laptop",
+    "name": "Hp Elitebook Folio 9480",
+    "price": 195000,
+    "image": "",
+    "specs": {
+      "cpu": "Intel Core I5",
+      "ram": "8GB",
+      "storage": "500GB HDD",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": "hot",
+    "featured": false,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:10:39.990Z"
+  },
+  {
+    "id": "prod_bd78f240",
+    "brand": "Hp",
+    "category": "laptop",
+    "name": "Hp Elitebook Folio 9480",
+    "price": 225000,
+    "image": "",
+    "specs": {
+      "cpu": "Intel Core I7",
+      "ram": "8GB",
+      "storage": "500GB HDD",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": null,
+    "featured": false,
+    "newArrival": true,
+    "createdAt": "2026-07-14T17:11:55.962Z"
+  },
+  {
+    "id": "prod_bdeaf4a0",
+    "brand": "DELL",
+    "category": "laptop",
+    "name": "Dell latitude 7490",
+    "price": 455000,
+    "image": "",
+    "specs": {
+      "cpu": "Intel Core I5 8th Gen",
+      "ram": "16gb",
+      "storage": "256GB",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": null,
+    "featured": true,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:13:14.996Z"
+  },
+  {
+    "id": "prod_038dfd95",
+    "brand": "DELL",
+    "category": "laptop",
+    "name": "Dell Inspiron  15-5577",
+    "price": 400000,
+    "image": "",
+    "specs": {
+      "cpu": "Intel Quad-core i7 Processor",
+      "ram": "16gb",
+      "storage": "128gb + 1tb HDD",
+      "display": "15.6 inch FHD Screen",
+      "condition": "New"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": null,
+    "featured": true,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:15:50.909Z"
+  },
+  {
+    "id": "prod_18b8796b",
+    "brand": "Hp",
+    "category": "laptop",
+    "name": "Hp Elitebook Folio 9470",
+    "price": 145000,
+    "image": "",
+    "specs": {
+      "cpu": "Intel Core I5",
+      "ram": "4GB",
+      "storage": "500GB HDD",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": null,
+    "featured": false,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:17:03.754Z"
+  },
+  {
+    "id": "prod_3275a40e",
+    "brand": "HP",
+    "category": "laptop",
+    "name": "Hp Stream 11",
+    "price": 70000,
+    "image": "",
+    "specs": {
+      "cpu": "",
+      "ram": "",
+      "storage": "",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": "hot",
+    "featured": false,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:18:16.318Z"
+  },
+  {
+    "id": "prod_41daf463",
+    "brand": "DELL",
+    "category": "laptop",
+    "name": "Dell latitude",
+    "price": 0,
+    "image": "",
+    "specs": {
+      "cpu": "Intel Core I5",
+      "ram": "4GB",
+      "storage": "320GB HDD",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": null,
+    "featured": false,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:20:25.591Z"
+  },
+  {
+    "id": "prod_6fb23aaf",
+    "brand": "APPLE",
+    "category": "phone",
+    "name": "Iphone XR",
+    "price": 172000,
+    "image": "",
+    "specs": {
+      "cpu": "",
+      "ram": "",
+      "storage": "",
+      "display": "",
+      "condition": "New"
+    },
+    "warranty": "6  months",
+    "stock": "In Stock",
+    "badge": null,
+    "featured": false,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:21:51.109Z"
   }
 ]
