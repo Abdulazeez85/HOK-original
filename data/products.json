@@ -382,5 +382,341 @@
     "featured": false,
     "newArrival": false,
     "createdAt": "2026-07-14T17:21:51.109Z"
+  },
+  {
+    "id": "prod_6a67ac32",
+    "brand": "APPLE",
+    "category": "phone",
+    "name": "Iphone 8",
+    "price": 90000,
+    "image": "",
+    "specs": {
+      "cpu": "",
+      "ram": "",
+      "storage": "64gb",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": null,
+    "featured": true,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:25:52.188Z"
+  },
+  {
+    "id": "prod_8c2c175c",
+    "brand": "APPLE",
+    "category": "phone",
+    "name": "Iphone X",
+    "price": 155000,
+    "image": "",
+    "specs": {
+      "cpu": "",
+      "ram": "",
+      "storage": "64gb",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": null,
+    "featured": true,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:27:22.294Z"
+  },
+  {
+    "id": "prod_af09bcbc",
+    "brand": "HP",
+    "category": "laptop",
+    "name": "Hp eilitebook",
+    "price": 350000,
+    "image": "",
+    "specs": {
+      "cpu": "Intel Core I7",
+      "ram": "",
+      "storage": "",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": null,
+    "featured": false,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:28:10.427Z"
+  },
+  {
+    "id": "prod_aef8b8eb",
+    "brand": "Apple",
+    "category": "phone",
+    "name": "Iphone 6",
+    "price": 40000,
+    "image": "",
+    "specs": {
+      "cpu": "",
+      "ram": "6gb",
+      "storage": "32gb",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": null,
+    "featured": false,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:30:45.194Z"
+  },
+  {
+    "id": "prod_7a07c97d",
+    "brand": "HP",
+    "category": "laptop",
+    "name": "Hp laptop",
+    "price": 110000,
+    "image": "",
+    "specs": {
+      "cpu": "Intel Core I5",
+      "ram": "4GB",
+      "storage": "500GB HDD",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": null,
+    "featured": false,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:32:12.470Z"
+  },
+  {
+    "id": "prod_5f8e6570",
+    "brand": "Apple",
+    "category": "phone",
+    "name": "Iphone 6 + Pouch + charging cord + scree guard",
+    "price": 0,
+    "image": "",
+    "specs": {
+      "cpu": "",
+      "ram": "",
+      "storage": "",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": "hot",
+    "featured": true,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:33:58.985Z"
+  },
+  {
+    "id": "prod_6484bf8c",
+    "brand": "Acer",
+    "category": "laptop",
+    "name": "Acer Travelmate 645-MG",
+    "price": 190000,
+    "image": "",
+    "specs": {
+      "cpu": "Intel Core I7 @2.40 gHZ",
+      "ram": "8GB",
+      "storage": "256GB",
+      "display": "14\"",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": "hot",
+    "featured": true,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:35:57.790Z"
+  },
+  {
+    "id": "prod_bb5998d8",
+    "brand": "HP",
+    "category": "laptop",
+    "name": "Hp 6470",
+    "price": 115000,
+    "image": "",
+    "specs": {
+      "cpu": "Intel Core I5",
+      "ram": "4GB",
+      "storage": "500GB HDD +  1gb dedicated graphics card",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": null,
+    "featured": true,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:37:37.145Z"
+  },
+  {
+    "id": "prod_fffe4c2a",
+    "brand": "Hp",
+    "category": "laptop",
+    "name": "Hp",
+    "price": 95000,
+    "image": "",
+    "specs": {
+      "cpu": "Intel Core I5",
+      "ram": "4GB",
+      "storage": "500GB HDD",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": null,
+    "featured": true,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:51:01.517Z"
+  },
+  {
+    "id": "prod_e2a58b3e",
+    "brand": "DELL",
+    "category": "laptop",
+    "name": "Delll Latitude E6430",
+    "price": 185000,
+    "image": "",
+    "specs": {
+      "cpu": "Intel Core I5",
+      "ram": "4GB",
+      "storage": "500GB HDD",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": null,
+    "featured": false,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:52:20.794Z"
+  },
+  {
+    "id": "prod_d0142dbf",
+    "brand": "HP",
+    "category": "laptop",
+    "name": "Hp 840 G6",
+    "price": 180000,
+    "image": "",
+    "specs": {
+      "cpu": "Intel Core I5",
+      "ram": "4GB",
+      "storage": "500GB HDD",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": null,
+    "featured": true,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:53:30.242Z"
+  },
+  {
+    "id": "prod_7d37c2b6",
+    "brand": "Samsung",
+    "category": "laptop",
+    "name": "Samsung s8",
+    "price": 80000,
+    "image": "",
+    "specs": {
+      "cpu": "",
+      "ram": "4GB",
+      "storage": "64gb",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": "hot",
+    "featured": true,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:55:03.369Z"
+  },
+  {
+    "id": "prod_6478cc1f",
+    "brand": "Asus",
+    "category": "laptop",
+    "name": "Asus",
+    "price": 70000,
+    "image": "",
+    "specs": {
+      "cpu": "Intel Core I3",
+      "ram": "4GB",
+      "storage": "320GB HDD",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": null,
+    "featured": false,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:56:11.212Z"
+  },
+  {
+    "id": "prod_a3ec05f3",
+    "brand": "Acer",
+    "category": "laptop",
+    "name": "Acer",
+    "price": 70000,
+    "image": "",
+    "specs": {
+      "cpu": "Intel Core I3",
+      "ram": "4GB",
+      "storage": "320GB HDD",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6 Months",
+    "stock": "Limited Stock",
+    "badge": null,
+    "featured": true,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:57:24.787Z"
+  },
+  {
+    "id": "prod_6580169e",
+    "brand": "Apple",
+    "category": "laptop",
+    "name": "MacBook Pro 2017",
+    "price": 450000,
+    "image": "",
+    "specs": {
+      "cpu": "Intel Core I5",
+      "ram": "",
+      "storage": "256GB",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": "hot",
+    "featured": true,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:58:52.162Z"
+  },
+  {
+    "id": "prod_37560c60",
+    "brand": "HP",
+    "category": "laptop",
+    "name": "Hp",
+    "price": 90000,
+    "image": "",
+    "specs": {
+      "cpu": "Intel Core I3",
+      "ram": "4GB",
+      "storage": "320GB HDD",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6  months",
+    "stock": "Limited Stock",
+    "badge": null,
+    "featured": false,
+    "newArrival": false,
+    "createdAt": "2026-07-14T17:59:52.469Z"
   }
 ]
