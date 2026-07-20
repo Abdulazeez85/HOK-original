@@ -221,7 +221,7 @@
     "category": "laptop",
     "name": "Hp Elitebook Folio 9480",
     "price": 195000,
-    "image": "",
+    "image": "https://res.cloudinary.com/da7jzmy2g/image/upload/v1784277758/WhatsApp_Image_2026-07-17_at_1.42.14_AM_zp56rq.jpg",
     "specs": {
       "cpu": "Intel Core I5",
       "ram": "8GB",
@@ -234,7 +234,8 @@
     "badge": "hot",
     "featured": false,
     "newArrival": false,
-    "createdAt": "2026-07-14T17:10:39.990Z"
+    "createdAt": "2026-07-14T17:10:39.990Z",
+    "updatedAt": "2026-07-17T16:41:48.148Z"
   },
   {
     "id": "prod_bd78f240",
@@ -242,7 +243,7 @@
     "category": "laptop",
     "name": "Hp Elitebook Folio 9480",
     "price": 225000,
-    "image": "",
+    "image": "https://res.cloudinary.com/da7jzmy2g/image/upload/v1784277862/WhatsApp_Image_2026-07-17_at_1.44.01_AM_j9iq3c.jpg",
     "specs": {
       "cpu": "Intel Core I7",
       "ram": "8GB",
@@ -255,7 +256,8 @@
     "badge": null,
     "featured": false,
     "newArrival": true,
-    "createdAt": "2026-07-14T17:11:55.962Z"
+    "createdAt": "2026-07-14T17:11:55.962Z",
+    "updatedAt": "2026-07-17T16:43:12.356Z"
   },
   {
     "id": "prod_bdeaf4a0",
@@ -718,5 +720,89 @@
     "featured": false,
     "newArrival": false,
     "createdAt": "2026-07-14T17:59:52.469Z"
+  },
+  {
+    "id": "prod_08ed0789",
+    "brand": "Lenovo",
+    "category": "laptop",
+    "name": "Lenovo Thinkpad X230",
+    "price": 77000,
+    "image": "https://res.cloudinary.com/da7jzmy2g/image/upload/v1784276303/lenovo_vsd9d2.jpg",
+    "specs": {
+      "cpu": "Intel Core i5",
+      "ram": "4GB",
+      "storage": "320GB",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6 Months",
+    "stock": "Limited Stock",
+    "badge": null,
+    "featured": false,
+    "newArrival": false,
+    "createdAt": "2026-07-17T16:23:22.892Z"
+  },
+  {
+    "id": "prod_9912315b",
+    "brand": "Lenovo",
+    "category": "laptop",
+    "name": "Lenovo X100e",
+    "price": 40000,
+    "image": "https://res.cloudinary.com/da7jzmy2g/image/upload/v1784276811/WhatsApp_Image_2026-07-17_at_1.26.01_AM_qx27ba.jpg",
+    "specs": {
+      "cpu": "AMD processor",
+      "ram": "4GB",
+      "storage": "250GB",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6 Months",
+    "stock": "Limited Stock",
+    "badge": "used",
+    "featured": false,
+    "newArrival": false,
+    "createdAt": "2026-07-17T16:27:13.847Z"
+  },
+  {
+    "id": "prod_00840d7c",
+    "brand": "Apple",
+    "category": "phone",
+    "name": "iPhone XSMax",
+    "price": 0,
+    "image": "https://res.cloudinary.com/da7jzmy2g/image/upload/v1784277102/WhatsApp_Image_2026-07-17_at_1.30.25_AM_fwkpmf.jpg",
+    "specs": {
+      "cpu": "",
+      "ram": "",
+      "storage": "256GB",
+      "display": "",
+      "condition": "UK Used"
+    },
+    "warranty": "6 Months",
+    "stock": "Limited Stock",
+    "badge": "used",
+    "featured": false,
+    "newArrival": false,
+    "createdAt": "2026-07-17T16:30:46.202Z"
+  },
+  {
+    "id": "prod_c8ba2da8",
+    "brand": "Samsung",
+    "category": "phone",
+    "name": "Samsung S10 & S10+",
+    "price": 195000,
+    "image": "https://res.cloudinary.com/da7jzmy2g/image/upload/v1784277394/WhatsApp_Image_2026-07-17_at_1.34.44_AM_k3ilpd.jpg",
+    "specs": {
+      "cpu": "",
+      "ram": "",
+      "storage": "",
+      "display": "",
+      "condition": "New"
+    },
+    "warranty": "6 Months",
+    "stock": "Limited Stock",
+    "badge": "hot",
+    "featured": false,
+    "newArrival": false,
+    "createdAt": "2026-07-17T16:36:10.037Z"
   }
 ]
