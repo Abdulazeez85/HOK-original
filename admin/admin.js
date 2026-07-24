@@ -38,8 +38,10 @@ function getSidebarHTML(active) {
     { href: '/admin/settings', icon: '⚙️', label: 'Settings', key: 'settings' },
   ];
   return `
+    <div class="admin-sidebar-overlay" onclick="closeMobileSidebar()"></div>
     <aside class="admin-sidebar">
       <div class="sidebar-logo">
+        <button class="mobile-sidebar-close" onclick="closeMobileSidebar()" aria-label="Close menu">✕</button>
         <svg viewBox="0 0 40 40" fill="none" width="28" height="28"><rect width="40" height="40" rx="6" fill="#0d1f14"/><path d="M10 10H16V18H24V10H30V30H24V22H16V30H10V10Z" fill="#25d466"/></svg>
         <div><span>HOK Computers</span><em>Admin Panel</em></div>
       </div>
@@ -56,3 +58,28 @@ function getSidebarHTML(active) {
 function confirmDelete(msg, callback) {
   if (window.confirm(msg || 'Are you sure you want to delete this?')) callback();
 }
+
+function openMobileSidebar() {
+  document.body.classList.add('admin-sidebar-open');
+}
+
+function closeMobileSidebar() {
+  document.body.classList.remove('admin-sidebar-open');
+}
+
+function initMobileAdminNav() {
+  if (document.querySelector('.mobile-nav-toggle')) return;
+  const topbar = document.querySelector('.admin-topbar');
+  if (!topbar) return;
+
+  const toggle = document.createElement('button');
+  toggle.className = 'mobile-nav-toggle';
+  toggle.setAttribute('aria-label', 'Open menu');
+  toggle.innerHTML = '☰';
+  toggle.onclick = openMobileSidebar;
+  topbar.insertBefore(toggle, topbar.firstChild);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initMobileAdminNav();
+});
