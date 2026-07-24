@@ -114,11 +114,12 @@ app.get('/api/reviews/top', (req, res) => {
 });
 
 app.post('/api/reviews', (req, res) => {
-  const { name, phone, rating, message, product } = req.body;
+  const { name, phone, rating, message, product, images } = req.body;
   if (!name || !phone || !rating || !message || !product) {
     return res.status(400).json({ error: 'All fields are required' });
   }
   const reviews = readData('reviews.json');
+  const reviewImages = Array.isArray(images) ? images : (images ? [images] : []);
   const newReview = {
     id: 'rev_' + uuidv4().slice(0, 8),
     name: name.trim(),
@@ -126,6 +127,7 @@ app.post('/api/reviews', (req, res) => {
     rating: parseInt(rating),
     message: message.trim(),
     product: product.trim(),
+    images: reviewImages,
     status: 'pending',
     verifiedBuyer: false,
     submittedAt: new Date().toISOString()

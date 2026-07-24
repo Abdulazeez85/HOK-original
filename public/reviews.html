@@ -26,6 +26,33 @@
       <div class="loading">Loading…</div>
     </div>
 
+    <div class="reviews-toolbar">
+      <div class="reviews-toolbar-group">
+        <label class="reviews-filter-label" for="reviewSort">Sort by</label>
+        <select id="reviewSort" class="sort-select">
+          <option value="newest">Newest first</option>
+          <option value="highest">Highest rated</option>
+          <option value="lowest">Lowest rated</option>
+        </select>
+      </div>
+      <div class="reviews-toolbar-group">
+        <label class="reviews-filter-label" for="reviewFilter">Minimum rating</label>
+        <select id="reviewFilter" class="sort-select">
+          <option value="all">All ratings</option>
+          <option value="5">5★ and up</option>
+          <option value="4">4★ and up</option>
+          <option value="3">3★ and up</option>
+          <option value="2">2★ and up</option>
+          <option value="1">1★ and up</option>
+        </select>
+      </div>
+      <label class="reviews-checkbox">
+        <input type="checkbox" id="verifiedOnly" />
+        <span>Verified buyers only</span>
+      </label>
+      <div class="review-count-pill" id="reviewsCount">Showing 0 reviews</div>
+    </div>
+
     <!-- REVIEWS GRID -->
     <div class="reviews-grid" id="reviewsGrid">
       <div class="loading">Loading reviews…</div>
@@ -40,6 +67,11 @@
         <div class="form-group"><label>Phone Number</label><input type="tel" id="rvPhone" placeholder="08012345678"/></div>
       </div>
       <div class="form-group"><label>Product Purchased</label><input type="text" id="rvProduct" placeholder="e.g. HP EliteBook 840 G9"/></div>
+      <div class="form-group">
+        <label>Upload Photos (optional)</label>
+        <input type="file" id="rvImages" accept="image/*" multiple onchange="handleReviewImagesSelection(event)"/>
+        <div class="image-preview-list" id="imagePreviewList"></div>
+      </div>
       <div class="form-group">
         <label>Your Rating</label>
         <div class="star-picker" id="starPicker">
@@ -62,12 +94,45 @@
 <script src="/app.js"></script>
 <script>
 let selectedRating = 0;
+let selectedReviewImages = [];
+let allReviews = [];
+let reviewFilters = {
+  sort: 'newest',
+  minRating: 'all',
+  verifiedOnly: false
+};
 
 function setRating(val) {
   selectedRating = val;
   document.querySelectorAll('.star-btn').forEach(btn => {
     btn.classList.toggle('active', parseInt(btn.dataset.val) <= val);
   });
+}
+
+function handleReviewImagesSelection(event) {
+  const files = Array.from(event.target.files || []);
+  selectedReviewImages = files;
+  const preview = document.getElementById('imagePreviewList');
+  if (!preview) return;
+
+  if (!files.length) {
+    preview.innerHTML = '';
+    return;
+  }
+
+  preview.innerHTML = files.map(file => `
+    <div class="preview-thumb">
+      <img src="${URL.createObjectURL(file)}" alt="Selected preview" />
+    </div>`).join('');
+}
+
+function readReviewImages(files) {
+  return Promise.all(Array.from(files).map(file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  })));
 }
 
 async function submitReview() {
@@ -79,16 +144,20 @@ async function submitReview() {
     showToast('Please fill in all fields and select a rating.'); return;
   }
   try {
+    const images = await readReviewImages(selectedReviewImages);
     const res = await fetch('/api/reviews', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, phone, product, message, rating: selectedRating })
+      body: JSON.stringify({ name, phone, product, message, rating: selectedRating, images })
     });
     const data = await res.json();
     if (data.success) {
       showToast('✅ Review submitted! Pending approval.');
       ['rvName','rvPhone','rvProduct','rvMessage'].forEach(id => document.getElementById(id).value = '');
       selectedRating = 0;
+      selectedReviewImages = [];
+      document.getElementById('rvImages').value = '';
+      document.getElementById('imagePreviewList').innerHTML = '';
       document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('active'));
     } else { showToast('Something went wrong. Try again.'); }
   } catch { showToast('Network error. Try again.'); }
@@ -118,18 +187,74 @@ function renderSummary(reviews) {
     </div>`;
 }
 
+function applyReviewFilters(reviews) {
+  let filtered = [...reviews];
+
+  if (reviewFilters.minRating !== 'all') {
+    const min = parseInt(reviewFilters.minRating, 10);
+    filtered = filtered.filter(r => r.rating >= min);
+  }
+
+  if (reviewFilters.verifiedOnly) {
+    filtered = filtered.filter(r => r.verifiedBuyer);
+  }
+
+  switch (reviewFilters.sort) {
+    case 'highest':
+      filtered.sort((a, b) => b.rating - a.rating || new Date(b.submittedAt) - new Date(a.submittedAt));
+      break;
+    case 'lowest':
+      filtered.sort((a, b) => a.rating - b.rating || new Date(b.submittedAt) - new Date(a.submittedAt));
+      break;
+    default:
+      filtered.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+  }
+
+  return filtered;
+}
+
+function updateReviewCount(count) {
+  const el = document.getElementById('reviewsCount');
+  if (el) {
+    el.textContent = count ? `Showing ${count} review${count === 1 ? '' : 's'}` : 'No matching reviews';
+  }
+}
+
+function bindReviewControls() {
+  const sortSelect = document.getElementById('reviewSort');
+  const filterSelect = document.getElementById('reviewFilter');
+  const verifiedToggle = document.getElementById('verifiedOnly');
+
+  [sortSelect, filterSelect, verifiedToggle].forEach(el => {
+    if (!el) return;
+    el.addEventListener('change', () => {
+      reviewFilters.sort = sortSelect?.value || 'newest';
+      reviewFilters.minRating = filterSelect?.value || 'all';
+      reviewFilters.verifiedOnly = verifiedToggle?.checked || false;
+      renderReviews(allReviews);
+    });
+  });
+}
+
 function renderReviews(reviews) {
-  if (!reviews.length) {
-    document.getElementById('reviewsGrid').innerHTML = '<p style="color:var(--text-2);padding:20px 0">No approved reviews yet.</p>';
+  const filtered = applyReviewFilters(reviews);
+  updateReviewCount(filtered.length);
+
+  if (!filtered.length) {
+    document.getElementById('reviewsGrid').innerHTML = '<p style="color:var(--text-2);padding:20px 0">No matching reviews found.</p>';
     return;
   }
-  document.getElementById('reviewsGrid').innerHTML = reviews.map(r => `
+
+  document.getElementById('reviewsGrid').innerHTML = filtered.map(r => {
+    const reviewImages = Array.isArray(r.images) ? r.images : (r.images ? [r.images] : []);
+    return `
     <div class="review-card reveal">
       <div class="rc-header">
         <div class="rc-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
         <div class="rc-date">${new Date(r.submittedAt).toLocaleDateString('en-NG', {day:'numeric',month:'short',year:'numeric'})}</div>
       </div>
       <p class="rc-text">"${r.message}"</p>
+      ${reviewImages.length ? `<div class="review-images">${reviewImages.map(img => `<img class="review-image-thumb" src="${img}" alt="${r.name} review photo" />`).join('')}</div>` : ''}
       <div class="rc-footer">
         <div>
           <div class="rc-name">${r.name}</div>
@@ -137,7 +262,8 @@ function renderReviews(reviews) {
         </div>
         ${r.verifiedBuyer ? '<span class="verified-badge">✅ Verified Buyer</span>' : ''}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -149,8 +275,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const res = await fetch('/api/reviews/approved');
   const reviews = await res.json();
+  allReviews = reviews;
   renderSummary(reviews);
   renderReviews(reviews);
+  bindReviewControls();
   initScrollReveal();
 });
 </script>
