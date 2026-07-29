@@ -126,15 +126,6 @@ function handleReviewImagesSelection(event) {
     </div>`).join('');
 }
 
-function readReviewImages(files) {
-  return Promise.all(Array.from(files).map(file => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  })));
-}
-
 async function submitReview() {
   const name = document.getElementById('rvName').value.trim();
   const phone = document.getElementById('rvPhone').value.trim();
@@ -144,12 +135,21 @@ async function submitReview() {
     showToast('Please fill in all fields and select a rating.'); return;
   }
   try {
-    const images = await readReviewImages(selectedReviewImages);
+    const form = new FormData();
+    form.append('name', name);
+    form.append('phone', phone);
+    form.append('product', product);
+    form.append('message', message);
+    form.append('rating', selectedRating);
+    if (selectedReviewImages && selectedReviewImages.length) {
+      selectedReviewImages.forEach(file => form.append('images', file));
+    }
+
     const res = await fetch('/api/reviews', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, phone, product, message, rating: selectedRating, images })
+      body: form
     });
+
     const data = await res.json();
     if (data.success) {
       showToast('✅ Review submitted! Pending approval.');
@@ -160,7 +160,7 @@ async function submitReview() {
       document.getElementById('imagePreviewList').innerHTML = '';
       document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('active'));
     } else { showToast('Something went wrong. Try again.'); }
-  } catch { showToast('Network error. Try again.'); }
+  } catch (err) { console.error(err); showToast('Network error. Try again.'); }
 }
 
 function renderSummary(reviews) {

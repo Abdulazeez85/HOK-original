@@ -8,6 +8,13 @@ const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
+const multer = require('multer');
+
+// ensure uploads folder exists
+const uploadsDir = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+
+const upload = multer({ dest: uploadsDir });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -113,20 +120,41 @@ app.get('/api/reviews/top', (req, res) => {
   res.json(top);
 });
 
-app.post('/api/reviews', (req, res) => {
-  const { name, phone, rating, message, product, images } = req.body;
+app.post('/api/reviews', upload.array('images', 5), (req, res) => {
+  const { name, phone, rating, message, product } = req.body;
   if (!name || !phone || !rating || !message || !product) {
     return res.status(400).json({ error: 'All fields are required' });
   }
   const reviews = readData('reviews.json');
-  const reviewImages = Array.isArray(images) ? images : (images ? [images] : []);
+
+  // handle uploaded files (multipart/form-data)
+  const reviewImages = [];
+  if (req.files && req.files.length) {
+    req.files.forEach(f => {
+      reviewImages.push(`/uploads/${f.filename}`);
+    });
+  } else if (req.body.images) {
+    // legacy: base64 data URLs sent as JSON; save them to files
+    const images = Array.isArray(req.body.images) ? req.body.images : [req.body.images];
+    images.forEach((dataUrl) => {
+      const matches = String(dataUrl).match(/^data:(image\/[a-zA-Z]+);base64,(.+)$/);
+      if (matches) {
+        const ext = matches[1].split('/')[1] || 'png';
+        const buffer = Buffer.from(matches[2], 'base64');
+        const filename = uuidv4().slice(0,8) + '.' + ext;
+        const outPath = path.join(__dirname, 'public', 'uploads', filename);
+        try { fs.writeFileSync(outPath, buffer); reviewImages.push(`/uploads/${filename}`); } catch (e) { /* ignore write errors */ }
+      }
+    });
+  }
+
   const newReview = {
     id: 'rev_' + uuidv4().slice(0, 8),
-    name: name.trim(),
-    phone: phone.trim(),
+    name: String(name).trim(),
+    phone: String(phone).trim(),
     rating: parseInt(rating),
-    message: message.trim(),
-    product: product.trim(),
+    message: String(message).trim(),
+    product: String(product).trim(),
     images: reviewImages,
     status: 'pending',
     verifiedBuyer: false,
