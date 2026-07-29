@@ -112,15 +112,15 @@ function renderTable() {
   empty.style.display = 'none';
   tbody.innerHTML = filtered.map(p => `
     <tr>
-      <td><img class="td-img" src="${p.image || 'https://via.placeholder.com/44'}" alt="${p.name}"/></td>
-      <td class="td-name">${p.name}<br/><span style="font-size:0.72rem;color:var(--text-3);font-weight:300">${p.brand}</span></td>
-      <td><span class="badge badge-blue">${p.category}</span></td>
-      <td class="td-price">${fmt(p.price)}</td>
-      <td><span class="badge ${p.stock==='In Stock'?'badge-green':p.stock==='Limited Stock'?'badge-yellow':'badge-red'}">${p.stock}</span></td>
-      <td><span style="color:${p.featured?'var(--accent)':'var(--text-3)'}">${p.featured?'✅':'—'}</span></td>
-      <td><span style="color:${p.newArrival?'var(--accent)':'var(--text-3)'}">${p.newArrival?'✅':'—'}</span></td>
-      <td>
-        <div style="display:flex;gap:6px">
+      <td data-label="Image"><img class="td-img" src="${p.image || 'https://via.placeholder.com/44'}" alt="${p.name}"/></td>
+      <td class="td-name" data-label="Name">${p.name}<br/><span style="font-size:0.72rem;color:var(--text-3);font-weight:300">${p.brand}</span></td>
+      <td data-label="Category"><span class="badge badge-blue">${p.category}</span></td>
+      <td class="td-price" data-label="Price">${fmt(p.price)}</td>
+      <td data-label="Stock"><span class="badge ${p.stock==='In Stock'?'badge-green':p.stock==='Limited Stock'?'badge-yellow':'badge-red'}">${p.stock}</span></td>
+      <td data-label="Featured"><span style="color:${p.featured?'var(--accent)':'var(--text-3)'}">${p.featured?'✅':'—'}</span></td>
+      <td data-label="New"><span style="color:${p.newArrival?'var(--accent)':'var(--text-3)'}">${p.newArrival?'✅':'—'}</span></td>
+      <td data-label="Actions">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
           <button class="btn btn-ghost btn-sm" onclick="editProduct('${p.id}')">Edit</button>
           <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}','${p.name}')">Delete</button>
         </div>

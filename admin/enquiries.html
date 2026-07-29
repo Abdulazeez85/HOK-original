@@ -48,11 +48,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const demand = pct > 70 ? 'High' : pct > 30 ? 'Medium' : 'Low';
     const badgeClass = pct > 70 ? 'badge-green' : pct > 30 ? 'badge-yellow' : 'badge-red';
     return `<tr>
-      <td style="font-weight:600;color:${i<3?'var(--accent)':'var(--text-2)'}">#${i+1}</td>
-      <td class="td-name">${p.productName}</td>
-      <td><strong style="color:var(--accent)">${p.totalClicks}</strong></td>
-      <td>${new Date(p.lastEnquiry).toLocaleDateString('en-NG')}</td>
-      <td><span class="badge ${badgeClass}">${demand}</span></td>
+      <td style="font-weight:600;color:${i<3?'var(--accent)':'var(--text-2)'}" data-label="Rank">#${i+1}</td>
+      <td class="td-name" data-label="Product">${p.productName}</td>
+      <td data-label="Total Clicks"><strong style="color:var(--accent)">${p.totalClicks}</strong></td>
+      <td data-label="Last Enquiry">${new Date(p.lastEnquiry).toLocaleDateString('en-NG')}</td>
+      <td data-label="Demand"><span class="badge ${badgeClass}">${demand}</span></td>
     </tr>`;}).join('');
 });
 </script>

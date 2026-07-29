@@ -113,10 +113,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     <table><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th></tr></thead>
     <tbody>${recent.map(p => `
       <tr>
-        <td class="td-name">${p.name}</td>
-        <td>${p.category}</td>
-        <td class="td-price">${fmt(p.price)}</td>
-        <td><span class="badge ${p.stock==='In Stock'?'badge-green':p.stock==='Limited Stock'?'badge-yellow':'badge-red'}">${p.stock}</span></td>
+        <td class="td-name" data-label="Product">${p.name}</td>
+        <td data-label="Category">${p.category}</td>
+        <td class="td-price" data-label="Price">${fmt(p.price)}</td>
+        <td data-label="Stock"><span class="badge ${p.stock==='In Stock'?'badge-green':p.stock==='Limited Stock'?'badge-yellow':'badge-red'}">${p.stock}</span></td>
       </tr>`).join('')}
     </tbody></table>` : '<div class="empty-state"><span>📦</span><p>No products yet.</p></div>';
 });
