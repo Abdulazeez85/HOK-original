@@ -33,6 +33,7 @@ function getSidebarHTML(active) {
   const items = [
     { href: '/admin/dashboard', icon: '📊', label: 'Dashboard', key: 'dashboard' },
     { href: '/admin/products', icon: '🖥️', label: 'Products', key: 'products' },
+    { href: '/admin/orders', icon: '🧾', label: 'Orders', key: 'orders' },
     { href: '/admin/reviews', icon: '⭐', label: 'Reviews', key: 'reviews' },
     { href: '/admin/enquiries', icon: '📈', label: 'Enquiries', key: 'enquiries' },
     { href: '/admin/settings', icon: '⚙️', label: 'Settings', key: 'settings' },

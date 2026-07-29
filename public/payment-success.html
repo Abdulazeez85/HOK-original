@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Payment Status — HOK Computers</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/styles.css"/>
+</head>
+<body>
+  <div class="page-hero">
+    <div class="container">
+      <h1>Payment Status</h1>
+      <p class="page-hero-sub">Verifying your payment with Paystack.</p>
+    </div>
+  </div>
+  <div class="container" style="padding:40px 0;">
+    <div class="detail-box" id="statusBox" style="max-width:720px;margin:0 auto;">
+      <p>Checking payment status...</p>
+    </div>
+  </div>
+  <div id="footer-mount"></div>
+  <script src="/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      document.getElementById('footer-mount').innerHTML = getFooterHTML();
+      await loadSettings();
+      initCommon();
+      const params = new URLSearchParams(window.location.search);
+      const reference = params.get('reference');
+      const box = document.getElementById('statusBox');
+      if (!reference) {
+        box.innerHTML = '<h2>Missing payment reference.</h2><p>Paystack did not return a reference. Please try again or contact support.</p><a class="btn-primary" href="/products">Back to products</a>';
+        return;
+      }
+      try {
+        const res = await fetch(`/api/paystack/verify/${encodeURIComponent(reference)}`);
+        const data = await res.json();
+        if (!res.ok) {
+          box.innerHTML = `<h2>Payment verification failed</h2><p>${data.error || 'Unable to verify payment.'}</p><a class="btn-primary" href="/products">Back to products</a>`;
+          return;
+        }
+        box.innerHTML = `
+          <h2>Payment ${data.status === 'success' ? 'Successful' : 'Completed'}</h2>
+          <p>Your payment was verified by Paystack.</p>
+          <div class="detail-spec-row"><span>Reference</span><strong>${data.reference}</strong></div>
+          <div class="detail-spec-row"><span>Amount</span><strong>₦${(data.amount / 100).toLocaleString('en-NG')}</strong></div>
+          <div class="detail-spec-row"><span>Email</span><strong>${data.customer?.email || 'N/A'}</strong></div>
+          <div class="detail-spec-row"><span>Product</span><strong>${data.metadata?.productName || 'N/A'}</strong></div>
+          <div style="margin-top:24px;"><a class="btn-primary" href="/products">Continue shopping</a></div>`;
+      } catch (err) {
+        box.innerHTML = `<h2>Verification error</h2><p>Could not verify the payment. Please try again later.</p><a class="btn-primary" href="/products">Back to products</a>`;
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>

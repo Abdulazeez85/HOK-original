@@ -110,6 +110,7 @@
           </div>
           <div class="detail-actions">
             <button class="btn-primary" onclick="addToCart('${product.id}','${product.name}',${product.price},'${displayImage}')">Add to Cart</button>
+            <button class="btn-primary" onclick="payWithPaystack('${product.id}','${product.name}',${product.price})">Pay with Card</button>
             <button class="btn-wa full" onclick="buyNowWA('${product.id}','${product.name}',${product.price})">Buy via WhatsApp</button>
           </div>
           <div class="detail-box">

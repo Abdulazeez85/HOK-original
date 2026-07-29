@@ -80,6 +80,7 @@ app.get('/admin/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'adm
 app.get('/admin/products', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'products.html')));
 app.get('/admin/reviews', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'reviews.html')));
 app.get('/admin/enquiries', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'enquiries.html')));
+app.get('/admin/orders', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'orders.html')));
 app.get('/admin/settings', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'settings.html')));
 
 // ════════════════════════════════════════════════════════
@@ -209,6 +210,82 @@ app.post('/api/notify', (req, res) => {
   });
   writeData('notify.json', notify);
   res.json({ success: true });
+});
+
+app.post('/api/paystack/initialize', async (req, res) => {
+  const { productId, productName, amount, email, callback_url, orderType, items } = req.body;
+  if (!amount || !email) {
+    return res.status(400).json({ error: 'Missing payment data' });
+  }
+  const secretKey = process.env.PAYSTACK_SECRET_KEY;
+  if (!secretKey) return res.status(500).json({ error: 'Paystack secret key not configured' });
+
+  try {
+    const metadata = {
+      productId: productId || null,
+      productName: productName || (orderType === 'cart' ? 'Cart Order' : 'HOK Order'),
+      orderType: orderType || 'single',
+      items: Array.isArray(items) ? items : []
+    };
+
+    const response = await fetch('https://api.paystack.co/transaction/initialize', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${secretKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email,
+        amount: Math.round(Number(amount) * 100),
+        currency: 'NGN',
+        metadata,
+        callback_url: callback_url || `${req.protocol}://${req.get('host')}/payment-success.html`
+      })
+    });
+    const data = await response.json();
+    if (!data.status) return res.status(400).json({ error: data.message || 'Paystack initialization failed', details: data });
+    res.json({ authorization_url: data.data.authorization_url, reference: data.data.reference });
+  } catch (error) {
+    res.status(500).json({ error: 'Paystack initialization error', details: error.message });
+  }
+});
+
+app.get('/api/paystack/verify/:reference', async (req, res) => {
+  const secretKey = process.env.PAYSTACK_SECRET_KEY;
+  if (!secretKey) return res.status(500).json({ error: 'Paystack secret key not configured' });
+
+  try {
+    const response = await fetch(`https://api.paystack.co/transaction/verify/${encodeURIComponent(req.params.reference)}`, {
+      headers: { Authorization: `Bearer ${secretKey}` }
+    });
+    const data = await response.json();
+    if (!data.status) return res.status(400).json({ error: data.message || 'Verification failed', details: data });
+
+    const payment = data.data;
+    const orders = readData('orders.json');
+    const existing = orders.find(o => o.reference === payment.reference);
+    if (!existing) {
+      orders.push({
+        id: 'order_' + uuidv4().slice(0, 8),
+        reference: payment.reference,
+        status: payment.status,
+        amount: payment.amount / 100,
+        currency: payment.currency,
+        email: payment.customer?.email || '',
+        productId: payment.metadata?.productId || null,
+        productName: payment.metadata?.productName || '',
+        orderType: payment.metadata?.orderType || 'single',
+        items: payment.metadata?.items || [],
+        paidAt: payment.paid_at || new Date().toISOString(),
+        raw: payment
+      });
+      writeData('orders.json', orders);
+    }
+
+    res.json(payment);
+  } catch (error) {
+    res.status(500).json({ error: 'Paystack verification error', details: error.message });
+  }
 });
 
 app.get('/api/settings', (req, res) => {
@@ -599,6 +676,10 @@ app.put('/api/adminsettings', requireAuth, (req, res) => {
   const updated = { ...current, ...req.body };
   writeData('settings.json', updated);
   res.json({ success: true, settings: updated });
+});
+
+app.get('/api/admin/orders', requireAuth, (req, res) => {
+  res.json(readData('orders.json'));
 });
 
 // ── 404 ───────────────────────────────────────────────────

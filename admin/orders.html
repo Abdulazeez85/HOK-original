@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Orders — HOK Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/admin/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div id="sidebar-mount"></div>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div><h1 class="page-title">Orders</h1><p class="page-sub">Track Paystack orders and cart payments.</p></div>
+    </div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Reference</th><th>Email</th><th>Amount</th><th>Type</th><th>Status</th><th>Product / Items</th><th>Paid At</th></tr></thead>
+          <tbody id="ordersTable"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="emptyOrders" style="display:none"><span>🧾</span><p>No orders yet.</p></div>
+    </div>
+  </main>
+</div>
+<script src="/admin/admin.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const ok = await checkAuth(); if (!ok) return;
+  document.getElementById('sidebar-mount').innerHTML = getSidebarHTML('orders');
+  const res = await adminFetch('/api/admin/orders');
+  const orders = await res.json();
+  const tbody = document.getElementById('ordersTable');
+  const empty = document.getElementById('emptyOrders');
+  if (!orders.length) { empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  tbody.innerHTML = orders.map(o => `
+    <tr>
+      <td>${o.reference}</td>
+      <td>${o.email}</td>
+      <td>₦${parseInt(o.amount).toLocaleString('en-NG')}</td>
+      <td>${o.orderType === 'cart' ? 'Cart' : 'Single'}</td>
+      <td>${o.status}</td>
+      <td>${o.orderType === 'cart' ? o.items.map(i => `${i.productName} x${i.quantity}`).join('<br/>') : o.productName || '—'}</td>
+      <td>${new Date(o.paidAt).toLocaleString('en-NG')}</td>
+    </tr>`).join('');
+});
+</script>
+</body>
+</html>
