@@ -21,10 +21,14 @@
     <div class="stats-grid" id="statsGrid"><div style="color:var(--text-2);font-size:0.82rem">Loading stats…</div></div>
 
     <!-- TOP PRODUCTS + PENDING REVIEWS -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px">
+    <div class="dashboard-panel-grid">
       <div class="card">
         <p class="card-title">🔥 Most Enquired Products</p>
         <div id="topProductsList"><div style="color:var(--text-2);font-size:0.82rem;font-weight:300">No enquiries yet.</div></div>
+      </div>
+      <div class="card">
+        <p class="card-title">👥 Most Visited Pages</p>
+        <div id="topPagesList"><div style="color:var(--text-2);font-size:0.82rem;font-weight:300">No visitors yet.</div></div>
       </div>
       <div class="card">
         <p class="card-title">⏳ Pending Reviews</p>
@@ -66,7 +70,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     <div class="stat-card warn"><div class="stat-card-icon">⏳</div><div class="stat-card-num">${stats.pendingReviews}</div><div class="stat-card-label">Pending Reviews</div></div>
     <div class="stat-card accent"><div class="stat-card-icon">⭐</div><div class="stat-card-num">${stats.approvedReviews}</div><div class="stat-card-label">Approved Reviews</div></div>
     <div class="stat-card"><div class="stat-card-icon">📊</div><div class="stat-card-num">${stats.totalEnquiries}</div><div class="stat-card-label">WhatsApp Clicks</div></div>
-    <div class="stat-card"><div class="stat-card-icon">🔔</div><div class="stat-card-num">${stats.notifyRequests}</div><div class="stat-card-label">Notify Requests</div></div>`;
+    <div class="stat-card"><div class="stat-card-icon">�</div><div class="stat-card-num">${stats.totalVisitors}</div><div class="stat-card-label">Site Visitors</div></div>
+    <div class="stat-card"><div class="stat-card-icon">�🔔</div><div class="stat-card-num">${stats.notifyRequests}</div><div class="stat-card-label">Notify Requests</div></div>`;
 
   // Top enquired
   if (stats.topProducts?.length) {
@@ -74,6 +79,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
         <span style="font-size:0.82rem;color:var(--text-1)">${i+1}. ${p.productName}</span>
         <span class="badge badge-green">${p.totalClicks} clicks</span>
+      </div>`).join('');
+  }
+
+  if (stats.topPages?.length) {
+    document.getElementById('topPagesList').innerHTML = stats.topPages.map((p,i) => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:0.82rem;color:var(--text-1)">${i+1}. ${p.page || p.path}</span>
+        <span class="badge badge-blue">${p.count} visits</span>
       </div>`).join('');
   }
 

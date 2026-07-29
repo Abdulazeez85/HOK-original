@@ -72,6 +72,7 @@ function requireAuth(req, res, next) {
 // ── SERVE HTML PAGES ──────────────────────────────────────
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/products', (req, res) => res.sendFile(path.join(__dirname, 'public', 'products.html')));
+app.get('/product/:id', (req, res) => res.sendFile(path.join(__dirname, 'public', 'product.html')));
 app.get('/reviews', (req, res) => res.sendFile(path.join(__dirname, 'public', 'reviews.html')));
 app.get('/about', (req, res) => res.sendFile(path.join(__dirname, 'public', 'about.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'login.html')));
@@ -179,6 +180,21 @@ app.post('/api/enquiries', (req, res) => {
   res.json({ success: true });
 });
 
+app.post('/api/visitors', (req, res) => {
+  const { path, page, referrer, userAgent } = req.body || {};
+  const visitors = readData('visitors.json');
+  visitors.push({
+    id: 'vis_' + uuidv4().slice(0, 8),
+    path: String(path || ''),
+    page: String(page || ''),
+    referrer: String(referrer || ''),
+    userAgent: String(userAgent || req.headers['user-agent'] || ''),
+    timestamp: new Date().toISOString()
+  });
+  writeData('visitors.json', visitors);
+  res.json({ success: true });
+});
+
 app.post('/api/notify', (req, res) => {
   const { productId, productName, phone } = req.body;
   if (!productId || !phone) return res.status(400).json({ error: 'Missing data' });
@@ -258,6 +274,7 @@ app.get('/api/admin/stats', requireAuth, (req, res) => {
   const reviews = readData('reviews.json');
   const enquiries = readData('enquiries.json');
   const notify = readData('notify.json');
+  const visitors = readData('visitors.json');
 
   const summary = {};
   enquiries.forEach(e => {
@@ -270,6 +287,18 @@ app.get('/api/admin/stats', requireAuth, (req, res) => {
     .sort((a, b) => b.totalClicks - a.totalClicks)
     .slice(0, 5);
 
+  const pageSummary = {};
+  visitors.forEach(v => {
+    const pageKey = v.path || v.page || 'unknown';
+    if (!pageSummary[pageKey]) {
+      pageSummary[pageKey] = { page: v.page || v.path || pageKey, path: v.path, count: 0 };
+    }
+    pageSummary[pageKey].count++;
+  });
+  const topPages = Object.values(pageSummary)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+
   res.json({
     totalProducts: products.length,
     inStock: products.filter(p => p.stock === 'In Stock').length,
@@ -279,7 +308,9 @@ app.get('/api/admin/stats', requireAuth, (req, res) => {
     approvedReviews: reviews.filter(r => r.status === 'approved').length,
     totalEnquiries: enquiries.length,
     notifyRequests: notify.length,
-    topProducts
+    totalVisitors: visitors.length,
+    topProducts,
+    topPages
   });
 });
 
@@ -292,10 +323,16 @@ app.get('/api/admin/products', requireAuth, (req, res) => {
 });
 
 app.post('/api/admin/products', requireAuth, (req, res) => {
-  const { brand, category, name, price, image, specs, warranty, stock, badge, featured, newArrival } = req.body;
+  const { brand, category, name, price, image, images, specs, warranty, stock, badge, featured, newArrival } = req.body;
   if (!brand || !name || !price || !category) {
     return res.status(400).json({ error: 'Brand, name, price and category are required' });
   }
+  const imageList = Array.isArray(images)
+    ? images.map(String).map(s => s.trim()).filter(Boolean)
+    : typeof images === 'string'
+      ? images.split('\n').map(s => s.trim()).filter(Boolean)
+      : [];
+  const primaryImage = image?.trim() || imageList[0] || '';
   const products = readData('products.json');
   const newProduct = {
     id: 'prod_' + uuidv4().slice(0, 8),
@@ -303,7 +340,8 @@ app.post('/api/admin/products', requireAuth, (req, res) => {
     category,
     name: name.trim(),
     price: parseInt(price),
-    image: image || '',
+    image: primaryImage,
+    images: imageList,
     specs: typeof specs === 'object' ? specs : {},
     warranty: warranty || '6 Months',
     stock: stock || 'In Stock',
@@ -321,10 +359,19 @@ app.put('/api/admin/products/:id', requireAuth, (req, res) => {
   const products = readData('products.json');
   const index = products.findIndex(p => p.id === req.params.id);
   if (index === -1) return res.status(404).json({ error: 'Product not found' });
+  const { image, images } = req.body;
+  const imageList = Array.isArray(images)
+    ? images.map(String).map(s => s.trim()).filter(Boolean)
+    : typeof images === 'string'
+      ? images.split('\n').map(s => s.trim()).filter(Boolean)
+      : products[index].images || [];
+  const primaryImage = image?.trim() || imageList[0] || products[index].image || '';
   products[index] = {
     ...products[index],
     ...req.body,
     id: products[index].id,
+    image: primaryImage,
+    images: imageList,
     price: parseInt(req.body.price) || products[index].price,
     featured: req.body.featured === true || req.body.featured === 'true',
     newArrival: req.body.newArrival === true || req.body.newArrival === 'true',
@@ -440,10 +487,16 @@ app.get('/api/adminproducts', requireAuth, (req, res) => {
 });
 
 app.post('/api/adminproducts', requireAuth, (req, res) => {
-  const { brand, category, name, price, image, specs, warranty, stock, badge, featured, newArrival } = req.body;
+  const { brand, category, name, price, image, images, specs, warranty, stock, badge, featured, newArrival } = req.body;
   if (!brand || !name || !price || !category) {
     return res.status(400).json({ error: 'Brand, name, price and category are required' });
   }
+  const imageList = Array.isArray(images)
+    ? images.map(String).map(s => s.trim()).filter(Boolean)
+    : typeof images === 'string'
+      ? images.split('\n').map(s => s.trim()).filter(Boolean)
+      : [];
+  const primaryImage = image?.trim() || imageList[0] || '';
   const products = readData('products.json');
   const newProduct = {
     id: 'prod_' + uuidv4().slice(0, 8),
@@ -451,7 +504,8 @@ app.post('/api/adminproducts', requireAuth, (req, res) => {
     category,
     name: name.trim(),
     price: parseInt(price),
-    image: image || '',
+    image: primaryImage,
+    images: imageList,
     specs: typeof specs === 'object' ? specs : {},
     warranty: warranty || '6 Months',
     stock: stock || 'In Stock',
@@ -469,10 +523,19 @@ app.put('/api/adminproducts/:id', requireAuth, (req, res) => {
   const products = readData('products.json');
   const index = products.findIndex(p => p.id === req.params.id);
   if (index === -1) return res.status(404).json({ error: 'Product not found' });
+  const { image, images } = req.body;
+  const imageList = Array.isArray(images)
+    ? images.map(String).map(s => s.trim()).filter(Boolean)
+    : typeof images === 'string'
+      ? images.split('\n').map(s => s.trim()).filter(Boolean)
+      : products[index].images || [];
+  const primaryImage = image?.trim() || imageList[0] || products[index].image || '';
   products[index] = {
     ...products[index],
     ...req.body,
     id: products[index].id,
+    image: primaryImage,
+    images: imageList,
     price: parseInt(req.body.price) || products[index].price,
     featured: req.body.featured === true || req.body.featured === 'true',
     newArrival: req.body.newArrival === true || req.body.newArrival === 'true',

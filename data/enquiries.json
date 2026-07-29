@@ -1,1 +1,8 @@
-[]
+[
+  {
+    "id": "enq_sample_001",
+    "productId": "test_prod_123",
+    "productName": "Test Product 123",
+    "timestamp": "2026-07-29T00:00:00.000Z"
+  }
+]

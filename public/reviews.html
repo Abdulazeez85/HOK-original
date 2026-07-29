@@ -50,6 +50,7 @@
         <input type="checkbox" id="verifiedOnly" />
         <span>Verified buyers only</span>
       </label>
+      <button class="btn-secondary" id="resetReviewFilters" type="button">Reset filters</button>
       <div class="review-count-pill" id="reviewsCount">Showing 0 reviews</div>
     </div>
 
@@ -220,20 +221,46 @@ function updateReviewCount(count) {
   }
 }
 
-function bindReviewControls() {
+function updateReviewFiltersFromUI() {
   const sortSelect = document.getElementById('reviewSort');
   const filterSelect = document.getElementById('reviewFilter');
   const verifiedToggle = document.getElementById('verifiedOnly');
 
-  [sortSelect, filterSelect, verifiedToggle].forEach(el => {
-    if (!el) return;
-    el.addEventListener('change', () => {
-      reviewFilters.sort = sortSelect?.value || 'newest';
-      reviewFilters.minRating = filterSelect?.value || 'all';
-      reviewFilters.verifiedOnly = verifiedToggle?.checked || false;
-      renderReviews(allReviews);
-    });
-  });
+  reviewFilters.sort = sortSelect?.value || 'newest';
+  reviewFilters.minRating = filterSelect?.value || 'all';
+  reviewFilters.verifiedOnly = verifiedToggle?.checked || false;
+}
+
+function resetReviewFilters() {
+  reviewFilters = {
+    sort: 'newest',
+    minRating: 'all',
+    verifiedOnly: false
+  };
+
+  document.getElementById('reviewSort').value = reviewFilters.sort;
+  document.getElementById('reviewFilter').value = reviewFilters.minRating;
+  document.getElementById('verifiedOnly').checked = reviewFilters.verifiedOnly;
+  renderReviews(allReviews);
+}
+
+function bindReviewControls() {
+  const sortSelect = document.getElementById('reviewSort');
+  const filterSelect = document.getElementById('reviewFilter');
+  const verifiedToggle = document.getElementById('verifiedOnly');
+  const resetButton = document.getElementById('resetReviewFilters');
+
+  const updateAndRender = () => {
+    updateReviewFiltersFromUI();
+    renderReviews(allReviews);
+  };
+
+  if (sortSelect) sortSelect.addEventListener('change', updateAndRender);
+  if (filterSelect) filterSelect.addEventListener('change', updateAndRender);
+  if (verifiedToggle) verifiedToggle.addEventListener('change', updateAndRender);
+  if (resetButton) resetButton.addEventListener('click', resetReviewFilters);
+
+  updateReviewFiltersFromUI();
 }
 
 function renderReviews(reviews) {
@@ -264,6 +291,9 @@ function renderReviews(reviews) {
       </div>
     </div>`;
   }).join('');
+  if (typeof initScrollReveal === 'function') {
+    initScrollReveal();
+  }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {

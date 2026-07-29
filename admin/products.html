@@ -50,6 +50,9 @@
         <div class="f-group"><label class="f-label">Warranty</label><input class="f-input" id="fWarranty" placeholder="e.g. 6 Months"/></div>
       </div>
       <div class="f-group"><label class="f-label">Image URL</label><input class="f-input" id="fImage" placeholder="https://…"/></div>
+      <div class="f-group"><label class="f-label">Image URLs</label><textarea class="f-input" id="fImages" rows="3" placeholder="https://...\nhttps://..."></textarea>
+        <p style="font-size:0.75rem;color:var(--text-3);font-weight:300;margin-top:6px">One URL per line. The first image is used as the primary display image.</p>
+      </div>
       <p style="font-size:0.75rem;color:var(--text-3);font-weight:300">Specs</p>
       <div class="form-row-2">
         <div class="f-group"><label class="f-label">CPU</label><input class="f-input" id="fCpu" placeholder="Intel Core i5-1235U"/></div>
@@ -129,7 +132,7 @@ function openModal(id = null) {
   editingId = id;
   document.getElementById('modalTitle').textContent = id ? 'Edit Product' : 'Add Product';
   if (!id) {
-    ['fBrand','fName','fPrice','fWarranty','fImage','fCpu','fRam','fStorage','fDisplay'].forEach(i => document.getElementById(i).value = '');
+    ['fBrand','fName','fPrice','fWarranty','fImage','fImages','fCpu','fRam','fStorage','fDisplay'].forEach(i => document.getElementById(i).value = '');
     document.getElementById('fCategory').value = 'laptop';
     document.getElementById('fCondition').value = 'New';
     document.getElementById('fStock').value = 'In Stock';
@@ -148,6 +151,7 @@ function editProduct(id) {
   document.getElementById('fPrice').value = p.price || '';
   document.getElementById('fWarranty').value = p.warranty || '';
   document.getElementById('fImage').value = p.image || '';
+  document.getElementById('fImages').value = Array.isArray(p.images) ? p.images.join('\n') : '';
   document.getElementById('fCategory').value = p.category || 'laptop';
   document.getElementById('fCpu').value = p.specs?.cpu || '';
   document.getElementById('fRam').value = p.specs?.ram || '';
@@ -170,10 +174,12 @@ async function saveProduct() {
   const category = document.getElementById('fCategory').value;
   if (!brand || !name || !price) { toast('Brand, name and price are required.', 'error'); return; }
 
+  const rawImages = document.getElementById('fImages').value.split('\n').map(s => s.trim()).filter(Boolean);
   const payload = {
     brand, name, price, category,
     warranty: document.getElementById('fWarranty').value.trim() || '6 Months',
     image: document.getElementById('fImage').value.trim(),
+    images: rawImages,
     specs: {
       cpu: document.getElementById('fCpu').value.trim(),
       ram: document.getElementById('fRam').value.trim(),

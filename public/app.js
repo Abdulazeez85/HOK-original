@@ -158,13 +158,51 @@ function checkoutWhatsApp() {
   window.open(waLink(msg, settings.whatsappNumber), '_blank');
 }
 
+async function recordEnquiry(productId, productName) {
+  try {
+    await fetch('/api/enquiries', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productId, productName }) });
+  } catch (e) {
+    // ignore logging failures
+  }
+}
+
+async function recordVisit(path, page) {
+  try {
+    await fetch('/api/visitors', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path, page, referrer: document.referrer, userAgent: navigator.userAgent })
+    });
+  } catch (e) {
+    // ignore logging failures
+  }
+}
+
 function buyNowWA(id, name, price, e) {
   if (e) e.stopPropagation();
-  // Log enquiry
-  fetch('/api/enquiries', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productId: id, productName: name }) }).catch(() => {});
+  // non-blocking record of the enquiry for admin insights
+  recordEnquiry(id, name).catch(() => {});
   const msg = `Hello HOK Computers, I want to buy: *${name}* at *${fmt(price)}*. Please confirm availability.`;
   window.open(waLink(msg, settings.whatsappNumber), '_blank');
 }
+
+// Delegate clicks on any anchor with data-enquire-product-id to record the enquiry
+document.addEventListener('DOMContentLoaded', () => {
+  const pagePath = window.location.pathname;
+  const pageTitle = document.title || pagePath;
+  recordVisit(pagePath, pageTitle).catch(() => {});
+
+  document.querySelectorAll('a[data-enquire-product-id]').forEach(el => {
+    el.addEventListener('click', function (ev) {
+      const id = this.dataset.enquireProductId;
+      const name = this.dataset.enquireProductName || this.dataset.enquireProduct;
+      if (id && name) {
+        // allow the fetch to run but don't block navigation
+        recordEnquiry(id, name).catch(() => {});
+      }
+    });
+  });
+});
 
 // ── INSTALLMENT ───────────────────────────────────────────
 function showInstallmentModal() {
@@ -276,14 +314,15 @@ function buildCard(p, i = 0) {
   const del = settings.delivery || {};
   const isOut = p.stock === 'Out of Stock';
   const specsText = [p.specs?.cpu, p.specs?.ram, p.specs?.storage].filter(v => v && v !== 'N/A').join(' · ');
+  const mainImage = p.images?.length ? p.images[0] : p.image;
 
   // Installment calc default (3 months)
   const monthly3 = Math.ceil(p.price / 3);
 
   return `
-    <div class="product-card reveal" style="transition-delay:${i * 0.04}s" onclick="handleCardClick(event,'${p.id}')">
+    <div class="product-card reveal" style="transition-delay:${i * 0.04}s" onclick="window.location.href='/product/${p.id}'">
       <div class="p-img-wrap">
-        <img src="${p.image}" alt="${p.name}" loading="lazy" />
+        <img src="${mainImage}" alt="${p.name}" loading="lazy" />
         ${p.badge ? `<span class="p-badge ${badgeClass(p.badge)}">${badgeLabel(p.badge)}</span>` : ''}
         <span class="p-stock ${stockClass(p.stock)}">${p.stock}</span>
       </div>
