@@ -24,13 +24,22 @@ app.use(cors({ origin: true, credentials: true ,methods: ['GET', 'POST', 'PUT', 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/admin', express.static(path.join(__dirname, 'admin')));
 app.use(session({
   secret: process.env.SESSION_SECRET || 'hok_fallback_secret',
   resave: false,
   saveUninitialized: false,
   cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 ,httpOnly: true ,sameSite: 'lax'}
 }));
+
+// Serve admin HTML pages only to authenticated sessions. Static assets remain available.
+app.use('/admin', (req, res, next) => {
+  const isHtmlRequest = req.path === '/' || req.path.endsWith('.html');
+  if (isHtmlRequest && !(req.session && req.session.isAdmin)) {
+    return res.sendFile(path.join(__dirname, 'admin', 'login.html'));
+  }
+  next();
+});
+app.use('/admin', express.static(path.join(__dirname, 'admin')));
 
 // ── FILE HELPERS ──────────────────────────────────────────
 const dataPath = (file) => path.join(__dirname, 'data', file);
@@ -296,27 +305,13 @@ app.get('/api/settings', (req, res) => {
 // ADMIN AUTH
 // ════════════════════════════════════════════════════════
 
-/*app.post('/api/admin/login', async (req, res) => {
-  const { username, password } = req.body;
-  const admin = readData('admin.json');
-  if (!admin.username || username !== admin.username) {
-    return res.status(401).json({ error: 'Invalid credentials' });
-  }
-  const match = await bcrypt.compare(password, admin.password);
-  if (!match) return res.status(401).json({ error: 'Invalid credentials' });
-  req.session.isAdmin = true;
-  res.json({ success: true });
-});
+// Legacy admin auth handlers were removed in favor of the consolidated endpoints below:
+// - POST /api/adminlogin
+// - POST /api/adminlogout
+// - GET  /api/admincheck
+// These endpoints provide session-based admin authentication and are used by the admin UI.
 
-app.post('/api/admin/logout', (req, res) => {
-  req.session.destroy();
-  res.json({ success: true });
-});
 
-app.get('/api/admin/check', requireAuth, (req, res) => {
-  res.json({ authenticated: true });
-});
-*/ 
 app.post('/api/adminlogin', async (req, res) => {
   const { username, password } = req.body;
   const admin = readData('admin.json');
