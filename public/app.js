@@ -359,12 +359,36 @@ async function submitRepair() {
   const phone = document.getElementById('repairPhone')?.value.trim();
   const device = document.getElementById('repairDevice')?.value;
   const problem = document.getElementById('repairProblem')?.value.trim();
+  const imageInput = document.getElementById('repairImage');
   if (!name || !phone || !device || !problem) { showToast('Please fill in all fields.'); return; }
-  const msg = `Hello HOK Computers, repair request:\n\n*Name:* ${name}\n*Phone:* ${phone}\n*Device:* ${device}\n*Problem:* ${problem}`;
-  window.open(waLink(msg, settings.whatsappNumber), '_blank');
-  ['repairName', 'repairPhone', 'repairProblem'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-  if (document.getElementById('repairDevice')) document.getElementById('repairDevice').value = '';
-  showToast('Repair request sent!');
+
+  const formData = new FormData();
+  formData.append('name', name);
+  formData.append('phone', phone);
+  formData.append('device', device);
+  formData.append('problem', problem);
+  if (imageInput?.files?.[0]) {
+    formData.append('image', imageInput.files[0]);
+  }
+
+  try {
+    const res = await fetch('/api/repair-requests', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (!res.ok) {
+      showToast(data.error || 'Could not submit repair request.', 'error');
+      return;
+    }
+    const imagePart = data.imageUrl ? `\n*Image:* ${data.imageUrl}` : '';
+    const msg = `Hello HOK Computers, repair request:\n\n*Name:* ${name}\n*Phone:* ${phone}\n*Device:* ${device}\n*Problem:* ${problem}${imagePart}`;
+    window.open(waLink(msg, settings.whatsappNumber), '_blank');
+    ['repairName', 'repairPhone', 'repairProblem'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    if (document.getElementById('repairDevice')) document.getElementById('repairDevice').value = '';
+    if (imageInput) imageInput.value = '';
+    showToast('Repair request sent!');
+  } catch (err) {
+    console.error('Repair request error:', err);
+    showToast('Something went wrong. Try again.', 'error');
+  }
 }
 
 // ── HELPERS ───────────────────────────────────────────────

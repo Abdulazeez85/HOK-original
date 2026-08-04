@@ -74,7 +74,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       <tr>
         <td data-label="Customer Phone">${r.phone || '—'}</td>
         <td class="td-name" data-label="Product">${r.productName}</td>
-        <td data-label="Request Details" style="max-width:360px;white-space:normal;word-break:break-word">${r.requestMessage.replace(/\n/g, '<br/>')}</td>
+        <td data-label="Request Details" style="max-width:360px;white-space:normal;word-break:break-word">
+          ${r.requestMessage.replace(/\n/g, '<br/>')}
+          ${r.imageUrl ? `<div style="margin-top:8px"><a href="${r.imageUrl}" target="_blank" rel="noreferrer noopener">View attached image</a></div>` : ''}
+        </td>
         <td data-label="Date">${new Date(r.createdAt).toLocaleDateString('en-NG')}</td>
       </tr>`).join('');
   }

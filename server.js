@@ -207,6 +207,26 @@ app.post('/api/requests', (req, res) => {
   res.json({ success: true });
 });
 
+app.post('/api/repair-requests', upload.single('image'), (req, res) => {
+  const { name, phone, device, problem } = req.body;
+  if (!name || !phone || !device || !problem) {
+    return res.status(400).json({ error: 'Missing repair data' });
+  }
+  const requests = readData('requests.json');
+  const newRequest = {
+    id: 'req_' + uuidv4().slice(0, 8),
+    productId: null,
+    productName: 'Repair request',
+    requestMessage: `Repair request:\n\nName: ${name}\nPhone: ${phone}\nDevice: ${device}\nProblem: ${problem}`,
+    phone: phone.trim(),
+    imageUrl: req.file ? `/uploads/${req.file.filename}` : '',
+    createdAt: new Date().toISOString()
+  };
+  requests.push(newRequest);
+  writeData('requests.json', requests);
+  res.json({ success: true, imageUrl: newRequest.imageUrl });
+});
+
 app.post('/api/visitors', (req, res) => {
   const { path, page, referrer, userAgent } = req.body || {};
   const visitors = readData('visitors.json');
