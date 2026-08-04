@@ -291,8 +291,8 @@ async function payWithPaystack(productId, productName, amount, e) {
 }
     showToast('Unable to start payment. Try again.');
     console.error('Paystack init error:', err);
-  }
-}
+  
+
 
 async function recordEnquiry(productId, productName) {
   try {
@@ -669,3 +669,4 @@ function initCommon() {
 
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') { closeCartDrawer(); closeProductModal(); closeNotifyModal(); closePaystackModal(); }
+  })};
