@@ -266,28 +266,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ── INSTALLMENT ───────────────────────────────────────────
-function showInstallmentModal() {
-  document.getElementById('installmentOverlay').classList.add('open');
-  document.getElementById('installmentModal').classList.add('open');
-}
-function closeInstallmentModal() {
-  document.getElementById('installmentOverlay').classList.remove('open');
-  document.getElementById('installmentModal').classList.remove('open');
-}
-function submitInstallment() {
-  const name = document.getElementById('instName').value.trim();
-  const phone = document.getElementById('instPhone').value.trim();
-  const dur = document.getElementById('instDuration').value;
-  const dep = document.getElementById('instDeposit').value.trim();
-  if (!name || !phone) { showToast('Please fill in name and phone.'); return; }
-  if (!cart.length) { showToast('Your cart is empty.'); return; }
-  const items = cart.map(i => `${i.name} x${i.qty}`).join(', ');
-  const msg = `Hello HOK Computers, installment request:\n\n*Items:* ${items}\n*Total:* ${fmt(calcTotal())}\n*Duration:* ${dur}${dep ? `\n*Deposit:* ${dep}` : ''}\n\n*Name:* ${name}\n*Phone:* ${phone}`;
-  window.open(waLink(msg, settings.whatsappNumber), '_blank');
-  closeInstallmentModal();
-}
-
 // ── PRODUCT MODAL ─────────────────────────────────────────
 function openProductModal(p) {
   const del = settings.delivery || {};
@@ -378,9 +356,6 @@ function buildCard(p, i = 0) {
   const specsText = [p.specs?.cpu, p.specs?.ram, p.specs?.storage].filter(v => v && v !== 'N/A').join(' · ');
   const mainImage = p.images?.length ? p.images[0] : p.image;
 
-  // Installment calc default (3 months)
-  const monthly3 = Math.ceil(p.price / 3);
-
   return `
     <div class="product-card reveal" style="transition-delay:${i * 0.04}s" onclick="window.location.href='/product/${p.id}'">
       <div class="p-img-wrap">
@@ -405,25 +380,8 @@ function buildCard(p, i = 0) {
           </div>
         </div>
       </div>
-      <div class="installment-calc">
-        <div class="calc-label">Installment estimate:</div>
-        <div class="calc-tabs">
-          <button class="calc-tab" onclick="setCalcTab(this,${p.price},2);event.stopPropagation()">2mo</button>
-          <button class="calc-tab active" onclick="setCalcTab(this,${p.price},3);event.stopPropagation()">3mo</button>
-          <button class="calc-tab" onclick="setCalcTab(this,${p.price},6);event.stopPropagation()">6mo</button>
-        </div>
-        <div class="calc-result">Pay <span>${fmt(monthly3)}/month</span></div>
-      </div>
       ${isOut ? `<button class="notify-btn" onclick="openNotifyModal('${p.id}','${p.name}');event.stopPropagation()">🔔 Notify me when back in stock</button>` : ''}
     </div>`;
-}
-
-function setCalcTab(btn, price, months) {
-  const card = btn.closest('.product-card');
-  card.querySelectorAll('.calc-tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  const monthly = Math.ceil(price / months);
-  card.querySelector('.calc-result').innerHTML = `Pay <span>${fmt(monthly)}/month</span>`;
 }
 
 // Store products in memory for modal
@@ -479,7 +437,6 @@ function getCartDrawerHTML() {
         <div class="cart-actions">
           <button class="btn-primary full" onclick="checkoutPaystackCart()">Pay with Card</button>
           <button class="btn-wa full" onclick="checkoutWhatsApp()">Checkout via WhatsApp</button>
-          <button class="btn-outline full" onclick="showInstallmentModal()">Installment Plan</button>
         </div>
       </div>
     </div>`;
@@ -491,17 +448,6 @@ function getModalsHTML() {
     <div class="product-modal" id="productModal">
       <button class="close-btn modal-close" id="closeModal">✕</button>
       <div class="modal-content" id="modalContent"></div>
-    </div>
-    <div class="modal-overlay" id="installmentOverlay"></div>
-    <div class="installment-modal" id="installmentModal">
-      <button class="close-btn" onclick="closeInstallmentModal()">✕</button>
-      <h3>Installment Plan</h3>
-      <p class="modal-sub">Pay over time. We'll confirm on WhatsApp.</p>
-      <div class="form-group"><label>Full Name</label><input type="text" id="instName" placeholder="Your full name" /></div>
-      <div class="form-group"><label>Phone Number</label><input type="tel" id="instPhone" placeholder="08012345678" /></div>
-      <div class="form-group"><label>Duration</label><select id="instDuration"><option value="2 months">2 Months</option><option value="3 months" selected>3 Months</option><option value="6 months">6 Months</option></select></div>
-      <div class="form-group"><label>Initial Deposit (Optional)</label><input type="text" id="instDeposit" placeholder="e.g. ₦50,000" /></div>
-      <button class="btn-wa full" onclick="submitInstallment()">Send Installment Request</button>
     </div>
     <div class="modal-overlay" id="notifyOverlay"></div>
     <div class="notify-modal" id="notifyModal">
@@ -566,10 +512,9 @@ function initCommon() {
   document.getElementById('cartOverlay')?.addEventListener('click', closeCartDrawer);
   document.getElementById('closeModal')?.addEventListener('click', closeProductModal);
   document.getElementById('modalOverlay')?.addEventListener('click', closeProductModal);
-  document.getElementById('installmentOverlay')?.addEventListener('click', closeInstallmentModal);
   document.getElementById('notifyOverlay')?.addEventListener('click', closeNotifyModal);
 
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeCartDrawer(); closeProductModal(); closeInstallmentModal(); closeNotifyModal(); }
+    if (e.key === 'Escape') { closeCartDrawer(); closeProductModal(); closeNotifyModal(); }
   });
 }

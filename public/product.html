@@ -84,7 +84,6 @@
             <img src="${src}" alt="${product.name} image ${idx + 1}" loading="lazy"/>
           </button>`).join('') : '';
 
-      const pricePer3 = Math.ceil(product.price / 3);
       const badge = product.badge ? `<span class="detail-badge ${badgeClass(product.badge)}">${badgeLabel(product.badge)}</span>` : '';
       const displayImage = mainImage || '';
 
@@ -116,10 +115,6 @@
           <div class="detail-box">
             <div class="detail-box-title">Delivery</div>
             <p>${delivery.local || 'Ilorin — Same Day'} · ${delivery.state || 'Other Kwara — Next Day'} · ${delivery.national || 'Outside Kwara — 2-3 Days'}</p>
-          </div>
-          <div class="detail-box">
-            <div class="detail-box-title">Installment estimate</div>
-            <p>From ${fmt(pricePer3)} / month for 3 months</p>
           </div>
           <div class="detail-box detail-specs-card">
             <div class="detail-box-title">Specifications</div>
