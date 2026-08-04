@@ -403,9 +403,14 @@ ul{list-style:none;}
 .footer-logo {display:flex;align-items:center;gap:10px;font-size:0.95rem;font-weight:600;color:var(--text-1);margin-bottom:12px;}
 .footer-logo img{width:50px;height:50px;border-radius:10px;object-fit:cover;}
 .footer-brand p{font-size:0.82rem;color:var(--text-2);line-height:1.65;font-weight:300;max-width:280px;}
-.socials{display:flex;gap:8px;margin-top:16px;}
-.socials a{background:var(--bg-3);border:1px solid var(--border);width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;transition:all 0.2s;}
-.socials a:hover{border-color:var(--text-3);}
+.socials{display:flex;gap:10px;margin-top:16px;}
+.social-link{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;color:#fff;}
+.social-link svg{width:18px;height:18px;}
+.social-link:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(0,0,0,0.12);}
+.social-facebook{background:#1877f2;color:#fff;}
+.social-instagram{background:radial-gradient(circle at 35% 25%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);color:#fff;}
+.social-linkedin{background:#0a66c2;color:#fff;}
+.social-whatsapp{background:#25d366;color:#fff;}
 .footer-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
 .footer-col{display:flex;flex-direction:column;gap:8px;}
 .footer-col h5{font-size:0.78rem;font-weight:600;color:var(--text-1);letter-spacing:0.5px;margin-bottom:2px;}
