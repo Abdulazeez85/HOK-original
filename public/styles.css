@@ -408,10 +408,12 @@ ul{list-style:none;}
 /* ── FOOTER ── */
 .footer{background:var(--bg-2);border-top:1px solid var(--border);padding:56px 0 24px;}
 .footer-top{display:grid;grid-template-columns:1.2fr 1fr;gap:56px;margin-bottom:40px;}
-.footer-logo {display:flex;align-items:center;gap:10px;font-size:0.95rem;font-weight:600;color:var(--text-1);margin-bottom:12px;}
+.footer-logo {display:flex;align-items:center;gap:10px;font-size:0.95rem;font-weight:700;color:var(--text-1);margin-bottom:12px;letter-spacing:0.02em;}
 .footer-logo img{width:50px;height:50px;border-radius:10px;object-fit:cover;}
-.footer-brand p{font-size:0.82rem;color:var(--text-2);line-height:1.65;font-weight:300;max-width:280px;}
-.socials{display:flex;gap:10px;margin-top:16px;}
+.footer-brand{display:flex;flex-direction:column;gap:10px;}
+.footer-brand p{font-size:0.9rem;color:var(--text-2);line-height:1.75;font-weight:400;max-width:320px;letter-spacing:0.01em;}
+.footer-note{margin-top:10px;font-size:0.88rem;line-height:1.8;color:var(--text-2);max-width:400px;opacity:0.94;font-weight:400;letter-spacing:0.01em;}
+.socials{display:flex;gap:10px;margin-top:18px;}
 .social-link{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;color:#fff;}
 .social-link svg{width:18px;height:18px;}
 .social-link:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(0,0,0,0.12);}

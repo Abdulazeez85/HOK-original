@@ -526,6 +526,7 @@ function getFooterHTML() {
           <span>HOK Computers</span>
         </div>
         <p>Home of Khayr — Ilorin's premier tech store. CAC Registered since 2020.</p>
+            <p class="footer-note">Some items may no longer be in store. It will be gotten ready for dispatch within 4-48 hours of payment.</p>
         <div class="socials">
           <a class="social-link social-facebook" href="https://web.facebook.com/homeofkhayr/?_rdc=1&_rdr#" aria-label="Facebook" target="_blank" rel="noreferrer noopener">
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12a10 10 0 10-11.5 9.9v-7H8.5v-2.9h2v-2.2c0-2 1.2-3.1 3-3.1.9 0 1.8.1 1.8.1v2h-1c-1 0-1.3.6-1.3 1.2v1.7h2.3l-.4 2.9h-1.9v7A10 10 0 0022 12z"/></svg>
