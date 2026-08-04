@@ -6,6 +6,7 @@ const session = require('express-session');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
+const crypto = require('crypto');
 const path = require('path');
 require('dotenv').config();
 const multer = require('multer');
@@ -271,7 +272,9 @@ app.post('/api/paystack/initialize', async (req, res) => {
       productId: productId || null,
       productName: productName || (orderType === 'cart' ? 'Cart Order' : 'HOK Order'),
       orderType: orderType || 'single',
-      items: Array.isArray(items) ? items : []
+      items: Array.isArray(items) ? items : [],
+      customerName: req.body.name || '',
+      customerPhone: req.body.phone || ''
     };
 
     const response = await fetch('https://api.paystack.co/transaction/initialize', {
@@ -294,6 +297,60 @@ app.post('/api/paystack/initialize', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Paystack initialization error', details: error.message });
   }
+});
+
+app.get('/api/paystack/config', (req, res) => {
+  const publicKey = process.env.PAYSTACK_PUBLIC_KEY;
+  if (!publicKey) return res.status(500).json({ error: 'Paystack public key not configured' });
+  res.json({ publicKey });
+});
+
+app.post('/api/paystack/webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  const secretKey = process.env.PAYSTACK_SECRET_KEY;
+  if (!secretKey) return res.status(500).json({ error: 'Paystack secret key not configured' });
+  const signature = req.get('x-paystack-signature');
+  const expected = crypto.createHmac('sha512', secretKey).update(req.body).digest('hex');
+  if (!signature || signature !== expected) {
+    return res.status(401).json({ error: 'Invalid Paystack webhook signature' });
+  }
+
+  let payload;
+  try {
+    payload = JSON.parse(req.body.toString());
+  } catch (err) {
+    return res.status(400).json({ error: 'Invalid webhook body' });
+  }
+
+  const eventType = payload.event;
+  const payment = payload.data;
+  if (eventType === 'charge.success') {
+    const orders = readData('orders.json');
+    const existing = orders.find(o => o.reference === payment.reference);
+    const record = {
+      id: existing ? existing.id : 'order_' + uuidv4().slice(0, 8),
+      reference: payment.reference,
+      status: payment.status,
+      amount: payment.amount / 100,
+      currency: payment.currency,
+      email: payment.customer?.email || '',
+      phone: payment.customer?.phone || payment.metadata?.customerPhone || '',
+      customerName: payment.metadata?.customerName || '',
+      productId: payment.metadata?.productId || null,
+      productName: payment.metadata?.productName || '',
+      orderType: payment.metadata?.orderType || 'single',
+      items: payment.metadata?.items || [],
+      paidAt: payment.paid_at || new Date().toISOString(),
+      raw: payment
+    };
+    if (existing) {
+      Object.assign(existing, record);
+    } else {
+      orders.push(record);
+    }
+    writeData('orders.json', orders);
+  }
+
+  res.json({ received: true });
 });
 
 app.get('/api/paystack/verify/:reference', async (req, res) => {

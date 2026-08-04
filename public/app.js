@@ -11,12 +11,115 @@ const stars = n => '★'.repeat(n) + '☆'.repeat(5 - n);
 
 let settings = {};
 let cart = JSON.parse(localStorage.getItem('hok_cart') || '[]');
+let paystackPublicKey = '';
+let paystackOrderInfo = null;
 
 async function loadSettings() {
   try {
     const res = await fetch('/api/settings');
     settings = await res.json();
   } catch { settings = { whatsappNumber: WA_NUM, delivery: { local: 'Ilorin — Same Day', state: 'Other Kwara — Next Day', national: 'Outside Kwara — 2-3 Days' } }; }
+}
+
+async function loadPaystackConfig() {
+  try {
+    const res = await fetch('/api/paystack/config');
+    const data = await res.json();
+    if (res.ok && data.publicKey) paystackPublicKey = data.publicKey;
+  } catch (err) {
+    console.error('Unable to load Paystack config:', err);
+  }
+}
+
+function loadPaystackScript() {
+  return new Promise((resolve, reject) => {
+    if (window.PaystackPop) return resolve(window.PaystackPop);
+    const script = document.createElement('script');
+    script.src = 'https://js.paystack.co/v1/inline.js';
+    script.async = true;
+    script.onload = () => resolve(window.PaystackPop);
+    script.onerror = () => reject(new Error('Unable to load Paystack script'));
+    document.head.appendChild(script);
+  });
+}
+
+function openPaystackModal(orderInfo) {
+  paystackOrderInfo = orderInfo;
+  const bx = document.getElementById('paystackModal');
+  const overlay = document.getElementById('paystackOverlay');
+  if (!bx || !overlay) return;
+  document.getElementById('checkoutSummary').textContent = orderInfo.summary;
+  document.getElementById('checkoutTotal').textContent = orderInfo.total;
+  document.getElementById('checkoutEmail').value = orderInfo.email || '';
+  bx.classList.add('open');
+  overlay.classList.add('open');
+}
+
+function closePaystackModal() {
+  const bx = document.getElementById('paystackModal');
+  const overlay = document.getElementById('paystackOverlay');
+  if (!bx || !overlay) return;
+  bx.classList.remove('open');
+  overlay.classList.remove('open');
+  paystackOrderInfo = null;
+}
+
+async function submitPaystackCheckout() {
+  if (!paystackOrderInfo) return;
+  const emailInput = document.getElementById('checkoutEmail');
+  const email = emailInput?.value.trim();
+  if (!email || !email.includes('@')) {
+    showToast('Enter a valid email for your payment receipt.');
+    return;
+  }
+  const order = paystackOrderInfo;
+  closePaystackModal();
+  try {
+    const init = await createPaystackOrder({
+      productId: order.productId,
+      productName: order.productName,
+      amount: order.amount,
+      email,
+      orderType: order.orderType,
+      items: order.items,
+      metadata: { customerName: order.customerName || '', customerPhone: order.customerPhone || '' }
+    });
+    if (!init.authorization_url) {
+      showToast(init.error || 'Unable to start Paystack payment.');
+      return;
+    }
+    await loadPaystackScript();
+    if (!paystackPublicKey || !window.PaystackPop) {
+      window.location.href = init.authorization_url;
+      return;
+    }
+    window.PaystackPop.setup({
+      key: paystackPublicKey,
+      email,
+      amount: Math.round(Number(order.amount) * 100),
+      currency: 'NGN',
+      ref: init.reference,
+      metadata: init.metadata || {},
+      callback: function(response) {
+        window.location.href = `${window.location.origin}/payment-success.html?reference=${encodeURIComponent(response.reference)}`;
+      },
+      onClose: function() {
+        showToast('Payment window closed. You can try again when ready.');
+      }
+    }).openIframe();
+  } catch (err) {
+    console.error('Paystack checkout error:', err);
+    showToast('Unable to launch Paystack. Please try again.');
+  }
+}
+
+async function createPaystackOrder(payload) {
+  const res = await fetch('/api/paystack/initialize', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  return res.json();
 }
 
 // ── TOAST ─────────────────────────────────────────────────
@@ -160,61 +263,32 @@ function checkoutWhatsApp() {
 
 async function checkoutPaystackCart() {
   if (!cart.length) return;
-  const email = window.prompt('Enter your email address for the receipt:');
-  if (!email || !email.includes('@')) {
-    showToast('Please enter a valid email address.');
-    return;
-  }
-  try {
-    const res = await fetch('/api/paystack/initialize', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        amount: calcTotal(),
-        email,
-        orderType: 'cart',
-        items: cart.map(i => ({ productId: i.id, productName: i.name, quantity: i.qty, price: i.price })),
-        callback_url: `${window.location.origin}/payment-success.html`
-      })
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      showToast(data.error || 'Unable to start Paystack payment.');
-      return;
-    }
-    window.location.href = data.authorization_url;
-  } catch (err) {
-    showToast('Unable to start payment. Try again.');
-    console.error('Paystack cart init error:', err);
-  }
+  const summary = cart.map(i => `• ${i.name} x${i.qty} = ${fmt(i.price * i.qty)}`).join('\n');
+  openPaystackModal({
+    orderType: 'cart',
+    summary: `${summary}\n\nTotal: ${fmt(calcTotal())}`,
+    total: fmt(calcTotal()),
+    amount: calcTotal(),
+    items: cart.map(i => ({ productId: i.id, productName: i.name, quantity: i.qty, price: i.price })),
+    productId: null,
+    productName: 'Cart Order',
+    email: ''
+  });
 }
 
 async function payWithPaystack(productId, productName, amount, e) {
   if (e) e.stopPropagation();
-  const email = window.prompt('Enter your email address for the payment receipt:');
-  if (!email || !email.includes('@')) {
-    showToast('Please enter a valid email address.');
-    return;
-  }
-  try {
-    const res = await fetch('/api/paystack/initialize', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        productId,
-        productName,
-        amount,
-        email,
-        callback_url: `${window.location.origin}/payment-success.html`
-      })
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      showToast(data.error || 'Paystack initialization failed.');
-      return;
-    }
-    window.location.href = data.authorization_url;
-  } catch (err) {
+  openPaystackModal({
+    orderType: 'single',
+    summary: `${productName} — ${fmt(amount)}`,
+    total: fmt(amount),
+    amount,
+    items: [{ productId, productName, quantity: 1, price: amount }],
+    productId,
+    productName,
+    email: ''
+  });
+}
     showToast('Unable to start payment. Try again.');
     console.error('Paystack init error:', err);
   }
@@ -512,6 +586,27 @@ function getModalsHTML() {
       <div class="form-group"><label>WhatsApp Number</label><input type="tel" id="notifyPhone" placeholder="08012345678" /></div>
       <button class="btn-wa full" onclick="submitNotify()">Notify Me</button>
     </div>
+    <div class="cart-overlay" id="paystackOverlay"></div>
+    <div class="paystack-modal" id="paystackModal">
+      <button class="close-btn" id="paystackClose">✕</button>
+      <div class="paystack-modal-head">
+        <div>
+          <p class="eyebrow">Secure Checkout</p>
+          <h3>Pay with Card</h3>
+        </div>
+        <div class="paystack-badge">Powered by Paystack</div>
+      </div>
+      <div class="checkout-details">
+        <div class="checkout-summary" id="checkoutSummary"></div>
+        <div class="checkout-total"><span>Total</span><strong id="checkoutTotal"></strong></div>
+      </div>
+      <div class="form-group">
+        <label for="checkoutEmail">Email address</label>
+        <input type="email" id="checkoutEmail" placeholder="you@example.com" />
+      </div>
+      <button class="btn-primary full" onclick="submitPaystackCheckout()">Proceed to Payment</button>
+      <p class="checkout-note">You will be redirected to Paystack's secure checkout window to complete your payment.</p>
+    </div>
     <div class="toast" id="toast"></div>`;
 }
 
@@ -569,8 +664,8 @@ function initCommon() {
   document.getElementById('closeModal')?.addEventListener('click', closeProductModal);
   document.getElementById('modalOverlay')?.addEventListener('click', closeProductModal);
   document.getElementById('notifyOverlay')?.addEventListener('click', closeNotifyModal);
+  document.getElementById('paystackOverlay')?.addEventListener('click', closePaystackModal);
+  document.getElementById('paystackClose')?.addEventListener('click', closePaystackModal);
 
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeCartDrawer(); closeProductModal(); closeNotifyModal(); }
-  });
-}
+    if (e.key === 'Escape') { closeCartDrawer(); closeProductModal(); closeNotifyModal(); closePaystackModal(); }

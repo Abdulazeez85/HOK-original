@@ -133,6 +133,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('footer-mount').innerHTML = getFooterHTML();
   document.getElementById('modals-mount').innerHTML = getCartDrawerHTML() + getModalsHTML();
   await loadSettings();
+  await loadPaystackConfig();
   initCommon();
   initScrollReveal();
   const wa = settings.whatsappNumber || '2348000000000';
