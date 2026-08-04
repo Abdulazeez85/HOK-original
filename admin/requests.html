@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Requests — HOK Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/admin/admin.css"/>
+</head>
+<body>
+<div class="admin-layout">
+  <div id="sidebar-mount"></div>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div><h1 class="page-title">Requests</h1><p class="page-sub">Customer requests for out-of-stock or unavailable products.</p></div>
+    </div>
+
+    <div class="stats-grid" id="requestStats"></div>
+
+    <div class="card">
+      <p class="card-title">Top Requested Products</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Rank</th><th>Product</th><th>Total Requests</th><th>Last Request</th></tr></thead>
+          <tbody id="requestTable"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="emptyRequests" style="display:none"><span>📩</span><p>No product requests yet. Customers can submit requests from out-of-stock product pages.</p></div>
+    </div>
+
+    <div class="card" style="margin-top:24px;">
+      <p class="card-title">Recent Request Entries</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Customer Phone</th><th>Product</th><th>Request Details</th><th>Date</th></tr></thead>
+          <tbody id="requestEntries"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="emptyRequestEntries" style="display:none"><span>📝</span><p>No raw requests available yet.</p></div>
+    </div>
+  </main>
+</div>
+<script src="/admin/admin.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const ok = await checkAuth(); if (!ok) return;
+  document.getElementById('sidebar-mount').innerHTML = getSidebarHTML('requests');
+
+  const res = await adminFetch('/api/admin/requests');
+  const data = await res.json();
+  const summary = data.summary || [];
+  const raw = data.raw || [];
+
+  document.getElementById('requestStats').innerHTML = `
+    <div class="stat-card accent"><div class="stat-card-icon">📩</div><div class="stat-card-num">${raw.length}</div><div class="stat-card-label">Total Requests</div></div>
+    <div class="stat-card"><div class="stat-card-icon">🧾</div><div class="stat-card-num">${summary.length}</div><div class="stat-card-label">Products Requested</div></div>
+    <div class="stat-card warn"><div class="stat-card-icon">🔥</div><div class="stat-card-num">${summary[0]?.totalRequests || 0}</div><div class="stat-card-label">Top Product Requests</div></div>`;
+
+  if (!summary.length) {
+    document.getElementById('emptyRequests').style.display = 'block';
+  } else {
+    document.getElementById('requestTable').innerHTML = summary.map((r,i) => `
+      <tr>
+        <td style="font-weight:600;color:${i<3?'var(--accent)':'var(--text-2)'}" data-label="Rank">#${i+1}</td>
+        <td class="td-name" data-label="Product">${r.productName}</td>
+        <td data-label="Total Requests"><strong style="color:var(--accent)">${r.totalRequests}</strong></td>
+        <td data-label="Last Request">${new Date(r.lastRequest).toLocaleDateString('en-NG')}</td>
+      </tr>`).join('');
+  }
+
+  if (!raw.length) {
+    document.getElementById('emptyRequestEntries').style.display = 'block';
+  } else {
+    document.getElementById('requestEntries').innerHTML = raw.slice(-10).reverse().map(r => `
+      <tr>
+        <td data-label="Customer Phone">${r.phone || '—'}</td>
+        <td class="td-name" data-label="Product">${r.productName}</td>
+        <td data-label="Request Details" style="max-width:360px;white-space:normal;word-break:break-word">${r.requestMessage.replace(/\n/g, '<br/>')}</td>
+        <td data-label="Date">${new Date(r.createdAt).toLocaleDateString('en-NG')}</td>
+      </tr>`).join('');
+  }
+});
+</script>
+</body>
+</html>

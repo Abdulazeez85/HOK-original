@@ -87,6 +87,21 @@
       const badge = product.badge ? `<span class="detail-badge ${badgeClass(product.badge)}">${badgeLabel(product.badge)}</span>` : '';
       const displayImage = mainImage || '';
 
+      const requestCardHtml = product.stock === 'Out of Stock' ? `
+          <div class="detail-box detail-request-card">
+            <div class="detail-box-title">Need help sourcing this product?</div>
+            <p class="request-copy">This item is currently unavailable. Send us a request and we will follow up on WhatsApp with a sourcing update or similar option.</p>
+            <div class="request-grid">
+              <div class="form-group"><label>Your Name</label><input type="text" id="requestName" placeholder="John Doe" /></div>
+              <div class="form-group"><label>WhatsApp Number</label><input type="tel" id="requestPhone" placeholder="08012345678" /></div>
+              <div class="form-group full"><label>What are you looking for?</label><textarea id="requestMessage" placeholder="Describe the product, model, specs or service you need"></textarea></div>
+            </div>
+            <div class="request-actions">
+              <button class="btn-outline" data-request-product-id="${product.id}" data-request-product-name="${product.name}" onclick="submitProductRequest(this, false)">Submit Request</button>
+              <button class="btn-wa full" data-request-product-id="${product.id}" data-request-product-name="${product.name}" onclick="submitProductRequest(this, true)">Send WhatsApp Request</button>
+            </div>
+          </div>` : '';
+
       const content = document.getElementById('detailContent');
       content.innerHTML = `
         <div class="detail-image-card">
@@ -120,22 +135,7 @@
             <div class="detail-box-title">Specifications</div>
             ${specsHtml || '<p>No additional specifications available.</p>'}
           </div>
-          <div class="detail-box detail-request-card">
-            <div class="detail-box-title">Need help sourcing this product?</div>
-            <p class="request-copy">${product.stock === 'Out of Stock'
-              ? 'This item is currently unavailable. Send us a request and we will follow up on WhatsApp with a sourcing update or similar option.'
-              : 'Looking for a different model or a product not listed in the store? Share your request and we will contact you on WhatsApp as soon as possible.'}
-            </p>
-            <div class="request-grid">
-              <div class="form-group"><label>Your Name</label><input type="text" id="requestName" placeholder="John Doe" /></div>
-              <div class="form-group"><label>WhatsApp Number</label><input type="tel" id="requestPhone" placeholder="08012345678" /></div>
-              <div class="form-group full"><label>What are you looking for?</label><textarea id="requestMessage" placeholder="Describe the product, model, specs or service you need"></textarea></div>
-            </div>
-            <div class="request-actions">
-              <button class="btn-outline" data-request-product-id="${product.id}" data-request-product-name="${product.name}" onclick="submitProductRequest(this, false)">Submit Request</button>
-              <button class="btn-wa full" data-request-product-id="${product.id}" data-request-product-name="${product.name}" onclick="submitProductRequest(this, true)">Send WhatsApp Request</button>
-            </div>
-          </div>
+          ${requestCardHtml}
           <div class="detail-backlink"><a href="/products" class="btn-ghost">← Back to Products</a></div>
         </div>`;
     }

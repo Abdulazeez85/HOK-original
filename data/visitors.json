@@ -318,5 +318,149 @@
     "referrer": "",
     "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
     "timestamp": "2026-08-04T05:50:13.456Z"
+  },
+  {
+    "id": "vis_4da505d1",
+    "path": "/",
+    "page": "HOK Computers — Home of Khayr | Ilorin, Nigeria",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-04T05:57:12.434Z"
+  },
+  {
+    "id": "vis_a66ee3ae",
+    "path": "/products",
+    "page": "Products — HOK Computers | Laptops & Phones in Ilorin",
+    "referrer": "http://localhost:3000/",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-04T05:57:26.410Z"
+  },
+  {
+    "id": "vis_24889e08",
+    "path": "/products",
+    "page": "Products — HOK Computers | Laptops & Phones in Ilorin",
+    "referrer": "http://localhost:3000/",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-04T06:01:20.280Z"
+  },
+  {
+    "id": "vis_f58d1a83",
+    "path": "/products",
+    "page": "Products — HOK Computers | Laptops & Phones in Ilorin",
+    "referrer": "http://localhost:3000/",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-04T06:01:43.136Z"
+  },
+  {
+    "id": "vis_9850896b",
+    "path": "/",
+    "page": "HOK Computers — Home of Khayr | Ilorin, Nigeria",
+    "referrer": "http://localhost:3000/products",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-04T06:01:50.441Z"
+  },
+  {
+    "id": "vis_f7f7082e",
+    "path": "/products.html",
+    "page": "Products — HOK Computers | Laptops & Phones in Ilorin",
+    "referrer": "http://localhost:3000/",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-04T06:03:57.793Z"
+  },
+  {
+    "id": "vis_cc80420f",
+    "path": "/products.html",
+    "page": "Products — HOK Computers | Laptops & Phones in Ilorin",
+    "referrer": "http://localhost:3000/",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-04T06:07:19.985Z"
+  },
+  {
+    "id": "vis_74d82e4a",
+    "path": "/",
+    "page": "HOK Computers — Home of Khayr | Ilorin, Nigeria",
+    "referrer": "http://localhost:3000/products.html?cat=laptop",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-04T06:07:32.230Z"
+  },
+  {
+    "id": "vis_54009437",
+    "path": "/products",
+    "page": "Products — HOK Computers | Laptops & Phones in Ilorin",
+    "referrer": "http://localhost:3000/",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-04T06:07:46.565Z"
+  },
+  {
+    "id": "vis_98fba828",
+    "path": "/products",
+    "page": "Products — HOK Computers | Laptops & Phones in Ilorin",
+    "referrer": "http://localhost:3000/",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-04T06:08:06.357Z"
+  },
+  {
+    "id": "vis_506374df",
+    "path": "/products",
+    "page": "Products — HOK Computers | Laptops & Phones in Ilorin",
+    "referrer": "http://localhost:3000/",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-04T06:11:46.407Z"
+  },
+  {
+    "id": "vis_4c981539",
+    "path": "/",
+    "page": "HOK Computers — Home of Khayr | Ilorin, Nigeria",
+    "referrer": "http://localhost:3000/products",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-04T06:12:13.305Z"
+  },
+  {
+    "id": "vis_72a9b7ba",
+    "path": "/reviews",
+    "page": "Reviews — HOK Computers | Ilorin, Nigeria",
+    "referrer": "http://localhost:3000/",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-04T06:12:29.331Z"
+  },
+  {
+    "id": "vis_b3033806",
+    "path": "/product/prod_001",
+    "page": "Product Details — HOK Computers",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.131.0 Chrome/148.0.7778.280 Electron/42.7.0 Safari/537.36",
+    "timestamp": "2026-08-04T06:12:48.958Z"
+  },
+  {
+    "id": "vis_2a22264f",
+    "path": "/products",
+    "page": "Products — HOK Computers | Laptops & Phones in Ilorin",
+    "referrer": "http://localhost:3000/reviews",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-04T06:13:03.241Z"
+  },
+  {
+    "id": "vis_ae3048eb",
+    "path": "/product/prod_001",
+    "page": "Product Details — HOK Computers",
+    "referrer": "http://localhost:3000/products",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-04T06:13:04.626Z"
+  },
+  {
+    "id": "vis_e371fc27",
+    "path": "/products",
+    "page": "Products — HOK Computers | Laptops & Phones in Ilorin",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.131.0 Chrome/148.0.7778.280 Electron/42.7.0 Safari/537.36",
+    "timestamp": "2026-08-04T06:18:28.837Z"
+  },
+  {
+    "id": "vis_003dcd85",
+    "path": "/products",
+    "page": "Products — HOK Computers | Laptops & Phones in Ilorin",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-04T06:18:39.745Z"
   }
 ]

@@ -83,6 +83,26 @@
   </div>
 </div>
 
+  <section class="products-request container" style="margin:40px auto 24px;max-width:900px">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h3 style="margin:0 0 6px">Can't find what you're looking for?</h3>
+          <p style="margin:0;color:var(--text-2)">Tell us what you need and we'll source it — we'll contact you on WhatsApp.</p>
+        </div>
+      </div>
+      <div style="margin-top:12px" class="request-grid">
+        <div class="form-group"><label>Your Name</label><input type="text" id="requestName" placeholder="John Doe" /></div>
+        <div class="form-group"><label>WhatsApp Number</label><input type="tel" id="requestPhone" placeholder="08012345678" /></div>
+        <div class="form-group full"><label>What are you looking for?</label><textarea id="requestMessage" placeholder="Describe the product, model, specs or service you need"></textarea></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:12px">
+        <button class="btn-outline" data-request-product-name="Product search request" onclick="submitProductRequest(this, false)">Submit Request</button>
+        <button class="btn-wa" data-request-product-name="Product search request" onclick="submitProductRequest(this, true)">Send WhatsApp Request</button>
+      </div>
+    </div>
+  </section>
+
 <div id="footer-mount"></div>
 <div id="modals-mount"></div>
 

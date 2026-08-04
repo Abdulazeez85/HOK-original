@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "req_3c0d448a",
+    "productId": null,
+    "productName": "Product search request",
+    "requestMessage": "Customer request:\n\nnhhhhhhh\n\nProduct reference: Product search request\nName: hhh\nPhone: 888ggggg",
+    "phone": "888ggggg",
+    "createdAt": "2026-08-04T06:19:07.809Z"
+  },
+  {
+    "id": "req_3a89f557",
+    "productId": null,
+    "productName": "Product search request",
+    "requestMessage": "Customer request:\n\nnhhhhhhh\n\nProduct reference: Product search request\nName: hhh\nPhone: 888ggggg",
+    "phone": "888ggggg",
+    "createdAt": "2026-08-04T06:19:14.857Z"
+  }
+]

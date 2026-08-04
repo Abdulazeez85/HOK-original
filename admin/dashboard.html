@@ -38,6 +38,10 @@
         <p class="card-title">⏳ Pending Reviews</p>
         <div id="pendingReviewsList"><div style="color:var(--text-2);font-size:0.82rem;font-weight:300">No pending reviews.</div></div>
       </div>
+      <div class="card">
+        <p class="card-title">📩 Recent Product Requests</p>
+        <div id="recentRequestsList"><div style="color:var(--text-2);font-size:0.82rem;font-weight:300">No requests yet.</div></div>
+      </div>
     </div>
 
     <!-- RECENT PRODUCTS -->
@@ -100,6 +104,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
         <span style="font-size:0.82rem;color:var(--text-1)">${i+1}. ${p.page || p.path}</span>
         <span class="badge badge-blue">${p.count} visits</span>
+      </div>`).join('');
+  }
+
+  if (stats.topRequests?.length) {
+    document.getElementById('recentRequestsList').innerHTML = stats.topRequests.slice(0, 5).map((p,i) => `
+      <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:0.82rem;color:var(--text-1);font-weight:500">${i+1}. ${p.productName}</span>
+          <span class="badge badge-yellow">${p.totalRequests} reqs</span>
+        </div>
+        <div style="font-size:0.75rem;color:var(--text-2);margin-top:4px">Last: ${new Date(p.lastRequest).toLocaleDateString()}</div>
       </div>`).join('');
   }
 
