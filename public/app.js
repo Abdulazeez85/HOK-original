@@ -372,15 +372,21 @@ async function submitRepair() {
   }
 
   try {
+    const waWindow = window.open('about:blank', '_blank');
     const res = await fetch('/api/repair-requests', { method: 'POST', body: formData });
     const data = await res.json();
     if (!res.ok) {
+      if (waWindow) waWindow.close();
       showToast(data.error || 'Could not submit repair request.', 'error');
       return;
     }
     const imagePart = data.imageUrl ? `\n*Image:* ${data.imageUrl}` : '';
     const msg = `Hello HOK Computers, repair request:\n\n*Name:* ${name}\n*Phone:* ${phone}\n*Device:* ${device}\n*Problem:* ${problem}${imagePart}`;
-    window.open(waLink(msg, settings.whatsappNumber), '_blank');
+    if (waWindow) {
+      waWindow.location = waLink(msg, settings.whatsappNumber);
+    } else {
+      window.open(waLink(msg, settings.whatsappNumber), '_blank');
+    }
     ['repairName', 'repairPhone', 'repairProblem'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     if (document.getElementById('repairDevice')) document.getElementById('repairDevice').value = '';
     if (imageInput) imageInput.value = '';

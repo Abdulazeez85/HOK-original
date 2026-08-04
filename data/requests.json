@@ -14,5 +14,14 @@
     "requestMessage": "Customer request:\n\nnhhhhhhh\n\nProduct reference: Product search request\nName: hhh\nPhone: 888ggggg",
     "phone": "888ggggg",
     "createdAt": "2026-08-04T06:19:14.857Z"
+  },
+  {
+    "id": "req_3d806290",
+    "productId": null,
+    "productName": "Repair request",
+    "requestMessage": "Repair request:\n\nName: hh\nPhone: 77\nDevice: Laptop\nProblem: hh",
+    "phone": "77",
+    "imageUrl": "/uploads/5f6fa01f506b0b2a5ef2df75c9034286",
+    "createdAt": "2026-08-04T06:43:35.116Z"
   }
 ]
