@@ -27,7 +27,11 @@
         <div id="topProductsList"><div style="color:var(--text-2);font-size:0.82rem;font-weight:300">No enquiries yet.</div></div>
       </div>
       <div class="card">
-        <p class="card-title">👥 Most Visited Pages</p>
+        <p class="card-title">� Most Requested Products</p>
+        <div id="topRequestsList"><div style="color:var(--text-2);font-size:0.82rem;font-weight:300">No requests yet.</div></div>
+      </div>
+      <div class="card">
+        <p class="card-title">�👥 Most Visited Pages</p>
         <div id="topPagesList"><div style="color:var(--text-2);font-size:0.82rem;font-weight:300">No visitors yet.</div></div>
       </div>
       <div class="card">
@@ -70,6 +74,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     <div class="stat-card warn"><div class="stat-card-icon">⏳</div><div class="stat-card-num">${stats.pendingReviews}</div><div class="stat-card-label">Pending Reviews</div></div>
     <div class="stat-card accent"><div class="stat-card-icon">⭐</div><div class="stat-card-num">${stats.approvedReviews}</div><div class="stat-card-label">Approved Reviews</div></div>
     <div class="stat-card"><div class="stat-card-icon">📊</div><div class="stat-card-num">${stats.totalEnquiries}</div><div class="stat-card-label">WhatsApp Clicks</div></div>
+    <div class="stat-card"><div class="stat-card-icon">📩</div><div class="stat-card-num">${stats.totalRequests || 0}</div><div class="stat-card-label">Product Requests</div></div>
     <div class="stat-card"><div class="stat-card-icon">�</div><div class="stat-card-num">${stats.totalVisitors}</div><div class="stat-card-label">Site Visitors</div></div>
     <div class="stat-card"><div class="stat-card-icon">�🔔</div><div class="stat-card-num">${stats.notifyRequests}</div><div class="stat-card-label">Notify Requests</div></div>`;
 
@@ -79,6 +84,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
         <span style="font-size:0.82rem;color:var(--text-1)">${i+1}. ${p.productName}</span>
         <span class="badge badge-green">${p.totalClicks} clicks</span>
+      </div>`).join('');
+  }
+
+  if (stats.topRequests?.length) {
+    document.getElementById('topRequestsList').innerHTML = stats.topRequests.map((p,i) => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:0.82rem;color:var(--text-1)">${i+1}. ${p.productName}</span>
+        <span class="badge badge-yellow">${p.totalRequests} requests</span>
       </div>`).join('');
   }
 

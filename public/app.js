@@ -248,6 +248,31 @@ function buyNowWA(id, name, price, e) {
   window.open(waLink(msg, settings.whatsappNumber), '_blank');
 }
 
+async function submitProductRequest(button, openWhatsApp = false) {
+  const productId = button.dataset.requestProductId || null;
+  const productName = button.dataset.requestProductName || 'Product request';
+  const name = document.getElementById('requestName')?.value.trim();
+  const phone = document.getElementById('requestPhone')?.value.trim();
+  const message = document.getElementById('requestMessage')?.value.trim();
+  if (!message) { showToast('Please enter what you are looking for.'); return; }
+  const requestMessage = `Customer request:\n\n${message}\n\nProduct reference: ${productName}${productId ? ` (${productId})` : ''}\nName: ${name || 'Not provided'}\nPhone: ${phone || 'Not provided'}`;
+  try {
+    await fetch('/api/requests', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productId, productName, requestMessage, phone })
+    });
+  } catch (err) {
+    console.error('Request submit error:', err);
+  }
+  if (openWhatsApp) {
+    const waMsg = `Hello HOK Computers, I am looking for: ${message}\n\nProduct reference: ${productName}${productId ? ` (${productId})` : ''}\nName: ${name || 'Not provided'}\nPhone: ${phone || 'Not provided'}`;
+    window.open(waLink(waMsg, settings.whatsappNumber), '_blank');
+  } else {
+    showToast('Request submitted. We will contact you on WhatsApp soon.');
+  }
+}
+
 // Delegate clicks on any anchor with data-enquire-product-id to record the enquiry
 document.addEventListener('DOMContentLoaded', () => {
   const pagePath = window.location.pathname;

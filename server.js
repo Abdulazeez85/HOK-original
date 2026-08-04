@@ -90,6 +90,7 @@ app.get('/admin/products', (req, res) => res.sendFile(path.join(__dirname, 'admi
 app.get('/admin/reviews', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'reviews.html')));
 app.get('/admin/enquiries', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'enquiries.html')));
 app.get('/admin/orders', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'orders.html')));
+app.get('/admin/requests', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'requests.html')));
 app.get('/admin/settings', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'settings.html')));
 
 // ════════════════════════════════════════════════════════
@@ -187,6 +188,22 @@ app.post('/api/enquiries', (req, res) => {
     timestamp: new Date().toISOString()
   });
   writeData('enquiries.json', enquiries);
+  res.json({ success: true });
+});
+
+app.post('/api/requests', (req, res) => {
+  const { productId, productName, requestMessage, phone } = req.body;
+  if (!productName || !requestMessage) return res.status(400).json({ error: 'Missing data' });
+  const requests = readData('requests.json');
+  requests.push({
+    id: 'req_' + uuidv4().slice(0, 8),
+    productId: productId || null,
+    productName: productName || 'Custom request',
+    requestMessage: String(requestMessage).trim(),
+    phone: phone ? String(phone).trim() : '',
+    createdAt: new Date().toISOString()
+  });
+  writeData('requests.json', requests);
   res.json({ success: true });
 });
 
@@ -347,6 +364,7 @@ app.get('/api/admin/stats', requireAuth, (req, res) => {
   const enquiries = readData('enquiries.json');
   const notify = readData('notify.json');
   const visitors = readData('visitors.json');
+  const requests = readData('requests.json');
 
   const summary = {};
   enquiries.forEach(e => {
@@ -357,6 +375,19 @@ app.get('/api/admin/stats', requireAuth, (req, res) => {
   });
   const topProducts = Object.values(summary)
     .sort((a, b) => b.totalClicks - a.totalClicks)
+    .slice(0, 5);
+
+  const requestSummary = {};
+  requests.forEach(r => {
+    const key = r.productId || r.productName;
+    if (!requestSummary[key]) {
+      requestSummary[key] = { productName: r.productName, totalRequests: 0, lastRequest: r.createdAt };
+    }
+    requestSummary[key].totalRequests++;
+    if (r.createdAt > requestSummary[key].lastRequest) requestSummary[key].lastRequest = r.createdAt;
+  });
+  const topRequests = Object.values(requestSummary)
+    .sort((a, b) => b.totalRequests - a.totalRequests)
     .slice(0, 5);
 
   const pageSummary = {};
@@ -380,9 +411,11 @@ app.get('/api/admin/stats', requireAuth, (req, res) => {
     approvedReviews: reviews.filter(r => r.status === 'approved').length,
     totalEnquiries: enquiries.length,
     notifyRequests: notify.length,
+    totalRequests: requests.length,
     totalVisitors: visitors.length,
     topProducts,
-    topPages
+    topPages,
+    topRequests
   });
 });
 
@@ -508,6 +541,36 @@ app.get('/api/admin/enquiries', requireAuth, (req, res) => {
   res.json({ raw: enquiries, summary: sorted });
 });
 
+app.get('/api/admin/requests', requireAuth, (req, res) => {
+  const requests = readData('requests.json');
+  const summary = {};
+  requests.forEach(r => {
+    const key = r.productId || r.productName;
+    if (!summary[key]) {
+      summary[key] = { productId: r.productId, productName: r.productName, totalRequests: 0, lastRequest: r.createdAt };
+    }
+    summary[key].totalRequests++;
+    if (r.createdAt > summary[key].lastRequest) summary[key].lastRequest = r.createdAt;
+  });
+  const sorted = Object.values(summary).sort((a, b) => b.totalRequests - a.totalRequests);
+  res.json({ raw: requests, summary: sorted });
+});
+
+app.get('/api/adminrequests', requireAuth, (req, res) => {
+  const requests = readData('requests.json');
+  const summary = {};
+  requests.forEach(r => {
+    const key = r.productId || r.productName;
+    if (!summary[key]) {
+      summary[key] = { productId: r.productId, productName: r.productName, totalRequests: 0, lastRequest: r.createdAt };
+    }
+    summary[key].totalRequests++;
+    if (r.createdAt > summary[key].lastRequest) summary[key].lastRequest = r.createdAt;
+  });
+  const sorted = Object.values(summary).sort((a, b) => b.totalRequests - a.totalRequests);
+  res.json({ raw: requests, summary: sorted });
+});
+
 // ════════════════════════════════════════════════════════
 // ADMIN — SETTINGS
 // ════════════════════════════════════════════════════════
@@ -531,6 +594,7 @@ app.get('/api/adminstats', requireAuth, (req, res) => {
   const reviews = readData('reviews.json');
   const enquiries = readData('enquiries.json');
   const notify = readData('notify.json');
+  const requests = readData('requests.json');
   const summary = {};
   enquiries.forEach(e => {
     if (!summary[e.productId]) {
@@ -550,6 +614,7 @@ app.get('/api/adminstats', requireAuth, (req, res) => {
     approvedReviews: reviews.filter(r => r.status === 'approved').length,
     totalEnquiries: enquiries.length,
     notifyRequests: notify.length,
+    totalRequests: requests.length,
     topProducts
   });
 });

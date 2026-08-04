@@ -36,6 +36,7 @@ function getSidebarHTML(active) {
     { href: '/admin/orders', icon: '🧾', label: 'Orders', key: 'orders' },
     { href: '/admin/reviews', icon: '⭐', label: 'Reviews', key: 'reviews' },
     { href: '/admin/enquiries', icon: '📈', label: 'Enquiries', key: 'enquiries' },
+    { href: '/admin/requests', icon: '📩', label: 'Requests', key: 'requests' },
     { href: '/admin/settings', icon: '⚙️', label: 'Settings', key: 'settings' },
   ];
   return `
