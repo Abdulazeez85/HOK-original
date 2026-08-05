@@ -207,7 +207,7 @@ app.post('/api/requests', (req, res) => {
   writeData('requests.json', requests);
   res.json({ success: true });
 });
-
+    
 app.post('/api/repair-requests', upload.single('image'), (req, res) => {
   const { name, phone, device, problem } = req.body;
   if (!name || !phone || !device || !problem) {

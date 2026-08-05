@@ -620,15 +620,17 @@ function getFooterHTML() {
           <img src="https://res.cloudinary.com/da7jzmy2g/image/upload/v1780626286/hokp_lzhjha.jpg" alt="HOK logo" class="logo-img" width="32" height="32" border-radius="50%">
           <span>HOK Computers</span>
         </div>
-        <p>Home of Khayr — Ilorin's premier tech store. CAC Registered since 2020.</p>
-            <p class="footer-note">Some items may no longer be in store. It will be gotten ready for dispatch within 4-48 hours of payment.</p>
+        <p>Home of Khayr — The Most Customer-friendly Gadget Store In Nigeria . CAC Registered since 2020.</p>
+            <p class="footer-note">Some items may no longer be in store, and some items are not presently on store  It will be gotten ready for dispatch within 4-48 hours of payment.</p>
         <div class="socials">
           <a class="social-link social-facebook" href="https://web.facebook.com/homeofkhayr/?_rdc=1&_rdr#" aria-label="Facebook" target="_blank" rel="noreferrer noopener">
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12a10 10 0 10-11.5 9.9v-7H8.5v-2.9h2v-2.2c0-2 1.2-3.1 3-3.1.9 0 1.8.1 1.8.1v2h-1c-1 0-1.3.6-1.3 1.2v1.7h2.3l-.4 2.9h-1.9v7A10 10 0 0022 12z"/></svg>
           </a>
           <a class="social-link social-instagram" href="https://www.instagram.com/hokcomputers/" aria-label="Instagram" target="_blank" rel="noreferrer noopener">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M16.5 7.5h.01"/><path d="M7.5 7.5h9v9h-9z"/></svg>
-          </a>
+               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+           </svg>
+           </a>
           <a class="social-link social-linkedin" href="https://ng.linkedin.com/company/home-of-khayr" aria-label="LinkedIn" target="_blank" rel="noreferrer noopener">
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5A2.5 2.5 0 002.5 6v12a2.5 2.5 0 002.48 2.5h.02A2.5 2.5 0 007.5 18V6a2.5 2.5 0 00-2.52-2.5zM4.5 8.75h1.5V18H4.5V8.75zm4.5 0H10.5v1.35c.2-.35.8-.88 1.75-.88 1.85 0 2.25 1.22 2.25 2.8V18H13.5v-4.75c0-1.14-.02-2.6-1.6-2.6-1.6 0-1.85 1.26-1.85 2.54V18H9V8.75zM5.25 4.5h1.5v1.25h-1.5V4.5z"/></svg>
           </a>
