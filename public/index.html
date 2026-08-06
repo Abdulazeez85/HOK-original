@@ -25,7 +25,7 @@
     <div class="hero-content">
       <div class="hero-badge"><span class="badge-dot"></span>The Most Customer-friendly Gadget Store In Nigeria</div>
       <h1 class="hero-title">Premium Tech.<br/><span>From Ilorin<br/>To The World.</span></h1>
-      <p class="hero-sub">Laptops, phones, and accessories. Quality guaranteed.From the Heart of Ilorin To The World And Beyond  .</p>
+      <p class="hero-sub">Laptops, phones, and accessories. Quality guaranteed.From the Heart of Ilorin To The Nigerians  And Beyond  .</p>
       <div class="hero-actions">
         <a href="/products" class="btn-primary">Shop Products</a>
         <a href="#" id="heroWaBtn" class="btn-ghost">
@@ -34,7 +34,7 @@
         </a>
       </div>
       <div class="hero-stats">
-        <div class="stat"><span class="stat-n">200+</span><span class="stat-l">Clients</span></div>
+        <div class="stat"><span class="stat-n">500+</span><span class="stat-l">Clients</span></div>
         <div class="stat-sep"></div>
         <div class="stat"><span class="stat-n">500+</span><span class="stat-l">Devices Sold</span></div>
         <div class="stat-sep"></div>
@@ -51,6 +51,8 @@
     </div>
   </div>
 </section>
+
+<div id="trust-banner-mount"></div>
 
 <!-- NEW ARRIVALS -->
 <section class="featured-section" id="new-arrivals">
@@ -161,6 +163,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('navbar-mount').innerHTML = getNavHTML('home');
   document.getElementById('footer-mount').innerHTML = getFooterHTML();
+  document.getElementById('trust-banner-mount').innerHTML = getTrustBannerHTML();
   document.getElementById('modals-mount').innerHTML = getCartDrawerHTML() + getModalsHTML();
   await loadSettings();
   await loadPaystackConfig();
