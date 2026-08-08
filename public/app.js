@@ -656,80 +656,51 @@ function getFooterHTML() {
 
 function getTrustBannerHTML() {
   const orgs = [
-    {
-      name: 'Nigeria Civil Service',
-      svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="48" height="48" rx="8" fill="#008751"/>
-        <rect x="16" width="16" height="48" fill="#ffffff"/>
-        <circle cx="24" cy="24" r="8" fill="#008751"/>
-        <circle cx="24" cy="24" r="5" fill="#ffffff"/>
-      </svg>`
-    },
-    {
-      name: 'Nigerian Medical Association',
-      svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="48" height="48" rx="8" fill="#003580"/>
-        <path d="M24 8L24 40M8 24L40 24" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
-        <circle cx="24" cy="24" r="6" fill="#003580" stroke="#ffffff" stroke-width="3"/>
-        <path d="M16 16C16 16 20 20 24 20C28 20 32 16 32 16" stroke="#e8c84a" stroke-width="2.5" stroke-linecap="round"/>
-      </svg>`
-    },
-    {
-      name: 'Pharmacists Council of Nigeria',
-      svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="48" height="48" rx="8" fill="#2e7d32"/>
-        <path d="M14 12H26C30.4 12 34 15.6 34 20C34 24.4 30.4 28 26 28H20V36H14V12Z" fill="white"/>
-        <path d="M20 20H26C27.1 20 28 20.9 28 22C28 23.1 27.1 24 26 24H20V20Z" fill="#2e7d32"/>
-        <path d="M24 28L32 36" stroke="white" stroke-width="4" stroke-linecap="round"/>
-      </svg>`
-    },
-    {
-      name: 'Nursing & Midwifery Council',
-      svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="48" height="48" rx="8" fill="#c62828"/>
-        <path d="M24 10L24 38M10 24L38 24" stroke="white" stroke-width="7" stroke-linecap="round"/>
-        <circle cx="24" cy="24" r="4" fill="#c62828" stroke="white" stroke-width="2"/>
-      </svg>`
-    },
-    {
-      name: 'ASUU',
-      svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="48" height="48" rx="8" fill="#1a237e"/>
-        <path d="M24 10L36 36H12L24 10Z" fill="none" stroke="#ffd600" stroke-width="3" stroke-linejoin="round"/>
-        <circle cx="24" cy="24" r="4" fill="#ffd600"/>
-        <path d="M12 30H36" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-      </svg>`
-    },
-    {
-      name: 'SSANU',
-      svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="48" height="48" rx="8" fill="#4a148c"/>
-        <rect x="10" y="14" width="28" height="4" rx="2" fill="white"/>
-        <rect x="10" y="22" width="20" height="4" rx="2" fill="#ce93d8"/>
-        <rect x="10" y="30" width="28" height="4" rx="2" fill="white"/>
-        <circle cx="36" cy="24" r="5" fill="#ffd600" stroke="white" stroke-width="1.5"/>
-      </svg>`
-    },
-    {
-      name: 'Federal Airports Authority',
-      svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="48" height="48" rx="8" fill="#01579b"/>
-        <path d="M8 28L24 14L40 28" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M16 28V36H32V28" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="36" cy="16" r="5" fill="#ffd600"/>
-        <path d="M33 16H39M36 13V19" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>`
-    },
-    {
-      name: 'Dangote Cement',
-      svg: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="48" height="48" rx="8" fill="#d32f2f"/>
-        <path d="M12 14H24C30.6 14 36 19.4 36 26C36 32.6 30.6 38 24 38H12V14Z" fill="none" stroke="white" stroke-width="3.5" stroke-linejoin="round"/>
-        <path d="M18 20H24C27.3 20 30 22.7 30 26C30 29.3 27.3 32 24 32H18V20Z" fill="white"/>
-        <rect x="10" y="9" width="28" height="3" rx="1.5" fill="#ffd600"/>
-      </svg>`
-    }
-  ];
+  {
+    name: 'Federal Civil Service Commission',
+    img: 'https://res.cloudinary.com/da7jzmy2g/image/upload/v1786123495/WhatsApp_Image_2026-08-07_at_10.22.51_AM_1_cepsfq.jpg'
+  },
+  {
+    name: 'Nigerian Medical Association',
+    img: 'https://res.cloudinary.com/da7jzmy2g/image/upload/v1786123495/WhatsApp_Image_2026-08-07_at_10.22.50_AM_2_nzpmwl.jpg'
+  },
+  {
+    name: 'ASUU',
+    img: 'https://res.cloudinary.com/da7jzmy2g/image/upload/v1786123495/WhatsApp_Image_2026-08-07_at_10.22.50_AM_3_n7gjmh.jpg'
+  },
+  {
+    name: 'SSANU',
+    img: 'https://res.cloudinary.com/da7jzmy2g/image/upload/v1786123495/WhatsApp_Image_2026-08-07_at_10.22.51_AM_u2grlm.jpg'
+  },
+  {
+    name: 'Federal Airports Authority (FAAN)',
+    img: 'https://res.cloudinary.com/da7jzmy2g/image/upload/v1786123495/WhatsApp_Image_2026-08-07_at_10.22.50_AM_4_ocjqhp.jpg'
+  },
+  {
+    name: 'University of Ilorin',
+    img: 'https://res.cloudinary.com/da7jzmy2g/image/upload/v1786123496/WhatsApp_Image_2026-08-07_at_10.22.49_AM_1_vtsqg4.jpg'
+  },
+  {
+    name: 'UITH',
+    img: 'https://res.cloudinary.com/da7jzmy2g/image/upload/v1786123495/WhatsApp_Image_2026-08-07_at_10.22.50_AM_hvlwt3.jpg'
+  },
+  {
+    name: 'Pharmaceutical Society of Nigeria',
+    img: 'https://res.cloudinary.com/da7jzmy2g/image/upload/v1786123497/WhatsApp_Image_2026-08-07_at_10.22.48_AM_exzczp.jpg'
+  },
+  {
+    name: 'NANNM — Nurses & Midwives',
+    img: 'https://res.cloudinary.com/da7jzmy2g/image/upload/v1786123497/WhatsApp_Image_2026-08-07_at_10.22.48_AM_1_ngq7th.jpg'
+  },
+  {
+    name: 'Dangote Cement',
+    img: 'https://res.cloudinary.com/da7jzmy2g/image/upload/v1786123497/WhatsApp_Image_2026-08-07_at_10.22.49_AM_anowzs.jpg'
+  }
+];
+  
+    
+    
+
 
   // Duplicate for seamless infinite scroll
   const allOrgs = [...orgs, ...orgs];
@@ -743,8 +714,7 @@ function getTrustBannerHTML() {
         <div class="trust-track">
           ${allOrgs.map(org => `
             <div class="trust-item">
-              ${org.svg}
-              <span>${org.name}</span>
+                <img src="${org.img}" alt="${org.name}" style="width:64px;height:64px;object-fit:contain;border-radius:6px;" />              <span>${org.name}</span>
             </div>
           `).join('')}
         </div>
