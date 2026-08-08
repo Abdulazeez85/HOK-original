@@ -737,7 +737,7 @@ function getTrustBannerHTML() {
   return `
     <section class="trust-section">
       <div class="trust-header">
-        <p>Trusted by organisations & institutions across Nigeria</p>
+        <p>Trusted by staffs of these organisations & institutions across Nigeria</p>
       </div>
       <div class="trust-track-wrap">
         <div class="trust-track">
