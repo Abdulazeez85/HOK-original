@@ -289,9 +289,6 @@ async function payWithPaystack(productId, productName, amount, e) {
     email: ''
   });
 }
-    showToast('Unable to start payment. Try again.');
-    console.error('Paystack init error:', err);
-  
 
 
 async function recordEnquiry(productId, productName) {

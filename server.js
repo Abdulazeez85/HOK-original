@@ -300,8 +300,7 @@ app.post('/api/paystack/initialize', async (req, res) => {
 });
 
 app.get('/api/paystack/config', (req, res) => {
-  const publicKey = process.env.PAYSTACK_PUBLIC_KEY;
-  if (!publicKey) return res.status(500).json({ error: 'Paystack public key not configured' });
+  const publicKey = process.env.PAYSTACK_PUBLIC_KEY || '';
   res.json({ publicKey });
 });
 
