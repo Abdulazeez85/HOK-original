@@ -1,6 +1,25 @@
 'use strict';
 
 const express = require('express');
+const helmet = require('helmet');
+app.use(helmet({
+  contentSecurityPolicy: false // disable CSP for now — Paystack and Cloudinary need it open
+}));
+const rateLimit = require('express-rate-limit');
+
+// General API rate limit
+app.use('/api/', rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  message: { error: 'Too many requests. Try again later.' }
+}));
+
+// Strict limit on login — prevents brute force
+app.use('/api/adminlogin', rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too many login attempts. Try again in 15 minutes.' }
+}));
 const bcrypt = require('bcryptjs');
 const session = require('express-session');
 const cors = require('cors');
