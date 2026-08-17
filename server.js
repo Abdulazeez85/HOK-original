@@ -1,26 +1,9 @@
 'use strict';
 
 const express = require('express');
-const helmet = require('helmet');
-app.use(helmet({
-  contentSecurityPolicy: false // disable CSP for now — Paystack and Cloudinary need it open
-}));
-const rateLimit = require('express-rate-limit');
-
-// General API rate limit
-app.use('/api/', rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
-  message: { error: 'Too many requests. Try again later.' }
-}));
-
-// Strict limit on login — prevents brute force
-app.use('/api/adminlogin', rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  message: { error: 'Too many login attempts. Try again in 15 minutes.' }
-}));
 const bcrypt = require('bcryptjs');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const session = require('express-session');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
@@ -37,6 +20,21 @@ if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 const upload = multer({ dest: uploadsDir });
 
 const app = express();
+
+// Security headers
+app.use(helmet({ contentSecurityPolicy: false }));
+
+// Rate limiting
+app.use('/api/', rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: { error: 'Too many requests. Try again later.' }
+}));
+app.use('/api/adminlogin', rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too many login attempts. Try again in 15 minutes.' }
+}));
 const PORT = process.env.PORT || 3000;
 
 // ── MIDDLEWARE ────────────────────────────────────────────
@@ -86,7 +84,7 @@ async function seedAdmin() {
       username: 'hokadmin',
       password: hashed
     });
-    console.log('✅ Admin credentials created.');
+    console.log  ('✅ Admin credentials created.');
   } else {
     console.log('✅ Admin already exists:', admin.username);
   }

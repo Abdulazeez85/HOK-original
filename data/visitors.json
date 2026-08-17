@@ -598,5 +598,205 @@
     "referrer": "http://localhost:3000/",
     "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
     "timestamp": "2026-08-09T04:52:41.666Z"
+  },
+  {
+    "id": "vis_fba06784",
+    "path": "/",
+    "page": "HOK Computers — Home of Khayr | Ilorin, Nigeria",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.131.0 Chrome/148.0.7778.280 Electron/42.7.0 Safari/537.36",
+    "timestamp": "2026-08-12T15:14:30.369Z"
+  },
+  {
+    "id": "vis_c43a57bd",
+    "path": "/",
+    "page": "HOK Computers — Home of Khayr | Ilorin, Nigeria",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.131.0 Chrome/148.0.7778.280 Electron/42.7.0 Safari/537.36",
+    "timestamp": "2026-08-17T04:12:18.495Z"
+  },
+  {
+    "id": "vis_b468ca0e",
+    "path": "/",
+    "page": "HOK Computers — Home of Khayr | Ilorin, Nigeria",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T04:13:25.899Z"
+  },
+  {
+    "id": "vis_c95b85ac",
+    "path": "/about",
+    "page": "About — HOK Computers | Home of Khayr, Ilorin",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T04:13:33.935Z"
+  },
+  {
+    "id": "vis_c07cfe37",
+    "path": "/",
+    "page": "HOK Computers — Home of Khayr | Ilorin, Nigeria",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.131.0 Chrome/148.0.7778.280 Electron/42.7.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:27:54.186Z"
+  },
+  {
+    "id": "vis_1b33594c",
+    "path": "/about",
+    "page": "About — HOK Computers | Home of Khayr, Ilorin",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:28:21.617Z"
+  },
+  {
+    "id": "vis_de264762",
+    "path": "/",
+    "page": "HOK Computers — Home of Khayr | Ilorin, Nigeria",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:28:44.413Z"
+  },
+  {
+    "id": "vis_7860713d",
+    "path": "/",
+    "page": "HOK Computers — Home of Khayr | Ilorin, Nigeria",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:31:43.093Z"
+  },
+  {
+    "id": "vis_7aeb9fbf",
+    "path": "/about",
+    "page": "About — HOK Computers | Home of Khayr, Ilorin",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:33:23.832Z"
+  },
+  {
+    "id": "vis_dd6fa713",
+    "path": "/about",
+    "page": "About — HOK Computers | Home of Khayr, Ilorin",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:36:18.265Z"
+  },
+  {
+    "id": "vis_48e48271",
+    "path": "/about",
+    "page": "About — HOK Computers | Home of Khayr, Ilorin",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:37:08.032Z"
+  },
+  {
+    "id": "vis_8f7863b5",
+    "path": "/about",
+    "page": "About — HOK Computers | Home of Khayr, Ilorin",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:38:21.787Z"
+  },
+  {
+    "id": "vis_43b8bc99",
+    "path": "/about",
+    "page": "About — HOK Computers | Home of Khayr, Ilorin",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:38:44.030Z"
+  },
+  {
+    "id": "vis_fdff642f",
+    "path": "/about",
+    "page": "About — HOK Computers | Home of Khayr, Ilorin",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:38:57.062Z"
+  },
+  {
+    "id": "vis_dbf3a4e1",
+    "path": "/products",
+    "page": "Products — HOK Computers | Laptops & Phones in Ilorin",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:39:03.522Z"
+  },
+  {
+    "id": "vis_72e215ca",
+    "path": "/product/prod_001",
+    "page": "Product Details — HOK Computers",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:39:05.979Z"
+  },
+  {
+    "id": "vis_abb9fb5a",
+    "path": "/product/prod_001",
+    "page": "Product Details — HOK Computers",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:43:34.701Z"
+  },
+  {
+    "id": "vis_15941624",
+    "path": "/product/prod_001",
+    "page": "Product Details — HOK Computers",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:44:00.877Z"
+  },
+  {
+    "id": "vis_3a2ad8d0",
+    "path": "/product/prod_001",
+    "page": "Product Details — HOK Computers",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:44:51.897Z"
+  },
+  {
+    "id": "vis_6d53a580",
+    "path": "/product/prod_001",
+    "page": "Product Details — HOK Computers",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:45:05.288Z"
+  },
+  {
+    "id": "vis_44c0d846",
+    "path": "/product/prod_001",
+    "page": "Product Details — HOK Computers",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:45:20.676Z"
+  },
+  {
+    "id": "vis_47da3aae",
+    "path": "/product/prod_001",
+    "page": "Product Details — HOK Computers",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:45:39.841Z"
+  },
+  {
+    "id": "vis_17308641",
+    "path": "/product/prod_001",
+    "page": "Product Details — HOK Computers",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:46:12.958Z"
+  },
+  {
+    "id": "vis_75326639",
+    "path": "/product/prod_001",
+    "page": "Product Details — HOK Computers",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:46:42.473Z"
+  },
+  {
+    "id": "vis_7cca77bc",
+    "path": "/product/prod_001",
+    "page": "Product Details — HOK Computers",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-17T20:46:55.674Z"
   }
 ]
