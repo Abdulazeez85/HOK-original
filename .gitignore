@@ -1,3 +1,6 @@
 node_modules/
 .env
-data/admin.json
+data/
+cookies.txt
+scripts/
+reset-admin.js

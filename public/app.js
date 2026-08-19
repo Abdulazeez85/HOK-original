@@ -382,15 +382,19 @@ function openProductModal(p) {
         🚚 ${del.local || ''} · ${del.state || ''} · ${del.national || ''}
       </div>
       <div class="modal-actions">
-        <button class="btn-primary" style="justify-content:center;border:none;cursor:pointer;width:100%"
-          onclick="addToCart('${p.id}','${p.name}',${p.price},'${p.image}');closeProductModal()">
-          + Add to Cart
-        </button>
-        <button class="btn-wa" style="justify-content:center;width:100%"
-          onclick="buyNowWA('${p.id}','${p.name}',${p.price})">
-          Buy via WhatsApp
-        </button>
-      </div>
+  <button class="btn-primary" style="justify-content:center;border:none;cursor:pointer;width:100%"
+    onclick="addToCart('${p.id}','${p.name}',${p.price},'${p.image}');closeProductModal()">
+    + Add to Cart
+  </button>
+  <button class="btn-primary" style="justify-content:center;border:none;cursor:pointer;width:100%;background:#003580"
+    onclick="payWithPaystack('${p.id}','${p.name}',${p.price});closeProductModal()">
+    💳 Pay Online
+  </button>
+  <button class="btn-wa" style="justify-content:center;width:100%"
+    onclick="buyNowWA('${p.id}','${p.name}',${p.price})">
+    Buy via WhatsApp
+  </button>
+</div>
     </div>`;
   document.getElementById('modalOverlay').classList.add('open');
   document.getElementById('productModal').classList.add('open');
@@ -561,9 +565,15 @@ function getCartDrawerHTML() {
       <div class="cart-footer" id="cartFooter" style="display:none">
         <div class="cart-total"><span>Total</span><strong id="cartTotal">₦0</strong></div>
         <div class="cart-actions">
-          <button class="btn-primary full" onclick="checkoutPaystackCart()">Pay with Card</button>
-          <button class="btn-wa full" onclick="checkoutWhatsApp()">Checkout via WhatsApp</button>
-        </div>
+  <button class="btn-primary full" style="border:none;cursor:pointer;background:#003580;justify-content:center"
+    onclick="checkoutPaystackCart()">
+    💳 Pay Online (Paystack)
+  </button>
+  <button class="btn-wa full" onclick="checkoutWhatsApp()">
+    Checkout via WhatsApp
+  </button>
+  
+</div>
       </div>
     </div>`;
 }

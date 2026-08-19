@@ -84,7 +84,7 @@ async function seedAdmin() {
       username: 'hokadmin',
       password: hashed
     });
-    console.log  ('✅ Admin credentials created.');
+    console.logn('✅ Admin credentials created.');
   } else {
     console.log('✅ Admin already exists:', admin.username);
   }
@@ -425,15 +425,10 @@ app.get('/api/settings', (req, res) => {
 app.post('/api/adminlogin', async (req, res) => {
   const { username, password } = req.body;
   const admin = readData('admin.json');
-  console.log('Login attempt:', username);
-  console.log('Admin in file:', admin.username);
-  console.log('Password received:', password);
   if (!admin.username || username !== admin.username) {
-    console.log('Username mismatch');
     return res.status(401).json({ error: 'Invalid credentials' });
   }
   const match = await bcrypt.compare(password, admin.password);
-  console.log('Password match:', match);
   if (!match) return res.status(401).json({ error: 'Invalid credentials' });
   req.session.isAdmin = true;
   res.json({ success: true });
@@ -844,7 +839,7 @@ app.use((req, res) => {
 // ── START ─────────────────────────────────────────────────
 seedAdmin().then(() => {
   app.listen(PORT, () => {
-    console.log(`🚀 HOK Computers running → http://localhost:${PORT}`);
+    console.log  (`🚀 HOK Computers running → http://localhost:${PORT}`);
     console.log(`🔐 Admin panel → http://localhost:${PORT}/admin`);
   });
 });
