@@ -1,1 +1,194 @@
-[]
+[
+  {
+    "id": "order_395f38d4",
+    "reference": "T603717101674271",
+    "status": "success",
+    "amount": 10,
+    "currency": "NGN",
+    "email": "abdulazeezoluwaseun17@gmail.com",
+    "productId": "prod_001",
+    "productName": "Elitebook 840 G6",
+    "orderType": "single",
+    "items": [
+      {
+        "productId": "prod_001",
+        "productName": "Elitebook 840 G6",
+        "quantity": 1,
+        "price": 10
+      }
+    ],
+    "paidAt": "2026-08-19T02:40:46.000Z",
+    "raw": {
+      "id": 6470981208,
+      "domain": "live",
+      "status": "success",
+      "reference": "T603717101674271",
+      "receipt_number": null,
+      "amount": 1000,
+      "message": null,
+      "gateway_response": "Approved by Financial Institution",
+      "gateway_response_code": "approved",
+      "response_code": "00",
+      "paid_at": "2026-08-19T02:40:46.000Z",
+      "created_at": "2026-08-19T02:37:17.000Z",
+      "channel": "card",
+      "currency": "NGN",
+      "ip_address": "102.89.68.206",
+      "metadata": {
+        "productId": "prod_001",
+        "productName": "Elitebook 840 G6",
+        "orderType": "single",
+        "items": [
+          {
+            "productId": "prod_001",
+            "productName": "Elitebook 840 G6",
+            "quantity": 1,
+            "price": 10
+          }
+        ],
+        "customerName": "",
+        "customerPhone": ""
+      },
+      "log": {
+        "start_time": 1787135739,
+        "time_spent": 207,
+        "attempts": 2,
+        "errors": 0,
+        "success": true,
+        "mobile": false,
+        "input": [],
+        "history": [
+          {
+            "type": "action",
+            "message": "Set payment method to: ussd",
+            "time": 30
+          },
+          {
+            "type": "action",
+            "message": "Set payment method to: card",
+            "time": 33
+          },
+          {
+            "type": "action",
+            "message": "User switched transaction currency to NGN",
+            "time": 73
+          },
+          {
+            "type": "action",
+            "message": "User switched transaction currency to NGN",
+            "time": 81
+          },
+          {
+            "type": "action",
+            "message": "User switched transaction currency to NGN",
+            "time": 82
+          },
+          {
+            "type": "action",
+            "message": "User switched transaction currency to NGN",
+            "time": 86
+          },
+          {
+            "type": "action",
+            "message": "User switched transaction currency to NGN",
+            "time": 88
+          },
+          {
+            "type": "action",
+            "message": "User switched transaction currency to NGN",
+            "time": 90
+          },
+          {
+            "type": "input",
+            "message": "Filled this field: card number",
+            "time": 102
+          },
+          {
+            "type": "input",
+            "message": "Filled this field: card expiry",
+            "time": 117
+          },
+          {
+            "type": "input",
+            "message": "Filled this field: card cvv",
+            "time": 130
+          },
+          {
+            "type": "action",
+            "message": "Attempted to pay with card",
+            "time": 130
+          },
+          {
+            "type": "auth",
+            "message": "Authentication Required: pin",
+            "time": 130
+          },
+          {
+            "type": "action",
+            "message": "Attempted to pay with card",
+            "time": 152
+          },
+          {
+            "type": "auth",
+            "message": "Authentication Required: otp",
+            "time": 154
+          },
+          {
+            "type": "success",
+            "message": "Successfully paid with card",
+            "time": 207
+          }
+        ]
+      },
+      "fees": 15,
+      "fees_split": null,
+      "authorization": {
+        "authorization_code": "AUTH_lgka8p04s0",
+        "bin": "507872",
+        "last4": "0733",
+        "exp_month": "12",
+        "exp_year": "2029",
+        "channel": "card",
+        "card_type": "verve debit",
+        "bank": "PAYCOM",
+        "country_code": "NG",
+        "brand": "verve",
+        "reusable": true,
+        "signature": "SIG_iqbNVBqBayXnyxmzfO94",
+        "account_name": null,
+        "receiver_bank_account_number": null,
+        "receiver_bank": null
+      },
+      "customer": {
+        "id": 392214905,
+        "first_name": null,
+        "last_name": null,
+        "email": "abdulazeezoluwaseun17@gmail.com",
+        "customer_code": "CUS_dzdn6p8ay6qzwhb",
+        "phone": null,
+        "metadata": null,
+        "risk_action": "default",
+        "international_format_phone": null
+      },
+      "plan": null,
+      "split": {},
+      "order_id": null,
+      "paidAt": "2026-08-19T02:40:46.000Z",
+      "createdAt": "2026-08-19T02:37:17.000Z",
+      "requested_amount": 1000,
+      "pos_transaction_data": null,
+      "source": null,
+      "fees_breakdown": [
+        {
+          "amount": 15,
+          "formula": null,
+          "type": "paystack"
+        }
+      ],
+      "connect": null,
+      "transaction_date": "2026-08-19T02:37:17.000Z",
+      "plan_object": {},
+      "subaccount": {}
+    }
+  }
+]

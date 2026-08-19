@@ -4,7 +4,7 @@
     "brand": "HP",
     "category": "laptop",
     "name": "Elitebook 840 G6",
-    "price": 485000,
+    "price": 10,
     "image": "https://res.cloudinary.com/da7jzmy2g/image/upload/v1780627919/840_G6_gxjryc.jpg",
     "specs": {
       "cpu": "Intel Core i5",
@@ -19,7 +19,8 @@
     "featured": true,
     "newArrival": true,
     "createdAt": "2025-01-01T00:00:00.000Z",
-    "updatedAt": "2026-06-22T18:56:04.121Z"
+    "updatedAt": "2026-08-19T10:35:18.422Z",
+    "images": []
   },
   {
     "id": "prod_002",
