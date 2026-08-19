@@ -838,5 +838,29 @@
     "referrer": "",
     "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
     "timestamp": "2026-08-17T20:57:42.299Z"
+  },
+  {
+    "id": "vis_f504dd69",
+    "path": "/",
+    "page": "HOK Computers — Home of Khayr | Ilorin, Nigeria",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.131.0 Chrome/148.0.7778.280 Electron/42.7.0 Safari/537.36",
+    "timestamp": "2026-08-19T05:45:35.887Z"
+  },
+  {
+    "id": "vis_4ef7b984",
+    "path": "/",
+    "page": "HOK Computers — Home of Khayr | Ilorin, Nigeria",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-19T05:45:49.609Z"
+  },
+  {
+    "id": "vis_4decbe8b",
+    "path": "/",
+    "page": "HOK Computers — Home of Khayr | Ilorin, Nigeria",
+    "referrer": "",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "timestamp": "2026-08-19T05:46:45.425Z"
   }
 ]

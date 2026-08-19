@@ -45,7 +45,7 @@ ul{list-style:none;}
 /* ── NAVBAR ── */
 .navbar{position:fixed;top:0;left:0;right:0;z-index:900;background:var(--nav-bg);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);transition:all var(--t);}
 .navbar.scrolled{box-shadow:var(--shadow-sm);}
-.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;height:62px;display:flex;align-items:center;gap:24px;}
+.nav-inner{max-width:700px;margin:0 auto;padding:0 24px;height:62px;display:flex;align-items:center;gap:24px;}
 .nav-logo{display:flex;align-items:center;gap:10px;flex-shrink:0;}
 .logo-wordmark{font-size:0.95rem;font-weight:600;color:var(--text-1);}
 .logo-wordmark em{font-style:normal;color:var(--text-2);font-weight:400;}
