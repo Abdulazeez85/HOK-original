@@ -84,7 +84,7 @@ async function seedAdmin() {
       username: 'hokadmin',
       password: hashed
     });
-    console.logn('✅ Admin credentials created.');
+    console.log('✅ Admin credentials created.');
   } else {
     console.log('✅ Admin already exists:', admin.username);
   }
