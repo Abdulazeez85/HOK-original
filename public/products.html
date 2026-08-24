@@ -74,6 +74,24 @@
           <button class="filter-toggle-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">⚙ Filters</button>
         </div>
       </div>
+      <!-- BUDGET TIER FILTER -->
+<div class="tier-filter-wrap">
+  <button class="tier-btn all active" onclick="setTier('all', this)">
+    🌟 All
+  </button>
+  <button class="tier-btn bronze" onclick="setTier('bronze', this)">
+    🥉 Bronze <span>Under ₦200k</span>
+  </button>
+  <button class="tier-btn silver" onclick="setTier('silver', this)">
+    🥈 Silver <span>₦200k – ₦500k</span>
+  </button>
+  <button class="tier-btn gold" onclick="setTier('gold', this)">
+    🥇 Gold <span>₦500k – ₦1M</span>
+  </button>
+  <button class="tier-btn diamond" onclick="setTier('diamond', this)">
+    💎 Diamond <span>Above ₦1M</span>
+  </button>
+</div>
       <div class="products-grid" id="productsGrid"><div class="loading">Loading products…</div></div>
       <div class="no-results" id="noResults" style="display:none">
         <p>No products found for your filters.</p>
@@ -107,7 +125,8 @@
 <div id="modals-mount"></div>
 
 <script src="/app.js"></script>
-<script>
+<script> 
+ let activeTier = 'all';
 let allProducts = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -151,6 +170,16 @@ function applyFilters() {
   if (ram) result = result.filter(p => p.specs?.ram === ram);
   if (stor) result = result.filter(p => p.specs?.storage?.includes(stor));
   result = result.filter(p => p.price <= maxPrice);
+
+if (activeTier === 'bronze') {
+  result = result.filter(p => p.price < 200000);
+} else if (activeTier === 'silver') {
+  result = result.filter(p => p.price >= 200000 && p.price <= 500000);
+} else if (activeTier === 'gold') {
+  result = result.filter(p => p.price > 500000 && p.price <= 1000000);
+} else if (activeTier === 'diamond') {
+  result = result.filter(p => p.price > 1000000);
+}
   if (search) result = result.filter(p =>
     p.name.toLowerCase().includes(search) ||
     p.brand.toLowerCase().includes(search) ||
@@ -170,6 +199,9 @@ function applyFilters() {
 }
 
 function resetFilters() {
+  activeTier = 'all';
+  document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.tier-btn.all').classList.add('active');
   document.querySelector('input[name="cat"][value="all"]').checked = true;
   document.querySelector('input[name="cond"][value=""]').checked = true;
   document.querySelector('input[name="ram"][value=""]').checked = true;
@@ -178,6 +210,12 @@ function resetFilters() {
   document.getElementById('priceVal').textContent = '₦5,000,000';
   document.getElementById('searchInput').value = '';
   document.getElementById('sortSelect').value = 'default';
+  applyFilters();
+}
+function setTier(tier, btn) {
+  activeTier = tier;
+  document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
   applyFilters();
 }
 </script>

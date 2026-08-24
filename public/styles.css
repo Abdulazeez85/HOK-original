@@ -600,3 +600,97 @@ ul{list-style:none;}
   max-width: 110px;
 }
   .nav-links.mobile-open{display:flex;flex-direction:column;position:fixed;top:62px;left:0;right:0;background:var(--bg-2);padding:12px 24px 20px 20px;border-bottom:1px solid var(--border);z-index:899;}
+/* ── TIER FILTER ── */
+.tier-filter-wrap {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--r);
+}
+
+.tier-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 20px;
+  border-radius: var(--r-sm);
+  border: 1.5px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-2);
+  transition: all 0.2s;
+  flex: 1;
+  min-width: 100px;
+}
+
+.tier-btn span {
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: var(--text-3);
+}
+
+.tier-btn:hover { transform: translateY(-2px); }
+
+.tier-btn.all.active,
+.tier-btn.all:hover {
+  background: var(--bg-3);
+  border-color: var(--text-2);
+  color: var(--text-1);
+}
+
+.tier-btn.bronze.active,
+.tier-btn.bronze:hover {
+  background: rgba(205,127,50,0.15);
+  border-color: #cd7f32;
+  color: #cd7f32;
+}
+.tier-btn.bronze.active span,
+.tier-btn.bronze:hover span { color: #cd7f32; opacity: 0.7; }
+
+.tier-btn.silver.active,
+.tier-btn.silver:hover {
+  background: rgba(192,192,192,0.15);
+  border-color: #c0c0c0;
+  color: #c0c0c0;
+}
+.tier-btn.silver.active span,
+.tier-btn.silver:hover span { color: #c0c0c0; opacity: 0.7; }
+
+.tier-btn.gold.active,
+.tier-btn.gold:hover {
+  background: rgba(255,215,0,0.15);
+  border-color: #ffd700;
+  color: #ffd700;
+}
+.tier-btn.gold.active span,
+.tier-btn.gold:hover span { color: #ffd700; opacity: 0.7; }
+
+.tier-btn.diamond.active,
+.tier-btn.diamond:hover {
+  background: rgba(185,242,255,0.15);
+  border-color: #b9f2ff;
+  color: #b9f2ff;
+}
+.tier-btn.diamond.active span,
+.tier-btn.diamond:hover span { color: #b9f2ff; opacity: 0.7; }
+
+.tier-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 50px;
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+.tier-bronze { background: rgba(205,127,50,0.15); color: #cd7f32; border: 1px solid rgba(205,127,50,0.3); }
+.tier-silver { background: rgba(192,192,192,0.15); color: #a8a8a8; border: 1px solid rgba(192,192,192,0.3); }
+.tier-gold { background: rgba(255,215,0,0.15); color: #ffd700; border: 1px solid rgba(255,215,0,0.3); }
+.tier-diamond { background: rgba(185,242,255,0.15); color: #b9f2ff; border: 1px solid rgba(185,242,255,0.3); }

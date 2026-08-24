@@ -479,6 +479,16 @@ function stockClass(s) {
 function badgeClass(b) { return { hot: 'b-hot', new: 'b-new', used: 'b-used' }[b] || 'b-new'; }
 function badgeLabel(b) { return { hot: '🔥 Hot', new: 'New', used: 'UK Used' }[b] || b; }
 
+
+// Get tier badge 
+function getTierBadge(price) {
+  if (price < 200000) return '<span class="tier-tag tier-bronze">🥉 Bronze</span>';
+  if (price <= 500000) return '<span class="tier-tag tier-silver">🥈 Silver</span>';
+  if (price <= 1000000) return '<span class="tier-tag tier-gold">🥇 Gold</span>';
+  return '<span class="tier-tag tier-diamond">💎 Diamond</span>';
+}
+
+
 // ── BUILD PRODUCT CARD ────────────────────────────────────
 function buildCard(p, i = 0) {
   const del = settings.delivery || {};
@@ -496,6 +506,8 @@ function buildCard(p, i = 0) {
       <div class="p-warranty">✅ ${p.warranty || '6 Months'} Warranty Included</div>
       <div class="p-info">
         <div class="p-brand">${p.brand}</div>
+        ${getTierBadge(p.price)}
+
         <div class="p-name">${p.name}</div>
         <div class="p-specs">${specsText}</div>
         <div class="p-delivery">🚚 ${del.local || 'Ilorin — Same Day'}</div>
