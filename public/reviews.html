@@ -18,7 +18,7 @@
     <div class="page-hero" style="padding:100px 0 36px;border:none;">
       <p class="breadcrumb"><a href="/">Home</a> / Reviews</p>
       <h1>Customer Reviews</h1>
-      <p class="page-hero-sub">Real feedback from verified HOK Computers customers across Ilorin,Kwara State And Beyond. </p>
+      <p class="page-hero-sub">Real feedback from verified HOK Computers customers across Ilorin,Kwara State And Beyond.  </p>
     </div>
 
     <!-- SUMMARY -->
@@ -281,7 +281,15 @@ function renderReviews(reviews) {
         <div class="rc-date">${new Date(r.submittedAt).toLocaleDateString('en-NG', {day:'numeric',month:'short',year:'numeric'})}</div>
       </div>
       <p class="rc-text">"${r.message}"</p>
-      ${reviewImages.length ? `<div class="review-images">${reviewImages.map(img => `<img class="review-image-thumb" src="${img}" alt="${r.name} review photo" />`).join('')}</div>` : ''}
+      ${r.images && r.images.length ? `
+       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+      ${r.images.map(img => `
+      <img src="${img}" 
+        style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:pointer"
+        onclick="window.open('${img}','_blank')"
+        alt="Review image"
+      />`).join('')}
+  </div>` : ''}
       <div class="rc-footer">
         <div>
           <div class="rc-name">${r.name}</div>

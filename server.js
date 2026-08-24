@@ -1,33 +1,29 @@
 'use strict';
+const dns = require('dns');
+dns.setServers(['8.8.8.8','8.8.4.4']);
 
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
 const session = require('express-session');
 const cors = require('cors');
+const mongoose = require('mongoose');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
-const crypto = require('crypto');
 const path = require('path');
-require('dotenv').config();
+const crypto = require('crypto');
 const multer = require('multer');
-
-// ensure uploads folder exists
-const uploadsDir = path.join(__dirname, 'public', 'uploads');
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-
-const upload = multer({ dest: uploadsDir });
+require('dotenv').config();
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Security headers
+// ── SECURITY ──────────────────────────────────────────────
 app.use(helmet({ contentSecurityPolicy: false }));
-
-// Rate limiting
-app.use('/api/', rateLimit({
+app.use(rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 500,
   message: { error: 'Too many requests. Try again later.' }
 }));
 app.use('/api/adminlogin', rateLimit({
@@ -35,58 +31,192 @@ app.use('/api/adminlogin', rateLimit({
   max: 10,
   message: { error: 'Too many login attempts. Try again in 15 minutes.' }
 }));
-const PORT = process.env.PORT || 3000;
+
+// ── MONGODB ───────────────────────────────────────────────
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('✅ MongoDB connected'))
+  .catch(err => console.error('❌ MongoDB error:', err));
+
+// ── SCHEMAS ───────────────────────────────────────────────
+const ProductSchema = new mongoose.Schema({
+  id: String,
+  brand: String,
+  category: String,
+  name: String,
+  price: Number,
+  image: String,
+  images: [String],
+  specs: {
+    cpu: String,
+    ram: String,
+    storage: String,
+    display: String,
+    condition: String
+  },
+  warranty: String,
+  stock: String,
+  badge: String,
+  featured: Boolean,
+  newArrival: Boolean,
+  createdAt: String,
+  updatedAt: String
+});
+
+const ReviewSchema = new mongoose.Schema({
+  id: String,
+  name: String,
+  phone: String,
+  rating: Number,
+  message: String,
+  product: String,
+  status: String,
+  verifiedBuyer: Boolean,
+  images: [String],
+  submittedAt: String,
+  updatedAt: String
+});
+
+const OrderSchema = new mongoose.Schema({
+  id: String,
+  reference: String,
+  email: String,
+  amount: Number,
+  productId: String,
+  productName: String,
+  orderType: String,
+  items: Array,
+  metadata: Object,
+  status: String,
+  paidAt: String,
+  createdAt: String
+});
+
+const EnquirySchema = new mongoose.Schema({
+  id: String,
+  productId: String,
+  productName: String,
+  timestamp: String
+});
+
+const NotifySchema = new mongoose.Schema({
+  id: String,
+  productId: String,
+  productName: String,
+  phone: String,
+  createdAt: String
+});
+
+const RequestSchema = new mongoose.Schema({
+  id: String,
+  type: String,
+  name: String,
+  phone: String,
+  device: String,
+  problem: String,
+  imageUrl: String,
+  productName: String,
+  budget: String,
+  status: String,
+  createdAt: String
+});
+
+const VisitorSchema = new mongoose.Schema({
+  id: String,
+  path: String,
+  page: String,
+  referrer: String,
+  userAgent: String,
+  timestamp: String
+});
+
+const SettingsSchema = new mongoose.Schema({
+  key: { type: String, default: 'main' },
+  whatsappNumber: String,
+  businessName: String,
+  businessEmail: String,
+  businessHours: String,
+  location: String,
+  delivery: {
+    local: String,
+    state: String,
+    national: String
+  }
+});
+
+const AdminSchema = new mongoose.Schema({
+  username: String,
+  password: String
+});
+
+const Product = mongoose.model('Product', ProductSchema);
+const Review = mongoose.model('Review', ReviewSchema);
+const Order = mongoose.model('Order', OrderSchema);
+const Enquiry = mongoose.model('Enquiry', EnquirySchema);
+const Notify = mongoose.model('Notify', NotifySchema);
+const Request = mongoose.model('Request', RequestSchema);
+const Visitor = mongoose.model('Visitor', VisitorSchema);
+const Settings = mongoose.model('Settings', SettingsSchema);
+const Admin = mongoose.model('Admin', AdminSchema);
 
 // ── MIDDLEWARE ────────────────────────────────────────────
-app.use(cors({ origin: true, credentials: true ,methods: ['GET', 'POST', 'PUT', 'DELETE'] ,allowedHeaders: ['Content-Type', 'Authorization'] }));
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/admin', express.static(path.join(__dirname, 'admin')));
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'hok_fallback_secret',
+  secret: process.env.SESSION_SECRET || 'hok_secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 ,httpOnly: true ,sameSite: 'lax'}
+  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'lax' }
 }));
 
-// Serve admin HTML pages only to authenticated sessions. Static assets remain available.
-app.use('/admin', (req, res, next) => {
-  const isHtmlRequest = req.path === '/' || req.path.endsWith('.html');
-  if (isHtmlRequest && !(req.session && req.session.isAdmin)) {
-    return res.sendFile(path.join(__dirname, 'admin', 'login.html'));
+// ── MULTER ────────────────────────────────────────────────
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, 'public', 'uploads');
+    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `${uuidv4()}${ext}`);
   }
-  next();
 });
-app.use('/admin', express.static(path.join(__dirname, 'admin')));
-
-// ── FILE HELPERS ──────────────────────────────────────────
-const dataPath = (file) => path.join(__dirname, 'data', file);
-
-function readData(file) {
-  try {
-    const raw = fs.readFileSync(dataPath(file), 'utf8');
-    return JSON.parse(raw);
-  } catch {
-    return file.includes('admin') ? {} : [];
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) cb(null, true);
+    else cb(new Error('Only image files allowed'));
   }
-}
+});
 
-function writeData(file, data) {
-  fs.writeFileSync(dataPath(file), JSON.stringify(data, null, 2));
-}
-
-// ── SEED ADMIN ────────────────────────────────────────────
-async function seedAdmin() {
-  const admin = readData('admin.json');
-  if (!admin.username) {
+// ── SEED DATA ─────────────────────────────────────────────
+async function seedData() {
+  const admin = await Admin.findOne({});
+  if (!admin) {
     const hashed = await bcrypt.hash('hokcomputers2025', 10);
-    writeData('admin.json', {
-      username: 'hokadmin',
-      password: hashed
+    await Admin.create({ username: 'hokadmin', password: hashed });
+    console.log('✅ Admin created');
+  }
+
+  const settings = await Settings.findOne({ key: 'main' });
+  if (!settings) {
+    await Settings.create({
+      key: 'main',
+      whatsappNumber: '2348114550145',
+      businessName: 'HOK Computers',
+      businessEmail: 'info@hokcomputers.com',
+      businessHours: 'Monday - Saturday, 9AM - 6PM',
+      location: 'Ilorin, Kwara State, Nigeria',
+      delivery: {
+        local: 'Ilorin — Same Day',
+        state: 'Other Kwara — Next Day',
+        national: 'Outside Kwara — 2-3 Days'
+      }
     });
-    console.log('✅ Admin credentials created.');
-  } else {
-    console.log('✅ Admin already exists:', admin.username);
+    console.log('✅ Settings created');
   }
 }
 
@@ -99,220 +229,208 @@ function requireAuth(req, res, next) {
 // ── SERVE HTML PAGES ──────────────────────────────────────
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/products', (req, res) => res.sendFile(path.join(__dirname, 'public', 'products.html')));
-app.get('/product/:id', (req, res) => res.sendFile(path.join(__dirname, 'public', 'product.html')));
 app.get('/reviews', (req, res) => res.sendFile(path.join(__dirname, 'public', 'reviews.html')));
 app.get('/about', (req, res) => res.sendFile(path.join(__dirname, 'public', 'about.html')));
+app.get('/product', (req, res) => res.sendFile(path.join(__dirname, 'public', 'product.html')));
+app.get('/payment-success', (req, res) => res.sendFile(path.join(__dirname, 'public', 'payment-success.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'login.html')));
 app.get('/admin/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'dashboard.html')));
 app.get('/admin/products', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'products.html')));
 app.get('/admin/reviews', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'reviews.html')));
-app.get('/admin/enquiries', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'enquiries.html')));
 app.get('/admin/orders', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'orders.html')));
+app.get('/admin/enquiries', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'enquiries.html')));
 app.get('/admin/requests', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'requests.html')));
 app.get('/admin/settings', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'settings.html')));
 
 // ════════════════════════════════════════════════════════
 // PUBLIC API ROUTES
-// ════════════════════════════════════════════════════════
-
-app.get('/api/products', (req, res) => {
-  res.json(readData('products.json'));
-});
-
-app.get('/api/products/featured', (req, res) => {
-  const products = readData('products.json');
-  res.json(products.filter(p => p.featured));
-});
-
-app.get('/api/products/new-arrivals', (req, res) => {
-  const products = readData('products.json');
-  res.json(products.filter(p => p.newArrival));
-});
-
-app.get('/api/products/:id', (req, res) => {
-  const products = readData('products.json');
-  const product = products.find(p => p.id === req.params.id);
-  if (!product) return res.status(404).json({ error: 'Product not found' });
-  res.json(product);
-});
-
-app.get('/api/reviews/approved', (req, res) => {
-  const reviews = readData('reviews.json');
-  res.json(reviews.filter(r => r.status === 'approved').sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt)));
-});
-
-app.get('/api/reviews/top', (req, res) => {
-  const reviews = readData('reviews.json');
-  const top = reviews
-    .filter(r => r.status === 'approved')
-    .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt))
-    .slice(0, 3);
-  res.json(top);
-});
-
-app.post('/api/reviews', upload.array('images', 5), (req, res) => {
-  const { name, phone, rating, message, product } = req.body;
-  if (!name || !phone || !rating || !message || !product) {
-    return res.status(400).json({ error: 'All fields are required' });
-  }
-  const reviews = readData('reviews.json');
-
-  // handle uploaded files (multipart/form-data)
-  const reviewImages = [];
-  if (req.files && req.files.length) {
-    req.files.forEach(f => {
-      reviewImages.push(`/uploads/${f.filename}`);
-    });
-  } else if (req.body.images) {
-    // legacy: base64 data URLs sent as JSON; save them to files
-    const images = Array.isArray(req.body.images) ? req.body.images : [req.body.images];
-    images.forEach((dataUrl) => {
-      const matches = String(dataUrl).match(/^data:(image\/[a-zA-Z]+);base64,(.+)$/);
-      if (matches) {
-        const ext = matches[1].split('/')[1] || 'png';
-        const buffer = Buffer.from(matches[2], 'base64');
-        const filename = uuidv4().slice(0,8) + '.' + ext;
-        const outPath = path.join(__dirname, 'public', 'uploads', filename);
-        try { fs.writeFileSync(outPath, buffer); reviewImages.push(`/uploads/${filename}`); } catch (e) { /* ignore write errors */ }
-      }
-    });
-  }
-
-  const newReview = {
-    id: 'rev_' + uuidv4().slice(0, 8),
-    name: String(name).trim(),
-    phone: String(phone).trim(),
-    rating: parseInt(rating),
-    message: String(message).trim(),
-    product: String(product).trim(),
-    images: reviewImages,
-    status: 'pending',
-    verifiedBuyer: false,
-    submittedAt: new Date().toISOString()
-  };
-  reviews.push(newReview);
-  writeData('reviews.json', reviews);
-  res.json({ success: true, message: 'Review submitted successfully' });
-});
-
-app.post('/api/enquiries', (req, res) => {
-  const { productId, productName } = req.body;
-  if (!productId || !productName) return res.status(400).json({ error: 'Missing data' });
-  const enquiries = readData('enquiries.json');
-  enquiries.push({
-    id: 'enq_' + uuidv4().slice(0, 8),
-    productId,
-    productName,
-    timestamp: new Date().toISOString()
-  });
-  writeData('enquiries.json', enquiries);
-  res.json({ success: true });
-});
-
-app.post('/api/requests', (req, res) => {
-  const { productId, productName, requestMessage, phone } = req.body;
-  if (!productName || !requestMessage) return res.status(400).json({ error: 'Missing data' });
-  const requests = readData('requests.json');
-  requests.push({
-    id: 'req_' + uuidv4().slice(0, 8),
-    productId: productId || null,
-    productName: productName || 'Custom request',
-    requestMessage: String(requestMessage).trim(),
-    phone: phone ? String(phone).trim() : '',
-    createdAt: new Date().toISOString()
-  });
-  writeData('requests.json', requests);
-  res.json({ success: true });
-});
-    
-app.post('/api/repair-requests', upload.single('image'), (req, res) => {
-  const { name, phone, device, problem } = req.body;
-  if (!name || !phone || !device || !problem) {
-    return res.status(400).json({ error: 'Missing repair data' });
-  }
-  const requests = readData('requests.json');
-  const newRequest = {
-    id: 'req_' + uuidv4().slice(0, 8),
-    productId: null,
-    productName: 'Repair request',
-    requestMessage: `Repair request:\n\nName: ${name}\nPhone: ${phone}\nDevice: ${device}\nProblem: ${problem}`,
-    phone: phone.trim(),
-    imageUrl: req.file ? `/uploads/${req.file.filename}` : '',
-    createdAt: new Date().toISOString()
-  };
-  requests.push(newRequest);
-  writeData('requests.json', requests);
-  res.json({ success: true, imageUrl: newRequest.imageUrl });
-});
-
-app.post('/api/visitors', (req, res) => {
-  const { path, page, referrer, userAgent } = req.body || {};
-  const visitors = readData('visitors.json');
-  visitors.push({
-    id: 'vis_' + uuidv4().slice(0, 8),
-    path: String(path || ''),
-    page: String(page || ''),
-    referrer: String(referrer || ''),
-    userAgent: String(userAgent || req.headers['user-agent'] || ''),
-    timestamp: new Date().toISOString()
-  });
-  writeData('visitors.json', visitors);
-  res.json({ success: true });
-});
-
-app.post('/api/notify', (req, res) => {
-  const { productId, productName, phone } = req.body;
-  if (!productId || !phone) return res.status(400).json({ error: 'Missing data' });
-  const notify = readData('notify.json');
-  const exists = notify.find(n => n.productId === productId && n.phone === phone);
-  if (exists) return res.json({ success: true, message: 'Already registered' });
-  notify.push({
-    id: 'ntf_' + uuidv4().slice(0, 8),
-    productId, productName,
-    phone: phone.trim(),
-    createdAt: new Date().toISOString()
-  });
-  writeData('notify.json', notify);
-  res.json({ success: true });
-});
-
-app.post('/api/paystack/initialize', async (req, res) => {
-  const { productId, productName, amount, email, callback_url, orderType, items } = req.body;
-  if (!amount || !email) {
-    return res.status(400).json({ error: 'Missing payment data' });
-  }
-  const secretKey = process.env.PAYSTACK_SECRET_KEY;
-  if (!secretKey) return res.status(500).json({ error: 'Paystack secret key not configured' });
-
+// ════════════════════════════════════
+app.get('/api/products', async (req, res) => {
   try {
-    const metadata = {
-      productId: productId || null,
-      productName: productName || (orderType === 'cart' ? 'Cart Order' : 'HOK Order'),
-      orderType: orderType || 'single',
-      items: Array.isArray(items) ? items : [],
-      customerName: req.body.name || '',
-      customerPhone: req.body.phone || ''
-    };
+    const products = await Product.find({}).sort({ createdAt: -1 });
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch products' });
+  }
+});
 
-    const response = await fetch('https://api.paystack.co/transaction/initialize', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${secretKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        email,
-        amount: Math.round(Number(amount) * 100),
-        currency: 'NGN',
-        metadata,
-        callback_url: callback_url || `${req.protocol}://${req.get('host')}/payment-success.html`
-      })
+app.get('/api/products/featured', async (req, res) => {
+  try {
+    const products = await Product.find({ featured: true }).sort({ createdAt: -1 });
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch featured products' });
+  }
+});
+
+app.get('/api/products/new-arrivals', async (req, res) => {
+  try {
+    const products = await Product.find({ newArrival: true }).sort({ createdAt: -1 });
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch new arrivals' });
+  }
+});
+
+app.get('/api/products/:id', async (req, res) => {
+  try {
+    const product = await Product.findOne({ id: req.params.id });
+    if (!product) return res.status(404).json({ error: 'Product not found' });
+    res.json(product);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch product' });
+  }
+});
+
+app.get('/api/reviews/approved', async (req, res) => {
+  try {
+    const reviews = await Review.find({ status: 'approved' }).sort({ submittedAt: -1 });
+    res.json(reviews);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch reviews' });
+  }
+});
+
+app.get('/api/reviews/top', async (req, res) => {
+  try {
+    const reviews = await Review.find({ status: 'approved' })
+      .sort({ submittedAt: -1 }).limit(3);
+    res.json(reviews);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch top reviews' });
+  }
+});
+
+app.post('/api/reviews', upload.array('images', 5), async (req, res) => {
+  try {
+    const { name, phone, rating, message, product } = req.body;
+    if (!name || !phone || !rating || !message || !product) {
+      return res.status(400).json({ error: 'All fields required' });
+    }
+
+    const images = req.files ? req.files.map(f => `/uploads/${f.filename}`) : [];
+
+    await Review.create({
+      id: 'rev_' + uuidv4().slice(0, 8),
+      name: name.trim(),
+      phone: phone.trim(),
+      rating: parseInt(rating),
+      message: message.trim(),
+      product: product.trim(),
+      images,
+      status: 'pending',
+      verifiedBuyer: false,
+      submittedAt: new Date().toISOString()
     });
-    const data = await response.json();
-    if (!data.status) return res.status(400).json({ error: data.message || 'Paystack initialization failed', details: data });
-    res.json({ authorization_url: data.data.authorization_url, reference: data.data.reference });
-  } catch (error) {
-    res.status(500).json({ error: 'Paystack initialization error', details: error.message });
+    res.json({ success: true, message: 'Review submitted successfully' });
+  } catch (err) {
+    console.error('Review error:', err);
+    res.status(500).json({ error: 'Failed to submit review' });
+  }
+});
+
+app.post('/api/enquiries', async (req, res) => {
+  try {
+    const { productId, productName } = req.body;
+    if (!productId || !productName) return res.status(400).json({ error: 'Missing data' });
+    await Enquiry.create({
+      id: 'enq_' + uuidv4().slice(0, 8),
+      productId, productName,
+      timestamp: new Date().toISOString()
+    });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to log enquiry' });
+  }
+});
+
+app.post('/api/notify', async (req, res) => {
+  try {
+    const { productId, productName, phone } = req.body;
+    if (!productId || !phone) return res.status(400).json({ error: 'Missing data' });
+    const exists = await Notify.findOne({ productId, phone });
+    if (exists) return res.json({ success: true, message: 'Already registered' });
+    await Notify.create({
+      id: 'ntf_' + uuidv4().slice(0, 8),
+      productId, productName,
+      phone: phone.trim(),
+      createdAt: new Date().toISOString()
+    });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to register notification' });
+  }
+});
+
+app.post('/api/requests', async (req, res) => {
+  try {
+    const { name, phone, productName, budget } = req.body;
+    if (!name || !phone || !productName) {
+      return res.status(400).json({ error: 'Name, phone and product name required' });
+    }
+    await Request.create({
+      id: 'req_' + uuidv4().slice(0, 8),
+      type: 'product',
+      name: name.trim(), phone: phone.trim(),
+      productName: productName.trim(),
+      budget: budget || '',
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to submit request' });
+  }
+});
+
+app.post('/api/repair-requests', upload.single('image'), async (req, res) => {
+  try {
+    const { name, phone, device, problem } = req.body;
+    if (!name || !phone || !device || !problem) {
+      return res.status(400).json({ error: 'All fields required' });
+    }
+    let imageUrl = '';
+    if (req.file) {
+      imageUrl = `/uploads/${req.file.filename}`;
+    }
+    await Request.create({
+      id: 'rep_' + uuidv4().slice(0, 8),
+      type: 'repair',
+      name: name.trim(), phone: phone.trim(),
+      device, problem: problem.trim(),
+      imageUrl,
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    });
+    res.json({ success: true, imageUrl });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to submit repair request' });
+  }
+});
+
+app.post('/api/visitors', async (req, res) => {
+  try {
+    const { path: visitPath, page } = req.body;
+    await Visitor.create({
+      id: 'vis_' + uuidv4().slice(0, 8),
+      path: visitPath,
+      page,
+      referrer: req.headers.referer || '',
+      userAgent: req.headers['user-agent'] || '',
+      timestamp: new Date().toISOString()
+    });
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ success: false });
+  }
+});
+
+app.get('/api/settings', async (req, res) => {
+  try {
+    const settings = await Settings.findOne({ key: 'main' });
+    res.json(settings || {});
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch settings' });
   }
 });
 
@@ -321,117 +439,139 @@ app.get('/api/paystack/config', (req, res) => {
   res.json({ publicKey });
 });
 
-app.post('/api/paystack/webhook', express.raw({ type: 'application/json' }), (req, res) => {
-  const secretKey = process.env.PAYSTACK_SECRET_KEY;
-  if (!secretKey) return res.status(500).json({ error: 'Paystack secret key not configured' });
-  const signature = req.get('x-paystack-signature');
-  const expected = crypto.createHmac('sha512', secretKey).update(req.body).digest('hex');
-  if (!signature || signature !== expected) {
-    return res.status(401).json({ error: 'Invalid Paystack webhook signature' });
-  }
+// ════════════════════════════════════════════════════════
+// PAYSTACK ROUTES
+// ════════════════════════════════════════════════════════
 
-  let payload;
+app.post('/api/paystack/initialize', async (req, res) => {
   try {
-    payload = JSON.parse(req.body.toString());
-  } catch (err) {
-    return res.status(400).json({ error: 'Invalid webhook body' });
-  }
+    const secretKey = process.env.PAYSTACK_SECRET_KEY;
+    if (!secretKey) return res.status(500).json({ error: 'Paystack secret key not configured' });
 
-  const eventType = payload.event;
-  const payment = payload.data;
-  if (eventType === 'charge.success') {
-    const orders = readData('orders.json');
-    const existing = orders.find(o => o.reference === payment.reference);
-    const record = {
-      id: existing ? existing.id : 'order_' + uuidv4().slice(0, 8),
-      reference: payment.reference,
-      status: payment.status,
-      amount: payment.amount / 100,
-      currency: payment.currency,
-      email: payment.customer?.email || '',
-      phone: payment.customer?.phone || payment.metadata?.customerPhone || '',
-      customerName: payment.metadata?.customerName || '',
-      productId: payment.metadata?.productId || null,
-      productName: payment.metadata?.productName || '',
-      orderType: payment.metadata?.orderType || 'single',
-      items: payment.metadata?.items || [],
-      paidAt: payment.paid_at || new Date().toISOString(),
-      raw: payment
-    };
-    if (existing) {
-      Object.assign(existing, record);
-    } else {
-      orders.push(record);
+    const { email, amount, productId, productName, orderType, items, metadata } = req.body;
+    if (!email || !amount) return res.status(400).json({ error: 'Email and amount required' });
+
+    const reference = 'HOK_' + crypto.randomBytes(8).toString('hex').toUpperCase();
+
+    const paystackRes = await fetch('https://api.paystack.co/transaction/initialize', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${secretKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email,
+        amount: Math.round(Number(amount) * 100),
+        reference,
+        currency: 'NGN',
+        metadata: {
+          productId, productName, orderType,
+          items: items || [],
+          ...metadata
+        }
+      })
+    });
+
+    const paystackData = await paystackRes.json();
+    if (!paystackData.status) {
+      return res.status(400).json({ error: paystackData.message || 'Paystack initialization failed' });
     }
-    writeData('orders.json', orders);
-  }
 
-  res.json({ received: true });
+    await Order.create({
+      id: 'ord_' + uuidv4().slice(0, 8),
+      reference,
+      email,
+      amount: Number(amount),
+      productId, productName, orderType,
+      items: items || [],
+      metadata: metadata || {},
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    });
+
+    res.json({
+      authorization_url: paystackData.data.authorization_url,
+      reference: paystackData.data.reference
+    });
+  } catch (err) {
+    console.error('Paystack init error:', err);
+    res.status(500).json({ error: 'Payment initialization failed' });
+  }
 });
 
 app.get('/api/paystack/verify/:reference', async (req, res) => {
-  const secretKey = process.env.PAYSTACK_SECRET_KEY;
-  if (!secretKey) return res.status(500).json({ error: 'Paystack secret key not configured' });
-
   try {
-    const response = await fetch(`https://api.paystack.co/transaction/verify/${encodeURIComponent(req.params.reference)}`, {
+    const secretKey = process.env.PAYSTACK_SECRET_KEY;
+    if (!secretKey) return res.status(500).json({ error: 'Paystack secret key not configured' });
+
+    const { reference } = req.params;
+    const paystackRes = await fetch(`https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`, {
       headers: { Authorization: `Bearer ${secretKey}` }
     });
-    const data = await response.json();
-    if (!data.status) return res.status(400).json({ error: data.message || 'Verification failed', details: data });
 
-    const payment = data.data;
-    const orders = readData('orders.json');
-    const existing = orders.find(o => o.reference === payment.reference);
-    if (!existing) {
-      orders.push({
-        id: 'order_' + uuidv4().slice(0, 8),
-        reference: payment.reference,
-        status: payment.status,
-        amount: payment.amount / 100,
-        currency: payment.currency,
-        email: payment.customer?.email || '',
-        productId: payment.metadata?.productId || null,
-        productName: payment.metadata?.productName || '',
-        orderType: payment.metadata?.orderType || 'single',
-        items: payment.metadata?.items || [],
-        paidAt: payment.paid_at || new Date().toISOString(),
-        raw: payment
-      });
-      writeData('orders.json', orders);
+    const paystackData = await paystackRes.json();
+    if (!paystackData.status || paystackData.data.status !== 'success') {
+      return res.status(400).json({ error: 'Payment verification failed', details: paystackData });
     }
 
-    res.json(payment);
-  } catch (error) {
-    res.status(500).json({ error: 'Paystack verification error', details: error.message });
+    await Order.findOneAndUpdate(
+      { reference },
+      { status: 'success', paidAt: new Date().toISOString() }
+    );
+
+    res.json({
+      status: 'success',
+      reference: paystackData.data.reference,
+      amount: paystackData.data.amount,
+      customer: paystackData.data.customer,
+      metadata: paystackData.data.metadata
+    });
+  } catch (err) {
+    console.error('Paystack verify error:', err);
+    res.status(500).json({ error: 'Payment verification failed' });
   }
 });
 
-app.get('/api/settings', (req, res) => {
-  res.json(readData('settings.json'));
+app.post('/api/paystack/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  try {
+    const secret = process.env.PAYSTACK_SECRET_KEY;
+    const hash = crypto.createHmac('sha512', secret).update(req.body).digest('hex');
+    if (hash !== req.headers['x-paystack-signature']) {
+      return res.status(401).send('Invalid signature');
+    }
+    const event = JSON.parse(req.body);
+    if (event.event === 'charge.success') {
+      const reference = event.data.reference;
+      await Order.findOneAndUpdate(
+        { reference },
+        { status: 'success', paidAt: new Date().toISOString() }
+      );
+    }
+    res.sendStatus(200);
+  } catch (err) {
+    console.error('Webhook error:', err);
+    res.sendStatus(500);
+  }
 });
 
 // ════════════════════════════════════════════════════════
 // ADMIN AUTH
 // ════════════════════════════════════════════════════════
 
-// Legacy admin auth handlers were removed in favor of the consolidated endpoints below:
-// - POST /api/adminlogin
-// - POST /api/adminlogout
-// - GET  /api/admincheck
-// These endpoints provide session-based admin authentication and are used by the admin UI.
-
-
 app.post('/api/adminlogin', async (req, res) => {
-  const { username, password } = req.body;
-  const admin = readData('admin.json');
-  if (!admin.username || username !== admin.username) {
-    return res.status(401).json({ error: 'Invalid credentials' });
+  try {
+    const { username, password } = req.body;
+    const admin = await Admin.findOne({});
+    if (!admin || username !== admin.username) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    const match = await bcrypt.compare(password, admin.password);
+    if (!match) return res.status(401).json({ error: 'Invalid credentials' });
+    req.session.isAdmin = true;
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Login failed' });
   }
-  const match = await bcrypt.compare(password, admin.password);
-  if (!match) return res.status(401).json({ error: 'Invalid credentials' });
-  req.session.isAdmin = true;
-  res.json({ success: true });
 });
 
 app.post('/api/adminlogout', (req, res) => {
@@ -442,404 +582,269 @@ app.post('/api/adminlogout', (req, res) => {
 app.get('/api/admincheck', requireAuth, (req, res) => {
   res.json({ authenticated: true });
 });
-// ════════════════════════════════════════════════════════
-// ADMIN — STATS
-// ════════════════════════════════════════════════════════
-
-app.get('/api/admin/stats', requireAuth, (req, res) => {
-  const products = readData('products.json');
-  const reviews = readData('reviews.json');
-  const enquiries = readData('enquiries.json');
-  const notify = readData('notify.json');
-  const visitors = readData('visitors.json');
-  const requests = readData('requests.json');
-
-  const summary = {};
-  enquiries.forEach(e => {
-    if (!summary[e.productId]) {
-      summary[e.productId] = { productName: e.productName, totalClicks: 0 };
-    }
-    summary[e.productId].totalClicks++;
-  });
-  const topProducts = Object.values(summary)
-    .sort((a, b) => b.totalClicks - a.totalClicks)
-    .slice(0, 5);
-
-  const requestSummary = {};
-  requests.forEach(r => {
-    const key = r.productId || r.productName;
-    if (!requestSummary[key]) {
-      requestSummary[key] = { productName: r.productName, totalRequests: 0, lastRequest: r.createdAt };
-    }
-    requestSummary[key].totalRequests++;
-    if (r.createdAt > requestSummary[key].lastRequest) requestSummary[key].lastRequest = r.createdAt;
-  });
-  const topRequests = Object.values(requestSummary)
-    .sort((a, b) => b.totalRequests - a.totalRequests)
-    .slice(0, 5);
-
-  const pageSummary = {};
-  visitors.forEach(v => {
-    const pageKey = v.path || v.page || 'unknown';
-    if (!pageSummary[pageKey]) {
-      pageSummary[pageKey] = { page: v.page || v.path || pageKey, path: v.path, count: 0 };
-    }
-    pageSummary[pageKey].count++;
-  });
-  const topPages = Object.values(pageSummary)
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 5);
-
-  res.json({
-    totalProducts: products.length,
-    inStock: products.filter(p => p.stock === 'In Stock').length,
-    limitedStock: products.filter(p => p.stock === 'Limited Stock').length,
-    outOfStock: products.filter(p => p.stock === 'Out of Stock').length,
-    pendingReviews: reviews.filter(r => r.status === 'pending').length,
-    approvedReviews: reviews.filter(r => r.status === 'approved').length,
-    totalEnquiries: enquiries.length,
-    notifyRequests: notify.length,
-    totalRequests: requests.length,
-    totalVisitors: visitors.length,
-    topProducts,
-    topPages,
-    topRequests
-  });
-});
 
 // ════════════════════════════════════════════════════════
-// ADMIN — PRODUCTS
+// ADMIN STATS
 // ════════════════════════════════════════════════════════
 
-app.get('/api/admin/products', requireAuth, (req, res) => {
-  res.json(readData('products.json'));
-});
+app.get('/api/adminstats', requireAuth, async (req, res) => {
+  try {
+    const [totalProducts, inStock, limitedStock, outOfStock,
+      pendingReviews, approvedReviews, totalEnquiries,
+      notifyRequests, totalOrders, totalRequests] = await Promise.all([
+      Product.countDocuments(),
+      Product.countDocuments({ stock: 'In Stock' }),
+      Product.countDocuments({ stock: 'Limited Stock' }),
+      Product.countDocuments({ stock: 'Out of Stock' }),
+      Review.countDocuments({ status: 'pending' }),
+      Review.countDocuments({ status: 'approved' }),
+      Enquiry.countDocuments(),
+      Notify.countDocuments(),
+      Order.countDocuments({ status: 'success' }),
+      Request.countDocuments({ status: 'pending' })
+    ]);
 
-app.post('/api/admin/products', requireAuth, (req, res) => {
-  const { brand, category, name, price, image, images, specs, warranty, stock, badge, featured, newArrival } = req.body;
-  if (!brand || !name || !price || !category) {
-    return res.status(400).json({ error: 'Brand, name, price and category are required' });
+    const enquiries = await Enquiry.find({});
+    const summary = {};
+    enquiries.forEach(e => {
+      if (!summary[e.productId]) summary[e.productId] = { productName: e.productName, totalClicks: 0 };
+      summary[e.productId].totalClicks++;
+    });
+    const topProducts = Object.values(summary)
+      .sort((a, b) => b.totalClicks - a.totalClicks).slice(0, 5);
+
+    const visitors = await Visitor.find({});
+    const pageSummary = {};
+    visitors.forEach(v => {
+      if (!pageSummary[v.path]) pageSummary[v.path] = { page: v.page, visits: 0 };
+      pageSummary[v.path].visits++;
+    });
+    const topPages = Object.values(pageSummary)
+      .sort((a, b) => b.visits - a.visits).slice(0, 5);
+
+    res.json({
+      totalProducts, inStock, limitedStock, outOfStock,
+      pendingReviews, approvedReviews, totalEnquiries,
+      notifyRequests, totalOrders, totalRequests,
+      topProducts, topPages
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch stats' });
   }
-  const imageList = Array.isArray(images)
-    ? images.map(String).map(s => s.trim()).filter(Boolean)
-    : typeof images === 'string'
-      ? images.split('\n').map(s => s.trim()).filter(Boolean)
-      : [];
-  const primaryImage = image?.trim() || imageList[0] || '';
-  const products = readData('products.json');
-  const newProduct = {
-    id: 'prod_' + uuidv4().slice(0, 8),
-    brand: brand.trim(),
-    category,
-    name: name.trim(),
-    price: parseInt(price),
-    image: primaryImage,
-    images: imageList,
-    specs: typeof specs === 'object' ? specs : {},
-    warranty: warranty || '6 Months',
-    stock: stock || 'In Stock',
-    badge: badge || null,
-    featured: featured === true || featured === 'true',
-    newArrival: newArrival === true || newArrival === 'true',
-    createdAt: new Date().toISOString()
-  };
-  products.push(newProduct);
-  writeData('products.json', products);
-  res.json({ success: true, product: newProduct });
-});
-
-app.put('/api/admin/products/:id', requireAuth, (req, res) => {
-  const products = readData('products.json');
-  const index = products.findIndex(p => p.id === req.params.id);
-  if (index === -1) return res.status(404).json({ error: 'Product not found' });
-  const { image, images } = req.body;
-  const imageList = Array.isArray(images)
-    ? images.map(String).map(s => s.trim()).filter(Boolean)
-    : typeof images === 'string'
-      ? images.split('\n').map(s => s.trim()).filter(Boolean)
-      : products[index].images || [];
-  const primaryImage = image?.trim() || imageList[0] || products[index].image || '';
-  products[index] = {
-    ...products[index],
-    ...req.body,
-    id: products[index].id,
-    image: primaryImage,
-    images: imageList,
-    price: parseInt(req.body.price) || products[index].price,
-    featured: req.body.featured === true || req.body.featured === 'true',
-    newArrival: req.body.newArrival === true || req.body.newArrival === 'true',
-    updatedAt: new Date().toISOString()
-  };
-  writeData('products.json', products);
-  res.json({ success: true, product: products[index] });
-});
-
-app.delete('/api/admin/products/:id', requireAuth, (req, res) => {
-  let products = readData('products.json');
-  const exists = products.find(p => p.id === req.params.id);
-  if (!exists) return res.status(404).json({ error: 'Product not found' });
-  products = products.filter(p => p.id !== req.params.id);
-  writeData('products.json', products);
-  res.json({ success: true });
 });
 
 // ════════════════════════════════════════════════════════
-// ADMIN — REVIEWS
+// ADMIN PRODUCTS
 // ════════════════════════════════════════════════════════
 
-app.get('/api/admin/reviews', requireAuth, (req, res) => {
-  const reviews = readData('reviews.json');
-  res.json(reviews.sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt)));
-});
-
-app.put('/api/admin/reviews/:id', requireAuth, (req, res) => {
-  const reviews = readData('reviews.json');
-  const index = reviews.findIndex(r => r.id === req.params.id);
-  if (index === -1) return res.status(404).json({ error: 'Review not found' });
-  const { status, verifiedBuyer } = req.body;
-  if (status) reviews[index].status = status;
-  if (verifiedBuyer !== undefined) reviews[index].verifiedBuyer = verifiedBuyer === true || verifiedBuyer === 'true';
-  reviews[index].updatedAt = new Date().toISOString();
-  writeData('reviews.json', reviews);
-  res.json({ success: true, review: reviews[index] });
-});
-
-app.delete('/api/admin/reviews/:id', requireAuth, (req, res) => {
-  let reviews = readData('reviews.json');
-  reviews = reviews.filter(r => r.id !== req.params.id);
-  writeData('reviews.json', reviews);
-  res.json({ success: true });
-});
-
-// ════════════════════════════════════════════════════════
-// ADMIN — ENQUIRIES
-// ════════════════════════════════════════════════════════
-
-app.get('/api/admin/enquiries', requireAuth, (req, res) => {
-  const enquiries = readData('enquiries.json');
-  const summary = {};
-  enquiries.forEach(e => {
-    if (!summary[e.productId]) {
-      summary[e.productId] = { productId: e.productId, productName: e.productName, totalClicks: 0, lastEnquiry: e.timestamp };
-    }
-    summary[e.productId].totalClicks++;
-    if (e.timestamp > summary[e.productId].lastEnquiry) summary[e.productId].lastEnquiry = e.timestamp;
-  });
-  const sorted = Object.values(summary).sort((a, b) => b.totalClicks - a.totalClicks);
-  res.json({ raw: enquiries, summary: sorted });
-});
-
-app.get('/api/admin/requests', requireAuth, (req, res) => {
-  const requests = readData('requests.json');
-  const summary = {};
-  requests.forEach(r => {
-    const key = r.productId || r.productName;
-    if (!summary[key]) {
-      summary[key] = { productId: r.productId, productName: r.productName, totalRequests: 0, lastRequest: r.createdAt };
-    }
-    summary[key].totalRequests++;
-    if (r.createdAt > summary[key].lastRequest) summary[key].lastRequest = r.createdAt;
-  });
-  const sorted = Object.values(summary).sort((a, b) => b.totalRequests - a.totalRequests);
-  res.json({ raw: requests, summary: sorted });
-});
-
-app.get('/api/adminrequests', requireAuth, (req, res) => {
-  const requests = readData('requests.json');
-  const summary = {};
-  requests.forEach(r => {
-    const key = r.productId || r.productName;
-    if (!summary[key]) {
-      summary[key] = { productId: r.productId, productName: r.productName, totalRequests: 0, lastRequest: r.createdAt };
-    }
-    summary[key].totalRequests++;
-    if (r.createdAt > summary[key].lastRequest) summary[key].lastRequest = r.createdAt;
-  });
-  const sorted = Object.values(summary).sort((a, b) => b.totalRequests - a.totalRequests);
-  res.json({ raw: requests, summary: sorted });
-});
-
-// ════════════════════════════════════════════════════════
-// ADMIN — SETTINGS
-// ════════════════════════════════════════════════════════
-
-app.get('/api/admin/settings', requireAuth, (req, res) => {
-  res.json(readData('settings.json'));
-});
-
-app.put('/api/admin/settings', requireAuth, (req, res) => {
-  const current = readData('settings.json');
-  const updated = { ...current, ...req.body };
-  writeData('settings.json', updated);
-  res.json({ success: true, settings: updated });
-});
-
-// ════════════════════════════════════════════════════════
-// ADMIN API ALIASES (for compatibility with admin pages)
-// ════════════════════════════════════════════════════════
-app.get('/api/adminstats', requireAuth, (req, res) => {
-  const products = readData('products.json');
-  const reviews = readData('reviews.json');
-  const enquiries = readData('enquiries.json');
-  const notify = readData('notify.json');
-  const requests = readData('requests.json');
-  const summary = {};
-  enquiries.forEach(e => {
-    if (!summary[e.productId]) {
-      summary[e.productId] = { productName: e.productName, totalClicks: 0 };
-    }
-    summary[e.productId].totalClicks++;
-  });
-  const topProducts = Object.values(summary)
-    .sort((a, b) => b.totalClicks - a.totalClicks)
-    .slice(0, 5);
-  res.json({
-    totalProducts: products.length,
-    inStock: products.filter(p => p.stock === 'In Stock').length,
-    limitedStock: products.filter(p => p.stock === 'Limited Stock').length,
-    outOfStock: products.filter(p => p.stock === 'Out of Stock').length,
-    pendingReviews: reviews.filter(r => r.status === 'pending').length,
-    approvedReviews: reviews.filter(r => r.status === 'approved').length,
-    totalEnquiries: enquiries.length,
-    notifyRequests: notify.length,
-    totalRequests: requests.length,
-    topProducts
-  });
-});
-
-app.get('/api/adminproducts', requireAuth, (req, res) => {
-  res.json(readData('products.json'));
-});
-
-app.post('/api/adminproducts', requireAuth, (req, res) => {
-  const { brand, category, name, price, image, images, specs, warranty, stock, badge, featured, newArrival } = req.body;
-  if (!brand || !name || !price || !category) {
-    return res.status(400).json({ error: 'Brand, name, price and category are required' });
+app.get('/api/adminproducts', requireAuth, async (req, res) => {
+  try {
+    const products = await Product.find({}).sort({ createdAt: -1 });
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch products' });
   }
-  const imageList = Array.isArray(images)
-    ? images.map(String).map(s => s.trim()).filter(Boolean)
-    : typeof images === 'string'
-      ? images.split('\n').map(s => s.trim()).filter(Boolean)
-      : [];
-  const primaryImage = image?.trim() || imageList[0] || '';
-  const products = readData('products.json');
-  const newProduct = {
-    id: 'prod_' + uuidv4().slice(0, 8),
-    brand: brand.trim(),
-    category,
-    name: name.trim(),
-    price: parseInt(price),
-    image: primaryImage,
-    images: imageList,
-    specs: typeof specs === 'object' ? specs : {},
-    warranty: warranty || '6 Months',
-    stock: stock || 'In Stock',
-    badge: badge || null,
-    featured: featured === true || featured === 'true',
-    newArrival: newArrival === true || newArrival === 'true',
-    createdAt: new Date().toISOString()
-  };
-  products.push(newProduct);
-  writeData('products.json', products);
-  res.json({ success: true, product: newProduct });
 });
 
-app.put('/api/adminproducts/:id', requireAuth, (req, res) => {
-  const products = readData('products.json');
-  const index = products.findIndex(p => p.id === req.params.id);
-  if (index === -1) return res.status(404).json({ error: 'Product not found' });
-  const { image, images } = req.body;
-  const imageList = Array.isArray(images)
-    ? images.map(String).map(s => s.trim()).filter(Boolean)
-    : typeof images === 'string'
-      ? images.split('\n').map(s => s.trim()).filter(Boolean)
-      : products[index].images || [];
-  const primaryImage = image?.trim() || imageList[0] || products[index].image || '';
-  products[index] = {
-    ...products[index],
-    ...req.body,
-    id: products[index].id,
-    image: primaryImage,
-    images: imageList,
-    price: parseInt(req.body.price) || products[index].price,
-    featured: req.body.featured === true || req.body.featured === 'true',
-    newArrival: req.body.newArrival === true || req.body.newArrival === 'true',
-    updatedAt: new Date().toISOString()
-  };
-  writeData('products.json', products);
-  res.json({ success: true, product: products[index] });
-});
-
-app.delete('/api/adminproducts/:id', requireAuth, (req, res) => {
-  let products = readData('products.json');
-  const exists = products.find(p => p.id === req.params.id);
-  if (!exists) return res.status(404).json({ error: 'Product not found' });
-  products = products.filter(p => p.id !== req.params.id);
-  writeData('products.json', products);
-  res.json({ success: true });
-});
-
-app.get('/api/adminreviews', requireAuth, (req, res) => {
-  res.json(readData('reviews.json'));
-});
-
-app.put('/api/adminreviews/:id', requireAuth, (req, res) => {
-  const reviews = readData('reviews.json');
-  const index = reviews.findIndex(r => r.id === req.params.id);
-  if (index === -1) return res.status(404).json({ error: 'Review not found' });
-  reviews[index] = { ...reviews[index], ...req.body };
-  writeData('reviews.json', reviews);
-  res.json({ success: true, review: reviews[index] });
-});
-
-app.delete('/api/adminreviews/:id', requireAuth, (req, res) => {
-  let reviews = readData('reviews.json');
-  const exists = reviews.find(r => r.id === req.params.id);
-  if (!exists) return res.status(404).json({ error: 'Review not found' });
-  reviews = reviews.filter(r => r.id !== req.params.id);
-  writeData('reviews.json', reviews);
-  res.json({ success: true });
-});
-
-app.get('/api/adminenquiries', requireAuth, (req, res) => {
-  const enquiries = readData('enquiries.json');
-  const summary = {};
-  enquiries.forEach(e => {
-    if (!summary[e.productId]) {
-      summary[e.productId] = { productId: e.productId, productName: e.productName, totalClicks: 0, lastEnquiry: e.timestamp };
+app.post('/api/adminproducts', requireAuth, async (req, res) => {
+  try {
+    const { brand, category, name, price, image, images, specs, warranty, stock, badge, featured, newArrival } = req.body;
+    if (!brand || !name || !price || !category) {
+      return res.status(400).json({ error: 'Brand, name, price and category required' });
     }
-    summary[e.productId].totalClicks++;
-    if (e.timestamp > summary[e.productId].lastEnquiry) summary[e.productId].lastEnquiry = e.timestamp;
-  });
-  const sorted = Object.values(summary).sort((a, b) => b.totalClicks - a.totalClicks);
-  res.json({ raw: enquiries, summary: sorted });
+    const product = await Product.create({
+      id: 'prod_' + uuidv4().slice(0, 8),
+      brand: brand.trim(), category,
+      name: name.trim(),
+      price: parseInt(price),
+      image: image || '',
+      images: images || [],
+      specs: typeof specs === 'object' ? specs : {},
+      warranty: warranty || '6 Months',
+      stock: stock || 'In Stock',
+      badge: badge || null,
+      featured: featured === true || featured === 'true',
+      newArrival: newArrival === true || newArrival === 'true',
+      createdAt: new Date().toISOString()
+    });
+    res.json({ success: true, product });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to add product' });
+  }
 });
 
-app.get('/api/adminsettings', requireAuth, (req, res) => {
-  res.json(readData('settings.json'));
+app.put('/api/adminproducts/:id', requireAuth, async (req, res) => {
+  try {
+    const update = {
+      ...req.body,
+      price: parseInt(req.body.price),
+      featured: req.body.featured === true || req.body.featured === 'true',
+      newArrival: req.body.newArrival === true || req.body.newArrival === 'true',
+      updatedAt: new Date().toISOString()
+    };
+    const product = await Product.findOneAndUpdate({ id: req.params.id }, update, { new: true });
+    if (!product) return res.status(404).json({ error: 'Product not found' });
+    res.json({ success: true, product });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update product' });
+  }
 });
 
-app.put('/api/adminsettings', requireAuth, (req, res) => {
-  const current = readData('settings.json');
-  const updated = { ...current, ...req.body };
-  writeData('settings.json', updated);
-  res.json({ success: true, settings: updated });
+app.delete('/api/adminproducts/:id', requireAuth, async (req, res) => {
+  try {
+    await Product.findOneAndDelete({ id: req.params.id });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete product' });
+  }
 });
 
-app.get('/api/admin/orders', requireAuth, (req, res) => {
-  res.json(readData('orders.json'));
+// ════════════════════════════════════════════════════════
+// ADMIN REVIEWS
+// ════════════════════════════════════════════════════════
+
+app.get('/api/adminreviews', requireAuth, async (req, res) => {
+  try {
+    const reviews = await Review.find({}).sort({ submittedAt: -1 });
+    res.json(reviews);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch reviews' });
+  }
+});
+
+app.put('/api/adminreviews/:id', requireAuth, async (req, res) => {
+  try {
+    const { status, verifiedBuyer } = req.body;
+    const update = { updatedAt: new Date().toISOString() };
+    if (status) update.status = status;
+    if (verifiedBuyer !== undefined) {
+      update.verifiedBuyer = verifiedBuyer === true || verifiedBuyer === 'true';
+    }
+    const review = await Review.findOneAndUpdate({ id: req.params.id }, update, { new: true });
+    if (!review) return res.status(404).json({ error: 'Review not found' });
+    res.json({ success: true, review });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update review' });
+  }
+});
+
+app.delete('/api/adminreviews/:id', requireAuth, async (req, res) => {
+  try {
+    await Review.findOneAndDelete({ id: req.params.id });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete review' });
+  }
+});
+
+// ════════════════════════════════════════════════════════
+// ADMIN ORDERS
+// ════════════════════════════════════════════════════════
+
+app.get('/api/admin/orders', requireAuth, async (req, res) => {
+  try {
+    const orders = await Order.find({}).sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch orders' });
+  }
+});
+
+// ════════════════════════════════════════════════════════
+// ADMIN ENQUIRIES
+// ════════════════════════════════════════════════════════
+
+app.get('/api/adminenquiries', requireAuth, async (req, res) => {
+  try {
+    const enquiries = await Enquiry.find({}).sort({ timestamp: -1 });
+    const summary = {};
+    enquiries.forEach(e => {
+      if (!summary[e.productId]) {
+        summary[e.productId] = {
+          productId: e.productId,
+          productName: e.productName,
+          totalClicks: 0,
+          lastEnquiry: e.timestamp
+        };
+      }
+      summary[e.productId].totalClicks++;
+      if (e.timestamp > summary[e.productId].lastEnquiry) {
+        summary[e.productId].lastEnquiry = e.timestamp;
+      }
+    });
+    const sorted = Object.values(summary).sort((a, b) => b.totalClicks - a.totalClicks);
+    res.json({ raw: enquiries, summary: sorted });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch enquiries' });
+  }
+});
+
+// ════════════════════════════════════════════════════════
+// ADMIN REQUESTS
+// ════════════════════════════════════════════════════════
+
+app.get('/api/admin/requests', requireAuth, async (req, res) => {
+  try {
+    const requests = await Request.find({}).sort({ createdAt: -1 });
+    res.json(requests);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch requests' });
+  }
+});
+
+app.put('/api/admin/requests/:id', requireAuth, async (req, res) => {
+  try {
+    const request = await Request.findOneAndUpdate(
+      { id: req.params.id },
+      { status: req.body.status },
+      { new: true }
+    );
+    if (!request) return res.status(404).json({ error: 'Request not found' });
+    res.json({ success: true, request });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update request' });
+  }
+});
+
+// ════════════════════════════════════════════════════════
+// ADMIN SETTINGS
+// ════════════════════════════════════════════════════════
+
+app.get('/api/adminsettings', requireAuth, async (req, res) => {
+  try {
+    const settings = await Settings.findOne({ key: 'main' });
+    res.json(settings || {});
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch settings' });
+  }
+});
+
+app.put('/api/adminsettings', requireAuth, async (req, res) => {
+  try {
+    const settings = await Settings.findOneAndUpdate(
+      { key: 'main' },
+      { ...req.body, key: 'main' },
+      { new: true, upsert: true }
+    );
+    res.json({ success: true, settings });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update settings' });
+  }
 });
 
 // ── 404 ───────────────────────────────────────────────────
 app.use((req, res) => {
-  if (req.path.startsWith('/api')) return res.status(404).json({ error: 'Route not found' });
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ error: 'Route not found' });
+  }
   res.sendFile(path.join(__dirname, 'public', '404.html'));
 });
 
 // ── START ─────────────────────────────────────────────────
-seedAdmin().then(() => {
+mongoose.connection.once('open', async () => {
+  await seedData();
   app.listen(PORT, () => {
-    console.log  (`🚀 HOK Computers running → http://localhost:${PORT}`);
+    console.log(`🚀 HOK Computers running → http://localhost:${PORT}`);
     console.log(`🔐 Admin panel → http://localhost:${PORT}/admin`);
   });
 });
