@@ -52,8 +52,8 @@
         <label class="radio-label"><input type="radio" name="stor" value="1TB" onchange="applyFilters()"> 1TB</label>
       </div>
       <div class="sidebar-section">
-        <h4>Max Price: <span id="priceVal">₦1,000,000</span></h4>
-        <input type="range" id="priceRange" min="20000" max="1000000" step="10000" value="1000000" oninput="onPrice(this.value)"/>
+        <h4>Max Price: <span id="priceVal">₦5,000,000</span></h4>
+        <input type="range" id="priceRange" min="20000" max="5000000" step="10000" value="1000000" oninput="onPrice(this.value)"/>
       </div>
       <button class="btn-reset" onclick="resetFilters()">Clear All Filters</button>
     </aside>
@@ -174,8 +174,8 @@ function resetFilters() {
   document.querySelector('input[name="cond"][value=""]').checked = true;
   document.querySelector('input[name="ram"][value=""]').checked = true;
   document.querySelector('input[name="stor"][value=""]').checked = true;
-  document.getElementById('priceRange').value = 1000000;
-  document.getElementById('priceVal').textContent = '₦1,000,000';
+  document.getElementById('priceRange').value = 5000000;
+  document.getElementById('priceVal').textContent = '₦5,000,000';
   document.getElementById('searchInput').value = '';
   document.getElementById('sortSelect').value = 'default';
   applyFilters();
