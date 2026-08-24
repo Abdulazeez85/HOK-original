@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 
-bcrypt.hash('hokcomputers2025', 10).then(hash => {
+bcrypt.hash('abuasmaa', 10).then(hash => {
   fs.writeFileSync('./data/admin.json', JSON.stringify({
     username: 'hokadmin',
     password: hash
