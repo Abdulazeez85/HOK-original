@@ -107,6 +107,12 @@
       <div class="service-card reveal"><div class="svc-icon">💾</div><h3>Software Install</h3><p>Windows, Office, antivirus, drivers — all set up and ready to go.</p><a href="#" id="softwareWa" class="svc-link">Get Quote →</a></div>
       <div class="service-card reveal"><div class="svc-icon">⚙️</div><h3>Hardware Upgrade</h3><p>RAM, SSD, cooling upgrades. Breathe new life into your machine.</p><a href="#" id="upgradeWa" class="svc-link">Upgrade →</a></div>
       <div class="service-card reveal"><div class="svc-icon">🌐</div><h3>Web Development</h3><p>Professional websites for businesses across Nigeria. Fast, modern, mobile-first.</p><a href="#" id="webdevWa" class="svc-link">Get Quote →</a></div>
+      <div class="service-card reveal">
+  <div class="svc-icon">📱</div>
+  <h3>App Development</h3>
+  <p>Custom mobile and web applications for businesses across Nigeria. Android, iOS and cross-platform solutions built to your specifications.</p>
+  <a href="#" id="appdevWa" class="svc-link">Get Quote →</a>
+</div>
     </div>
   </div>
 </section>
@@ -178,8 +184,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('softwareWa').href = `https://wa.me/${wa}?text=Hello%20HOK%2C%20I%20need%20software%20installation.`;
   document.getElementById('upgradeWa').href = `https://wa.me/${wa}?text=Hello%20HOK%2C%20I%20need%20a%20hardware%20upgrade.`;
   document.getElementById('webdevWa').href = `https://wa.me/${wa}?text=Hello%20HOK%2C%20I%20need%20a%20website.`;
+  document.getElementById('appdevWa').href = `https://wa.me/${wa}?text=Hello%20HOK%2C%20I%20need%20an%20app%20developed.`;
   if (settings.businessHours) document.getElementById('contactHours').textContent = settings.businessHours;
   if (settings.businessEmail) document.getElementById('contactEmail').textContent = settings.businessEmail;
+
 
   // Load new arrivals
   const [newRes, featRes, revRes] = await Promise.all([

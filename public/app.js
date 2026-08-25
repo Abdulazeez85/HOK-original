@@ -665,7 +665,7 @@ function getFooterHTML() {
     </div>
     <div class="footer-bottom">
       <p>© 2026 HOK Computers. Ilorin, Kwara State, Nigeria.</p>
-      <p>Built by <a href="https://my-personal-portfolio-the-quantum-c.vercel.app/">The Quantum Developer</a></p>
+      <p>Built & Developed  by <a href="https://hokcomputers.ng">Mavericq IT , a subdivision of HOK COMPUTERS </a></p>
     </div>
   </div>
   ${getTrustBannerHTML()}
