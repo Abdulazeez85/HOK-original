@@ -53,7 +53,7 @@
       </div>
       <div class="sidebar-section">
         <h4>Max Price: <span id="priceVal">₦5,000,000</span></h4>
-        <input type="range" id="priceRange" min="20000" max="5000000" step="10000" value="1000000" oninput="onPrice(this.value)"/>
+        <input type="range" id="priceRange" min="20000" max="5000000" step="10000" value="5000000" oninput="onPrice(this.value)"/>
       </div>
       <button class="btn-reset" onclick="resetFilters()">Clear All Filters</button>
     </aside>
@@ -178,7 +178,7 @@ if (activeTier === 'bronze') {
 } else if (activeTier === 'gold') {
   result = result.filter(p => p.price > 500000 && p.price <= 1000000);
 } else if (activeTier === 'diamond') {
-  result = result.filter(p => p.price > 1000000);
+  result = result.filter(p => p.price > 5000000);
 }
   if (search) result = result.filter(p =>
     p.name.toLowerCase().includes(search) ||

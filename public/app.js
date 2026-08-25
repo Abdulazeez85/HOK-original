@@ -530,8 +530,7 @@ function buildCard(p, i = 0) {
 let _allProducts = [];
 function handleCardClick(e, id) {
   if (e.target.closest('button')) return;
-  const p = _allProducts.find(x => x.id === id);
-  if (p) openProductModal(p);
+  window.location.href = `/product/${id}`;
 }
 
 // ── SHARED NAV HTML ───────────────────────────────────────

@@ -231,8 +231,7 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.ht
 app.get('/products', (req, res) => res.sendFile(path.join(__dirname, 'public', 'products.html')));
 app.get('/reviews', (req, res) => res.sendFile(path.join(__dirname, 'public', 'reviews.html')));
 app.get('/about', (req, res) => res.sendFile(path.join(__dirname, 'public', 'about.html')));
-app.get('/product', (req, res) => res.sendFile(path.join(__dirname, 'public', 'product.html')));
-app.get('/payment-success', (req, res) => res.sendFile(path.join(__dirname, 'public', 'payment-success.html')));
+app.get('/product/:id', (req, res) => res.sendFile(path.join(__dirname, 'public', 'product.html')));app.get('/payment-success', (req, res) => res.sendFile(path.join(__dirname, 'public', 'payment-success.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'login.html')));
 app.get('/admin/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'dashboard.html')));
 app.get('/admin/products', (req, res) => res.sendFile(path.join(__dirname, 'admin', 'products.html')));
