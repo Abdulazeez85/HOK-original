@@ -713,7 +713,15 @@ function getTrustBannerHTML() {
   {
     name: 'Dangote Cement',
     img: 'https://res.cloudinary.com/da7jzmy2g/image/upload/v1786123497/WhatsApp_Image_2026-08-07_at_10.22.49_AM_anowzs.jpg'
-  }
+  },
+  {
+  name: 'KWASUTH',
+  img: 'https://res.cloudinary.com/da7jzmy2g/image/upload/v1787537998/kwasuth_vjyuia.png'
+},
+{
+  name: 'Federal Polytechnic Offa',
+  img: 'https://res.cloudinary.com/da7jzmy2g/image/upload/v1787537978/fed_poly_offa_lunqy3.png'
+}
 ];
   
     

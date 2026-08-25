@@ -45,6 +45,16 @@
         <label class="radio-label"><input type="radio" name="ram" value="32GB" onchange="applyFilters()"> 32GB</label>
       </div>
       <div class="sidebar-section">
+  <h4>Brand</h4>
+  <label class="radio-label"><input type="radio" name="brand" value="" checked onchange="applyFilters()"> All Brands</label>
+  <label class="radio-label"><input type="radio" name="brand" value="HP" onchange="applyFilters()"> HP</label>
+  <label class="radio-label"><input type="radio" name="brand" value="Dell" onchange="applyFilters()"> Dell</label>
+  <label class="radio-label"><input type="radio" name="brand" value="Apple" onchange="applyFilters()"> Apple</label>
+  <label class="radio-label"><input type="radio" name="brand" value="Acer" onchange="applyFilters()"> Acer</label>
+  <label class="radio-label"><input type="radio" name="brand" value="Microsoft" onchange="applyFilters()"> Microsoft</label>
+  <label class="radio-label"><input type="radio" name="brand" value="Samsung" onchange="applyFilters()"> Samsung</label>
+    </div>
+      <div class="sidebar-section">
         <h4>Storage</h4>
         <label class="radio-label"><input type="radio" name="stor" value="" checked onchange="applyFilters()"> Any</label>
         <label class="radio-label"><input type="radio" name="stor" value="256GB" onchange="applyFilters()"> 256GB</label>
@@ -157,6 +167,7 @@ function onPrice(val) {
 
 function applyFilters() {
   const cat = document.querySelector('input[name="cat"]:checked')?.value || 'all';
+  const brand = document.querySelector('input[name="brand"]:checked')?.value || '';
   const cond = document.querySelector('input[name="cond"]:checked')?.value || '';
   const ram = document.querySelector('input[name="ram"]:checked')?.value || '';
   const stor = document.querySelector('input[name="stor"]:checked')?.value || '';
@@ -166,6 +177,7 @@ function applyFilters() {
 
   let result = [...allProducts];
   if (cat !== 'all') result = result.filter(p => p.category === cat);
+  if (brand) result = result.filter(p => p.brand === brand);
   if (cond) result = result.filter(p => p.specs?.condition === cond);
   if (ram) result = result.filter(p => p.specs?.ram === ram);
   if (stor) result = result.filter(p => p.specs?.storage?.includes(stor));
@@ -178,7 +190,7 @@ if (activeTier === 'bronze') {
 } else if (activeTier === 'gold') {
   result = result.filter(p => p.price > 500000 && p.price <= 1000000);
 } else if (activeTier === 'diamond') {
-  result = result.filter(p => p.price > 5000000);
+  result = result.filter(p => p.price > 5000000); 
 }
   if (search) result = result.filter(p =>
     p.name.toLowerCase().includes(search) ||
@@ -210,6 +222,7 @@ function resetFilters() {
   document.getElementById('priceVal').textContent = '₦5,000,000';
   document.getElementById('searchInput').value = '';
   document.getElementById('sortSelect').value = 'default';
+  document.querySelector('input[name="brand"][value=""]').checked = true;
   applyFilters();
 }
 function setTier(tier, btn) {
