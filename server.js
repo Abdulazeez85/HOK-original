@@ -15,6 +15,13 @@ const path = require('path');
 const crypto = require('crypto');
 const multer = require('multer');
 const sanitizeHtml = require('sanitize-html');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 require('dotenv').config();
 
@@ -187,20 +194,18 @@ app.use((req, res, next) => {
   next();
 });
 
-// ── MULTER ────────────────────────────────────────────────
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, 'public', 'uploads');
-    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `${uuidv4()}${ext}`);
+// ──CLOUDINARY STORAGE MULTER ────────────────────────────────────────────────
+const cloudinaryStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'hok-computers',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    transformation: [{ width: 800, quality: 'auto' }]
   }
 });
+
 const upload = multer({
-  storage,
+  storage: cloudinaryStorage,
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) cb(null, true);
@@ -326,8 +331,7 @@ app.post('/api/reviews', upload.array('images', 5), async (req, res) => {
     const cleanName = sanitizeHtml(name, { allowedTags: [], allowedAttributes: {} });
     const cleanMessage = sanitizeHtml(message, { allowedTags: [], allowedAttributes: {} });
     const cleanProduct = sanitizeHtml(product, { allowedTags: [], allowedAttributes: {} });
-
-    const images = req.files ? req.files.map(f => `/uploads/${f.filename}`) : [];
+    const images = req.files ? req.files.map(f => f.path) : [];
 
     await Review.create({
       id: 'rev_' + uuidv4().slice(0, 8),
@@ -418,9 +422,9 @@ const cleanName = sanitizeHtml(name, { allowedTags: [], allowedAttributes: {} })
 const cleanProblem = sanitizeHtml(problem, { allowedTags: [], allowedAttributes: {} });
     
     let imageUrl = '';
-    if (req.file) {
-      imageUrl = `/uploads/${req.file.filename}`;
-    }
+if (req.file) {
+  imageUrl = req.file.path;
+}
     await Request.create({
   id: 'rep_' + uuidv4().slice(0, 8),
   type: 'repair',
