@@ -18,6 +18,7 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const sanitizeHtml = require('sanitize-html');
 
 // ── SECURITY ──────────────────────────────────────────────
 app.use(helmet({ contentSecurityPolicy: false }));
@@ -171,6 +172,13 @@ app.use(session({
   cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'lax' }
 }));
 
+app.use((req, res, next) => {
+  if (req.headers['x-forwarded-proto'] !== 'https' && process.env.NODE_ENV === 'production') {
+    return res.redirect(301, 'https://' + req.headers.host + req.url);
+  }
+  next();
+});
+
 // ── MULTER ────────────────────────────────────────────────
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -303,6 +311,9 @@ app.get('/api/reviews/top', async (req, res) => {
 app.post('/api/reviews', upload.array('images', 5), async (req, res) => {
   try {
     const { name, phone, rating, message, product } = req.body;
+    const cleanName = sanitizeHtml(name, { allowedTags: [], allowedAttributes: {} });
+const cleanMessage = sanitizeHtml(message, { allowedTags: [], allowedAttributes: {} });
+const cleanProduct = sanitizeHtml(product, { allowedTags: [], allowedAttributes: {} });
     if (!name || !phone || !rating || !message || !product) {
       return res.status(400).json({ error: 'All fields required' });
     }
