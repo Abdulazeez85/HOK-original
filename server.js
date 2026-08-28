@@ -14,11 +14,12 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const multer = require('multer');
+const sanitizeHtml = require('sanitize-html');
+
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const sanitizeHtml = require('sanitize-html');
 
 // ── SECURITY ──────────────────────────────────────────────
 app.use(helmet({ contentSecurityPolicy: false }));
@@ -165,6 +166,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
+// Force HTTPS in production
+app.use((req, res, next) => {
+  if (req.headers['x-forwarded-proto'] !== 'https' && process.env.NODE_ENV === 'production') {
+    return res.redirect(301, 'https://' + req.headers.host + req.url);
+  }
+  next();
+});
 app.use(session({
   secret: process.env.SESSION_SECRET || 'hok_secret',
   resave: false,
@@ -311,27 +319,29 @@ app.get('/api/reviews/top', async (req, res) => {
 app.post('/api/reviews', upload.array('images', 5), async (req, res) => {
   try {
     const { name, phone, rating, message, product } = req.body;
-    const cleanName = sanitizeHtml(name, { allowedTags: [], allowedAttributes: {} });
-const cleanMessage = sanitizeHtml(message, { allowedTags: [], allowedAttributes: {} });
-const cleanProduct = sanitizeHtml(product, { allowedTags: [], allowedAttributes: {} });
     if (!name || !phone || !rating || !message || !product) {
       return res.status(400).json({ error: 'All fields required' });
     }
+
+    const cleanName = sanitizeHtml(name, { allowedTags: [], allowedAttributes: {} });
+    const cleanMessage = sanitizeHtml(message, { allowedTags: [], allowedAttributes: {} });
+    const cleanProduct = sanitizeHtml(product, { allowedTags: [], allowedAttributes: {} });
 
     const images = req.files ? req.files.map(f => `/uploads/${f.filename}`) : [];
 
     await Review.create({
       id: 'rev_' + uuidv4().slice(0, 8),
-      name: name.trim(),
+      name: cleanName.trim(),
       phone: phone.trim(),
       rating: parseInt(rating),
-      message: message.trim(),
-      product: product.trim(),
+      message: cleanMessage.trim(),
+      product: cleanProduct.trim(),
       images,
       status: 'pending',
       verifiedBuyer: false,
       submittedAt: new Date().toISOString()
     });
+
     res.json({ success: true, message: 'Review submitted successfully' });
   } catch (err) {
     console.error('Review error:', err);
@@ -375,18 +385,22 @@ app.post('/api/notify', async (req, res) => {
 app.post('/api/requests', async (req, res) => {
   try {
     const { name, phone, productName, budget } = req.body;
-    if (!name || !phone || !productName) {
-      return res.status(400).json({ error: 'Name, phone and product name required' });
-    }
+if (!name || !phone || !productName) {
+  return res.status(400).json({ error: 'Name, phone and product name required' });
+}
+
+const cleanName = sanitizeHtml(name, { allowedTags: [], allowedAttributes: {} });
+const cleanProductName = sanitizeHtml(productName, { allowedTags: [], allowedAttributes: {} });
     await Request.create({
-      id: 'req_' + uuidv4().slice(0, 8),
-      type: 'product',
-      name: name.trim(), phone: phone.trim(),
-      productName: productName.trim(),
-      budget: budget || '',
-      status: 'pending',
-      createdAt: new Date().toISOString()
-    });
+  id: 'req_' + uuidv4().slice(0, 8),
+  type: 'product',
+  name: cleanName.trim(),
+  phone: phone.trim(),
+  productName: cleanProductName.trim(),
+  budget: budget || '',
+  status: 'pending',
+  createdAt: new Date().toISOString()
+});
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: 'Failed to submit request' });
@@ -396,22 +410,28 @@ app.post('/api/requests', async (req, res) => {
 app.post('/api/repair-requests', upload.single('image'), async (req, res) => {
   try {
     const { name, phone, device, problem } = req.body;
-    if (!name || !phone || !device || !problem) {
-      return res.status(400).json({ error: 'All fields required' });
-    }
+if (!name || !phone || !device || !problem) {
+  return res.status(400).json({ error: 'All fields required' });
+}
+
+const cleanName = sanitizeHtml(name, { allowedTags: [], allowedAttributes: {} });
+const cleanProblem = sanitizeHtml(problem, { allowedTags: [], allowedAttributes: {} });
+    
     let imageUrl = '';
     if (req.file) {
       imageUrl = `/uploads/${req.file.filename}`;
     }
     await Request.create({
-      id: 'rep_' + uuidv4().slice(0, 8),
-      type: 'repair',
-      name: name.trim(), phone: phone.trim(),
-      device, problem: problem.trim(),
-      imageUrl,
-      status: 'pending',
-      createdAt: new Date().toISOString()
-    });
+  id: 'rep_' + uuidv4().slice(0, 8),
+  type: 'repair',
+  name: cleanName.trim(),
+  phone: phone.trim(),
+  device,
+  problem: cleanProblem.trim(),
+  imageUrl,
+  status: 'pending',
+  createdAt: new Date().toISOString()
+});
     res.json({ success: true, imageUrl });
   } catch (err) {
     res.status(500).json({ error: 'Failed to submit repair request' });
