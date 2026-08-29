@@ -178,7 +178,7 @@ function applyFilters() {
 
   let result = [...allProducts];
   if (cat !== 'all') result = result.filter(p => p.category === cat);
-  if (brand) result = result.filter(p => p.brand === brand);
+  if (brand) result = result.filter(p => p.brand.toLowerCase() === brand.toLowerCase());
   if (cond) result = result.filter(p => p.specs?.condition === cond);
   if (ram) result = result.filter(p => p.specs?.ram === ram);
   if (stor) result = result.filter(p => p.specs?.storage?.includes(stor));
@@ -190,8 +190,8 @@ if (activeTier === 'bronze') {
   result = result.filter(p => p.price >= 200000 && p.price <= 500000);
 } else if (activeTier === 'gold') {
   result = result.filter(p => p.price > 500000 && p.price <= 1000000);
-} else if (activeTier === 'diamond') {
-  result = result.filter(p => p.price > 5000000); 
+}  else if (activeTier === 'diamond') {
+  result = result.filter(p => p.price >= 1000000);
 }
   if (search) result = result.filter(p =>
     p.name.toLowerCase().includes(search) ||
