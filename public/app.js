@@ -638,7 +638,7 @@ function getFooterHTML() {
           <img src="https://res.cloudinary.com/da7jzmy2g/image/upload/v1780626286/hokp_lzhjha.jpg" alt="HOK logo" class="logo-img" width="32" height="32" border-radius="50%">
           <span>HOK Computers</span>
         </div>
-        <p>Home of Khayr — The Most Customer-friendly Gadget Store In Nigeria . Corporate Affairs Commission (CAC) Registered since August  2020.</p>
+        <p></p>
             <p class="footer-note">Some items may no longer be available  in store. It will be gotten ready for dispatch within 4-48 hours of payment.</p>
         <div class="socials">
           <a class="social-link social-facebook" href="https://web.facebook.com/homeofkhayr/?_rdc=1&_rdr#" aria-label="Facebook" target="_blank" rel="noreferrer noopener">
