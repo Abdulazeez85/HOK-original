@@ -17,8 +17,18 @@
     <div class="card">
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Reference</th><th>Email</th><th>Amount</th><th>Type</th><th>Status</th><th>Product / Items</th><th>Paid At</th></tr></thead>
-          <tbody id="ordersTable"></tbody>
+<thead>
+  <tr>
+    <th>Reference</th>
+    <th>Product</th>
+    <th>Customer Name</th>
+    <th>Phone</th>
+    <th>Address</th>
+    <th>Amount</th>
+    <th>Status</th>
+    <th>Date</th>
+  </tr>
+</thead>          <tbody id="ordersTable"></tbody>
         </table>
       </div>
       <div class="empty-state" id="emptyOrders" style="display:none"><span>🧾</span><p>No orders yet.</p></div>
@@ -37,15 +47,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!orders.length) { empty.style.display = 'block'; return; }
   empty.style.display = 'none';
   tbody.innerHTML = orders.map(o => `
-    <tr>
-      <td>${o.reference}</td>
-      <td>${o.email}</td>
-      <td>₦${parseInt(o.amount).toLocaleString('en-NG')}</td>
-      <td>${o.orderType === 'cart' ? 'Cart' : 'Single'}</td>
-      <td>${o.status}</td>
-      <td>${o.orderType === 'cart' ? o.items.map(i => `${i.productName} x${i.quantity}`).join('<br/>') : o.productName || '—'}</td>
-      <td>${new Date(o.paidAt).toLocaleString('en-NG')}</td>
-    </tr>`).join('');
+  <tr>
+    <td style="font-size:0.75rem;color:var(--text-3)">${o.reference}</td>
+    <td class="td-name">${o.productName || o.metadata?.productName || 'N/A'}</td>
+    <td>${o.customerName || o.metadata?.customerName || 'N/A'}</td>
+    <td>${o.customerPhone || o.metadata?.customerPhone || 'N/A'}</td>
+    <td style="max-width:150px;font-size:0.78rem">${o.customerAddress || o.metadata?.customerAddress || 'N/A'}</td>
+    <td class="td-price">${fmt(o.amount)}</td>
+    <td><span class="badge ${o.status === 'success' ? 'badge-green' : 'badge-yellow'}">${o.status}</span></td>
+    <td style="font-size:0.75rem">${o.paidAt ? new Date(o.paidAt).toLocaleDateString('en-NG') : 'Pending'}</td>
+  </tr>`).join('');
 });
 </script>
 </body>

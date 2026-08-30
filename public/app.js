@@ -48,11 +48,22 @@ function openPaystackModal(orderInfo) {
   const bx = document.getElementById('paystackModal');
   const overlay = document.getElementById('paystackOverlay');
   if (!bx || !overlay) return;
-  document.getElementById('checkoutSummary').textContent = orderInfo.summary;
-  document.getElementById('checkoutTotal').textContent = orderInfo.total;
-  document.getElementById('checkoutEmail').value = orderInfo.email || '';
+
+  // Auto-fill product name and total
+  const nameEl = document.getElementById('checkoutProductName');
+  const totalEl = document.getElementById('checkoutTotal');
+  if (nameEl) nameEl.textContent = orderInfo.productName || orderInfo.summary || '';
+  if (totalEl) totalEl.textContent = orderInfo.total || '';
+
+  // Clear previous inputs
+  ['checkoutName','checkoutPhone','checkoutEmail','checkoutAddress'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+
   bx.classList.add('open');
   overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
 function closePaystackModal() {
@@ -66,14 +77,20 @@ function closePaystackModal() {
 
 async function submitPaystackCheckout() {
   if (!paystackOrderInfo) return;
-  const emailInput = document.getElementById('checkoutEmail');
-  const email = emailInput?.value.trim();
-  if (!email || !email.includes('@')) {
-    showToast('Enter a valid email for your payment receipt.');
-    return;
-  }
+
+  const name = document.getElementById('checkoutName')?.value.trim();
+  const phone = document.getElementById('checkoutPhone')?.value.trim();
+  const email = document.getElementById('checkoutEmail')?.value.trim();
+  const address = document.getElementById('checkoutAddress')?.value.trim();
+
+  if (!name) { showToast('Please enter your full name.'); return; }
+  if (!phone) { showToast('Please enter your phone number.'); return; }
+  if (!email || !email.includes('@')) { showToast('Please enter a valid email address.'); return; }
+  if (!address) { showToast('Please enter your delivery address.'); return; }
+
   const order = paystackOrderInfo;
   closePaystackModal();
+
   try {
     const init = await createPaystackOrder({
       productId: order.productId,
@@ -82,17 +99,26 @@ async function submitPaystackCheckout() {
       email,
       orderType: order.orderType,
       items: order.items,
-      metadata: { customerName: order.customerName || '', customerPhone: order.customerPhone || '' }
+      metadata: {
+        customerName: name,
+        customerPhone: phone,
+        customerAddress: address,
+        customerEmail: email
+      }
     });
+
     if (!init.authorization_url) {
-      showToast(init.error || 'Unable to start Paystack payment.');
+      showToast(init.error || 'Unable to start payment.');
       return;
     }
+
     await loadPaystackScript();
+
     if (!paystackPublicKey || !window.PaystackPop) {
       window.location.href = init.authorization_url;
       return;
     }
+
     window.PaystackPop.setup({
       key: paystackPublicKey,
       email,
@@ -101,18 +127,18 @@ async function submitPaystackCheckout() {
       ref: init.reference,
       metadata: init.metadata || {},
       callback: function(response) {
-        window.location.href = `${window.location.origin}/payment-success.html?reference=${encodeURIComponent(response.reference)}`;
+        window.location.href = `${window.location.origin}/payment-success?reference=${encodeURIComponent(response.reference)}`;
       },
       onClose: function() {
-        showToast('Payment window closed. You can try again when ready.');
+        showToast('Payment window closed. You can try again.');
       }
     }).openIframe();
+
   } catch (err) {
-    console.error('Paystack checkout error:', err);
-    showToast('Unable to launch Paystack. Please try again.');
+    console.error('Checkout error:', err);
+    showToast('Unable to start payment. Please try again.');
   }
 }
-
 async function createPaystackOrder(payload) {
   const res = await fetch('/api/paystack/initialize', {
     method: 'POST',
@@ -604,27 +630,46 @@ function getModalsHTML() {
       <div class="form-group"><label>WhatsApp Number</label><input type="tel" id="notifyPhone" placeholder="08012345678" /></div>
       <button class="btn-wa full" onclick="submitNotify()">Notify Me</button>
     </div>
-    <div class="cart-overlay" id="paystackOverlay"></div>
-    <div class="paystack-modal" id="paystackModal">
-      <button class="close-btn" id="paystackClose">✕</button>
-      <div class="paystack-modal-head">
-        <div>
-          <p class="eyebrow">Secure Checkout</p>
-          <h3>Pay with Card</h3>
-        </div>
-        <div class="paystack-badge">Powered by Paystack</div>
-      </div>
-      <div class="checkout-details">
-        <div class="checkout-summary" id="checkoutSummary"></div>
-        <div class="checkout-total"><span>Total</span><strong id="checkoutTotal"></strong></div>
-      </div>
-      <div class="form-group">
-        <label for="checkoutEmail">Email address</label>
-        <input type="email" id="checkoutEmail" placeholder="you@example.com" />
-      </div>
-      <button class="btn-primary full" onclick="submitPaystackCheckout()">Proceed to Payment</button>
-      <p class="checkout-note">You will be redirected to Paystack's secure checkout window to complete your payment.</p>
+    <!-- Paystack Checkout Modal -->
+<div class="modal-overlay" id="paystackOverlay"></div>
+<div class="product-modal" id="paystackModal" style="max-width:480px">
+  <button class="close-btn modal-close" onclick="closePaystackModal()" style="position:absolute;top:16px;right:16px">✕</button>
+  <div style="padding:8px">
+    <p class="eyebrow">Secure Checkout</p>
+    <h3 style="font-size:1.1rem;font-weight:600;color:var(--text-1);margin-bottom:4px" id="checkoutProductName"></h3>
+    <p style="font-size:1.4rem;font-weight:700;color:var(--accent);margin-bottom:20px" id="checkoutTotal"></p>
+    
+    <div class="form-group" style="margin-bottom:12px">
+      <label class="f-label" style="font-size:0.78rem;color:var(--text-2);display:block;margin-bottom:5px">Full Name *</label>
+      <input type="text" id="checkoutName" placeholder="e.g. Ibrahim Yusuf" 
+        style="width:100%;background:var(--bg-2);border:1px solid var(--border);color:var(--text-1);padding:10px 14px;border-radius:8px;font-size:0.88rem;outline:none"/>
     </div>
+
+    <div class="form-group" style="margin-bottom:12px">
+      <label class="f-label" style="font-size:0.78rem;color:var(--text-2);display:block;margin-bottom:5px">Phone Number *</label>
+      <input type="tel" id="checkoutPhone" placeholder="e.g. 08012345678"
+        style="width:100%;background:var(--bg-2);border:1px solid var(--border);color:var(--text-1);padding:10px 14px;border-radius:8px;font-size:0.88rem;outline:none"/>
+    </div>
+
+    <div class="form-group" style="margin-bottom:12px">
+      <label class="f-label" style="font-size:0.78rem;color:var(--text-2);display:block;margin-bottom:5px">Email Address *</label>
+      <input type="email" id="checkoutEmail" placeholder="e.g. you@gmail.com"
+        style="width:100%;background:var(--bg-2);border:1px solid var(--border);color:var(--text-1);padding:10px 14px;border-radius:8px;font-size:0.88rem;outline:none"/>
+    </div>
+
+    <div class="form-group" style="margin-bottom:20px">
+      <label class="f-label" style="font-size:0.78rem;color:var(--text-2);display:block;margin-bottom:5px">Delivery Address *</label>
+      <textarea id="checkoutAddress" placeholder="e.g. 12 University Road, Ilorin, Kwara State" rows="3"
+        style="width:100%;background:var(--bg-2);border:1px solid var(--border);color:var(--text-1);padding:10px 14px;border-radius:8px;font-size:0.88rem;outline:none;resize:vertical"></textarea>
+    </div>
+
+    <button class="btn-primary" style="width:100%;justify-content:center;border:none;cursor:pointer;padding:14px;font-size:0.95rem"
+      onclick="submitPaystackCheckout()">
+      🔒 Proceed to Payment
+    </button>
+    <p style="font-size:0.72rem;color:var(--text-3);text-align:center;margin-top:10px">Secured by Paystack. Your details are safe.</p>
+  </div>
+</div>
     <div class="toast" id="toast"></div>`;
 }
 

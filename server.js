@@ -1,4 +1,6 @@
 'use strict';
+require('dotenv').config();
+
 const dns = require('dns');
 dns.setServers(['8.8.8.8','8.8.4.4']);
 
@@ -22,8 +24,9 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
+const { Resend } = require('resend');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -96,6 +99,9 @@ const OrderSchema = new mongoose.Schema({
   items: Array,
   metadata: Object,
   status: String,
+  customerName: String,
+  customerPhone: String,
+  customerAddress: String,
   paidAt: String,
   createdAt: String
 });
@@ -167,6 +173,96 @@ const Visitor = mongoose.model('Visitor', VisitorSchema);
 const Settings = mongoose.model('Settings', SettingsSchema);
 const Admin = mongoose.model('Admin', AdminSchema);
 
+
+
+// ── EMAIL HELPER ──────────────────────────────────────────
+async function sendReceiptEmail(orderDetails) {
+  const { customerName, customerEmail, customerPhone, customerAddress, productName, amount, reference } = orderDetails;
+  
+  try {
+    await resend.emails.send({
+      from: process.env.FROM_EMAIL || 'info@hokcomputers.ng',
+      to: customerEmail,
+      subject: `Payment Receipt - ${productName} | HOK Computers`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8"/>
+          <style>
+            body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+            .container { max-width: 600px; margin: 30px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+            .header { background: #0d1f14; padding: 32px; text-align: center; }
+            .header img { width: 60px; margin-bottom: 12px; }
+            .header h1 { color: #25d466; font-size: 1.4rem; margin: 0; }
+            .header p { color: #7a9482; font-size: 0.85rem; margin: 6px 0 0; }
+            .body { padding: 32px; }
+            .success-badge { background: #e8f7ee; border: 1px solid #25d466; color: #1a7a3c; padding: 12px 20px; border-radius: 8px; text-align: center; font-size: 1rem; font-weight: 600; margin-bottom: 24px; }
+            .detail-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
+            .detail-row span:first-child { color: #666; }
+            .detail-row span:last-child { font-weight: 600; color: #0d1f14; }
+            .amount-row { display: flex; justify-content: space-between; padding: 16px 0; font-size: 1.1rem; }
+            .amount-row span:first-child { font-weight: 600; }
+            .amount-row span:last-child { font-weight: 700; color: #25d466; font-size: 1.3rem; }
+            .footer { background: #f9f9f9; padding: 24px 32px; text-align: center; }
+            .footer p { color: #999; font-size: 0.8rem; margin: 4px 0; }
+            .footer a { color: #25d466; text-decoration: none; }
+            .whatsapp-btn { display: inline-block; background: #128c7e; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 0.88rem; font-weight: 600; margin-top: 16px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>HOK Computers</h1>
+              <p>Home of Khayr — Ilorin, Kwara State</p>
+            </div>
+            <div class="body">
+              <div class="success-badge">✅ Payment Successful</div>
+              <p style="color:#333;margin-bottom:20px">Dear <strong>${customerName}</strong>, thank you for your purchase. Here are your order details:</p>
+              
+              <div class="detail-row"><span>Product</span><span>${productName}</span></div>
+              <div class="detail-row"><span>Reference</span><span>${reference}</span></div>
+              <div class="detail-row"><span>Name</span><span>${customerName}</span></div>
+              <div class="detail-row"><span>Phone</span><span>${customerPhone}</span></div>
+              <div class="detail-row"><span>Delivery Address</span><span>${customerAddress}</span></div>
+              <div class="amount-row"><span>Total Paid</span><span>₦${parseInt(amount).toLocaleString('en-NG')}</span></div>
+
+              <p style="color:#555;font-size:0.88rem;margin-top:20px">We will contact you on <strong>${customerPhone}</strong> to arrange delivery. If you have any questions, reach us on WhatsApp:</p>
+              <a href="https://wa.me/2348114550145" class="whatsapp-btn">Chat on WhatsApp</a>
+            </div>
+            <div class="footer">
+              <p>HOK Computers — Ilorin, Kwara State, Nigeria</p>
+              <p><a href="https://www.hokcomputers.ng">www.hokcomputers.ng</a></p>
+              <p style="margin-top:8px;font-size:0.75rem">This is an automated receipt. Please keep it for your records.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    });
+    console.log('✅ Receipt email sent to:', customerEmail);
+  } catch (err) {
+    console.error('❌ Email send error:', err);
+  }
+}
+// ── WHATSAPP NOTIFICATION HELPER ──────────────────────────
+function buildWhatsAppNotification(orderDetails) {
+  const { customerName, customerPhone, customerEmail, customerAddress, productName, amount, reference } = orderDetails;
+  const msg = `🛒 *NEW ORDER — HOK Computers*\n\n` +
+    `*Product:* ${productName}\n` +
+    `*Amount Paid:* ₦${parseInt(amount).toLocaleString('en-NG')}\n` +
+    `*Reference:* ${reference}\n\n` +
+    `*Customer Details:*\n` +
+    `👤 Name: ${customerName}\n` +
+    `📞 Phone: ${customerPhone}\n` +
+    `📧 Email: ${customerEmail}\n` +
+    `📍 Address: ${customerAddress}\n\n` +
+    `Please arrange delivery as soon as possible.`;
+  return `https://wa.me/2348114550145?text=${encodeURIComponent(msg)}`;
+}
+
+
+
 // ── MIDDLEWARE ────────────────────────────────────────────
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
@@ -196,7 +292,7 @@ app.use((req, res, next) => {
 
 // ──CLOUDINARY STORAGE MULTER ────────────────────────────────────────────────
 const cloudinaryStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
+  cloudinary: cloudinary, 
   params: {
     folder: 'hok-computers',
     allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
@@ -545,21 +641,49 @@ app.get('/api/paystack/verify/:reference', async (req, res) => {
 
     const paystackData = await paystackRes.json();
     if (!paystackData.status || paystackData.data.status !== 'success') {
-      return res.status(400).json({ error: 'Payment verification failed', details: paystackData });
+      return res.status(400).json({ error: 'Payment verification failed' });
     }
 
+    const data = paystackData.data;
+    const metadata = data.metadata || {};
+
+    const orderDetails = {
+      customerName: metadata.customerName || 'Customer',
+      customerPhone: metadata.customerPhone || 'N/A',
+      customerEmail: data.customer?.email || 'N/A',
+      customerAddress: metadata.customerAddress || 'N/A',
+      productName: metadata.productName || 'Product',
+      amount: data.amount / 100,
+      reference: data.reference
+    };
+
+    // Update order in database
     await Order.findOneAndUpdate(
       { reference },
-      { status: 'success', paidAt: new Date().toISOString() }
+      {
+        status: 'success',
+        paidAt: new Date().toISOString(),
+        customerName: orderDetails.customerName,
+        customerPhone: orderDetails.customerPhone,
+        customerAddress: orderDetails.customerAddress
+      }
     );
+
+    // Send receipt email to customer
+    await sendReceiptEmail(orderDetails);
+
+    // Build WhatsApp notification URL
+    const whatsappUrl = buildWhatsAppNotification(orderDetails);
 
     res.json({
       status: 'success',
-      reference: paystackData.data.reference,
-      amount: paystackData.data.amount,
-      customer: paystackData.data.customer,
-      metadata: paystackData.data.metadata
+      reference: data.reference,
+      amount: data.amount,
+      customer: data.customer,
+      metadata: data.metadata,
+      whatsappUrl
     });
+
   } catch (err) {
     console.error('Paystack verify error:', err);
     res.status(500).json({ error: 'Payment verification failed' });

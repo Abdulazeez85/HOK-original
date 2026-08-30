@@ -23,36 +23,59 @@
   <script src="/app.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      document.getElementById('footer-mount').innerHTML = getFooterHTML();
-      await loadSettings();
-      initCommon();
-      const params = new URLSearchParams(window.location.search);
-      const reference = params.get('reference');
-      const box = document.getElementById('statusBox');
-      if (!reference) {
-        box.innerHTML = '<h2>Missing payment reference.</h2><p>Paystack did not return a reference. Please try again or contact support.</p><a class="btn-primary" href="/products">Back to products</a>';
-        return;
-      }
-      try {
-        const res = await fetch(`/api/paystack/verify/${encodeURIComponent(reference)}`);
-        const data = await res.json();
-        if (!res.ok) {
-          box.innerHTML = `<h2>Payment verification failed</h2><p>${data.error || 'Unable to verify payment.'}</p><a class="btn-primary" href="/products">Back to products</a>`;
-          return;
-        }
-        box.innerHTML = `
-          <h2>Payment ${data.status === 'success' ? 'Successful' : 'Completed'}</h2>
-          <p>Your payment was verified by Paystack.</p>
-          <div class="detail-spec-row"><span>Reference</span><strong>${data.reference}</strong></div>
-          <div class="detail-spec-row"><span>Amount</span><strong>₦${(data.amount / 100).toLocaleString('en-NG')}</strong></div>
-          <div class="detail-spec-row"><span>Email</span><strong>${data.customer?.email || 'N/A'}</strong></div>
-          <div class="detail-spec-row"><span>Product</span><strong>${data.metadata?.productName || 'N/A'}</strong></div>
-          <div style="margin-top:24px;"><a class="btn-primary" href="/products">Continue shopping</a></div>`;
-      } catch (err) {
-        box.innerHTML = `<h2>Verification error</h2><p>Could not verify the payment. Please try again later.</p><a class="btn-primary" href="/products">Back to products</a>`;
-        console.error(err);
-      }
-    });
+  document.getElementById('footer-mount').innerHTML = getFooterHTML();
+  await loadSettings();
+  initCommon();
+
+  const params = new URLSearchParams(window.location.search);
+  const reference = params.get('reference');
+  const box = document.getElementById('statusBox');
+
+  if (!reference) {
+    box.innerHTML = '<h2>Missing payment reference.</h2><p>Please try again or contact support.</p><a class="btn-primary" href="/products">Back to products</a>';
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/paystack/verify/${encodeURIComponent(reference)}`);
+    const data = await res.json();
+
+    if (!res.ok) {
+      box.innerHTML = `<h2>Payment verification failed</h2><p>${data.error || 'Unable to verify.'}</p><a class="btn-primary" href="/products">Back to products</a>`;
+      return;
+    }
+
+    const meta = data.metadata || {};
+
+    box.innerHTML = `
+      <div style="text-align:center;padding:20px 0">
+        <div style="font-size:3rem;margin-bottom:16px">✅</div>
+        <h2 style="font-size:1.4rem;font-weight:600;color:var(--text-1);margin-bottom:8px">Payment Successful!</h2>
+        <p style="color:var(--text-2);font-size:0.88rem;margin-bottom:24px">A receipt has been sent to your email address.</p>
+      </div>
+      <div style="background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px">
+        <div class="modal-spec-row" style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.85rem"><span style="color:var(--text-2)">Product</span><span style="font-weight:600">${meta.productName || 'N/A'}</span></div>
+        <div class="modal-spec-row" style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.85rem"><span style="color:var(--text-2)">Amount Paid</span><span style="font-weight:600;color:var(--accent)">₦${(data.amount / 100).toLocaleString('en-NG')}</span></div>
+        <div class="modal-spec-row" style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.85rem"><span style="color:var(--text-2)">Name</span><span style="font-weight:600">${meta.customerName || 'N/A'}</span></div>
+        <div class="modal-spec-row" style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:0.85rem"><span style="color:var(--text-2)">Phone</span><span style="font-weight:600">${meta.customerPhone || 'N/A'}</span></div>
+        <div class="modal-spec-row" style="display:flex;justify-content:space-between;padding:8px 0;font-size:0.85rem"><span style="color:var(--text-2)">Reference</span><span style="font-weight:600">${data.reference}</span></div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <a href="/products" class="btn-primary" style="flex:1;justify-content:center">Continue Shopping</a>
+      </div>`;
+
+    // Auto-open WhatsApp notification to Adeyemi
+    if (data.whatsappUrl) {
+      setTimeout(() => {
+        window.open(data.whatsappUrl, '_blank');
+      }, 2000);
+    }
+
+  } catch (err) {
+    box.innerHTML = `<h2>Verification error</h2><p>Could not verify payment. Please contact support.</p><a class="btn-primary" href="/products">Back to products</a>`;
+    console.error(err);
+  }
+});
   </script>
 </body>
 </html>
