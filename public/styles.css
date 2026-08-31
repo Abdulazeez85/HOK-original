@@ -432,6 +432,8 @@ ul{list-style:none;}
 .footer-brand{display:flex;flex-direction:column;gap:10px;}
 .footer-brand p{font-size:0.9rem;color:var(--text-2);line-height:1.75;font-weight:400;max-width:320px;letter-spacing:0.01em;}
 .footer-note{margin-top:10px;font-size:0.88rem;line-height:1.8;color:var(--text-2);max-width:400px;opacity:0.94;font-weight:400;letter-spacing:0.01em;}
+.footer-address{margin-top:20px;font-size:0.98rem;line-height:1.2;color:var(--text-2);max-width:600px;opacity:0.94;font-weight:400;letter-spacing:0.01em;}
+
 .socials{display:flex;gap:10px;margin-top:18px;}
 .social-link{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;color:#fff;}
 .social-link svg{width:18px;height:18px;}

@@ -683,7 +683,6 @@ function getFooterHTML() {
           <img src="https://res.cloudinary.com/da7jzmy2g/image/upload/v1780626286/hokp_lzhjha.jpg" alt="HOK logo" class="logo-img" width="32" height="32" border-radius="50%">
           <span>HOK Computers</span>
         </div>
-        <p></p>
             <p class="footer-note">Some items may no longer be available  in store. It will be gotten ready for dispatch within 4-48 hours of payment.</p>
         <div class="socials">
           <a class="social-link social-facebook" href="https://web.facebook.com/homeofkhayr/?_rdc=1&_rdr#" aria-label="Facebook" target="_blank" rel="noreferrer noopener">
@@ -708,6 +707,9 @@ function getFooterHTML() {
         <div class="footer-col"><h5>Company</h5><a href="#home">About HOK</a><a href="#contact">Contact</a><a href="https://wa.me/2348114550145">WhatsApp</a></div>
       </div>
     </div>
+     
+            <p class="footer-address"> Visit Our Store @ Shop A12,  Arca Santa Plaza,  beside KWASU Business School, Ilorin , Kwara State</p>
+
     <div class="footer-bottom">
       <p>© 2026 HOK Computers. Ilorin, Kwara State, Nigeria.</p>
       <p>Built & Developed  by <a href="https://hokcomputers.ng">Mavericq IT , a subdivision of HOK COMPUTERS </a></p>
@@ -766,6 +768,10 @@ function getTrustBannerHTML() {
 {
   name: 'Federal Polytechnic Offa',
   img: 'https://res.cloudinary.com/da7jzmy2g/image/upload/v1787537978/fed_poly_offa_lunqy3.png'
+},
+{
+  name: 'National Association Of Residents Doctors',
+  img: 'https://res.cloudinary.com/da7jzmy2g/image/upload/v1788174792/bard_vjfb6r.jpg'
 }
 ];
   
@@ -779,7 +785,7 @@ function getTrustBannerHTML() {
   return `
     <section class="trust-section">
       <div class="trust-header">
-        <p>Trusted by staffs of these organisations & institutions across Nigeria</p>
+        <p>Trusted by staffs & members of these organisations & institutions across Nigeria</p>
       </div>
       <div class="trust-track-wrap">
         <div class="trust-track">
