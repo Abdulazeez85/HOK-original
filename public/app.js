@@ -412,7 +412,7 @@ function openProductModal(p) {
     onclick="addToCart('${p.id}','${p.name}',${p.price},'${p.image}');closeProductModal()">
     + Add to Cart
   </button>
-  <button class="btn-primary" style="justify-content:center;border:none;cursor:pointer;width:100%;background:#003580"
+  <button class="btn-primary" style="justify-content:center;border:none;cursor:pointer;width:100%;backgrdound:#003580"
     onclick="payWithPaystack('${p.id}','${p.name}',${p.price});closeProductModal()">
     💳 Pay Online
   </button>
@@ -536,7 +536,7 @@ function buildCard(p, i = 0) {
 
         <div class="p-name">${p.name}</div>
         <div class="p-specs">${specsText}</div>
-        <div class="p-delivery">🚚 ${del.local || 'Ilorin — Same Day'}</div>
+        <div class="p-delivery">🚚 ${del.local || 'Free Delivery Across Nigeria '}</div>
         <div class="p-footer">
           <div class="p-price">${fmt(p.price)}</div>
           <div class="p-actions">

@@ -64,12 +64,44 @@
         <a href="/products" class="btn-primary" style="flex:1;justify-content:center">Continue Shopping</a>
       </div>`;
 
-    // Auto-open WhatsApp notification to Adeyemi
-    if (data.whatsappUrl) {
-      setTimeout(() => {
-        window.open(data.whatsappUrl, '_blank');
-      }, 2000);
-    }
+    // Show WhatsApp popup
+if (data.whatsappUrl) {
+  const popup = document.createElement('div');
+  popup.style.cssText = `
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:var(--card-bg);border:1px solid rgba(37,212,102,0.4);
+    border-radius:16px;padding:20px 24px;z-index:9999;
+    box-shadow:0 20px 60px rgba(0,0,0,0.4);
+    max-width:360px;width:90%;text-align:center;
+    animation:fadeUp 0.4s ease;
+  `;
+  popup.innerHTML = `
+    <div style="font-size:1.8rem;margin-bottom:8px">📦</div>
+    <h4 style="color:var(--text-1);font-size:0.95rem;font-weight:600;margin-bottom:6px">
+      Confirm Your Delivery
+    </h4>
+    <p style="color:var(--text-2);font-size:0.82rem;line-height:1.5;margin-bottom:16px;font-weight:300">
+      Send your order details to HOK Computers on WhatsApp so they can arrange your delivery.
+    </p>
+    <a href="${data.whatsappUrl}" target="_blank"
+      style="display:flex;align-items:center;justify-content:center;gap:8px;
+      background:#128c7e;color:#fff;padding:12px 20px;border-radius:10px;
+      font-size:0.88rem;font-weight:600;text-decoration:none;margin-bottom:10px"
+      onclick="this.closest('div[style]').remove()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+        <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.852L.054 23.447a.5.5 0 00.61.61l5.595-1.478A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.802 9.802 0 01-5.031-1.385l-.36-.214-3.733.985.997-3.617-.235-.372A9.808 9.808 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/>
+      </svg>
+      Send Order to HOK WhatsApp
+    </a>
+    <button onclick="this.closest('div[style]').remove()"
+      style="background:none;border:none;color:var(--text-3);font-size:0.78rem;
+      cursor:pointer;padding:4px">
+      I'll do this later
+    </button>
+  `;
+  document.body.appendChild(popup);
+}
 
   } catch (err) {
     box.innerHTML = `<h2>Verification error</h2><p>Could not verify payment. Please contact support.</p><a class="btn-primary" href="/products">Back to products</a>`;
