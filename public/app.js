@@ -159,7 +159,7 @@ function showToast(msg) {
 
 // ── THEME ─────────────────────────────────────────────────
 function initTheme() {
-  const saved = localStorage.getItem('hok_theme') || 'dark';
+  const saved = localStorage.getItem('hok_theme') || 'light';
   document.documentElement.setAttribute('data-theme', saved);
   updateThemeIcon(saved);
 }
