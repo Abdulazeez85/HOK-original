@@ -2,8 +2,17 @@
 
 const fmt = n => '₦' + parseInt(n).toLocaleString('en-NG');
 // Wrap all admin fetches to always include credentials
-const adminFetch = (url, options = {}) => fetch(url, { ...options, credentials: 'include', headers: { 'Content-Type': 'application/json', ...(options.headers || {}) } });
-
+const adminFetch = (url, options = {}) => {
+  const isFormData = options.body instanceof FormData;
+  return fetch(url, {
+    ...options,
+    credentials: 'include',
+    headers: isFormData ? {} : {
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    }
+  });
+};
 // ── AUTH CHECK ────────────────────────────────────────────
 async function checkAuth() {
   try {

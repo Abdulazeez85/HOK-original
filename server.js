@@ -988,6 +988,16 @@ app.put('/api/adminsettings', requireAuth, async (req, res) => {
     res.status(500).json({ error: 'Failed to update settings' });
   }
 });
+// Admin direct image upload to Cloudinary
+app.post('/api/admin/upload-image', requireAuth, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No image provided' });
+    res.json({ success: true, url: req.file.path });
+  } catch (err) {
+    console.error('Upload error:', err);
+    res.status(500).json({ error: 'Upload failed' });
+  }
+});
 
 // ── 404 ───────────────────────────────────────────────────
 app.use((req, res) => {
@@ -1005,3 +1015,4 @@ mongoose.connection.once('open', async () => {
     console.log(`🔐 Admin panel → http://localhost:${PORT}/admin`);
   });
 });
+

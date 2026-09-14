@@ -49,8 +49,20 @@
         <div class="f-group"><label class="f-label">Price (₦) *</label><input class="f-input" type="number" id="fPrice" placeholder="385000"/></div>
         <div class="f-group"><label class="f-label">Warranty</label><input class="f-input" id="fWarranty" placeholder="e.g. 6 Months"/></div>
       </div>
-      <div class="f-group"><label class="f-label">Image URL</label><input class="f-input" id="fImage" placeholder="https://…"/></div>
-      <div class="f-group"><label class="f-label">Image URLs</label><textarea class="f-input" id="fImages" rows="3" placeholder="https://...\nhttps://..."></textarea>
+<div class="f-group">
+  <label class="f-label">Product Image</label>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <input class="f-input" id="fImage" placeholder="Paste URL or upload image below"/>
+<input type="file" id="fImageFile" accept="image/*" multiple style="display:none" onchange="uploadProductImage(this)"/>     <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('fImageFile').click()">
+      📁 Upload Image
+    </button>
+    <div id="imagePreview" style="display:none;margin-top:6px">
+      <img id="previewImg" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:1px solid var(--border)"/>
+      <p style="font-size:0.72rem;color:var(--accent);margin-top:4px">✅ Image uploaded successfully</p>
+    </div>
+    <div id="uploadProgress" style="display:none;font-size:0.78rem;color:var(--text-2)">⏳ Uploading...</div>
+  </div>
+</div>      <div class="f-group"><label class="f-label">Image URLs</label><textarea class="f-input" id="fImages" rows="3" placeholder="https://...\nhttps://..."></textarea>
         <p style="font-size:0.75rem;color:var(--text-3);font-weight:300;margin-top:6px">One URL per line. The first image is used as the primary display image.</p>
       </div>
       <p style="font-size:0.75rem;color:var(--text-3);font-weight:300">Specs</p>
@@ -178,7 +190,8 @@ async function saveProduct() {
   const payload = {
     brand, name, price, category,
     warranty: document.getElementById('fWarranty').value.trim() || '6 Months',
-    image: document.getElementById('fImage').value.trim(),
+image: document.getElementById('fImage').value.trim(),
+images: JSON.parse(document.getElementById('fImagesAll')?.value || '[]'),
     images: rawImages,
     specs: {
       cpu: document.getElementById('fCpu').value.trim(),
@@ -208,6 +221,76 @@ async function deleteProduct(id, name) {
     await adminFetch(`/api/adminproducts/${id}`, { method: 'DELETE' });
     toast('Product deleted.'); await loadProducts();
   });
+}
+
+async function uploadProductImage(input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+
+  document.getElementById('uploadProgress').style.display = 'block';
+  document.getElementById('imagePreview').style.display = 'none';
+
+  const uploadedUrls = [];
+
+  for (const file of files) {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const res = await adminFetch('/api/admin/upload-image', {
+        method: 'POST',
+        body: formData,
+        headers: {}
+      });
+      const data = await res.json();
+      if (data.success) {
+        uploadedUrls.push(data.url);
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+    }
+  }
+
+  document.getElementById('uploadProgress').style.display = 'none';
+
+  if (uploadedUrls.length) {
+    // Set first image as main image URL
+    document.getElementById('fImage').value = uploadedUrls[0];
+
+    // Show previews of all uploaded images
+    const preview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    
+    preview.innerHTML = `
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+        ${uploadedUrls.map((url, i) => `
+          <div style="position:relative">
+            <img src="${url}" 
+              style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:${i===0?'2px solid var(--accent)':'1px solid var(--border)'}"/>
+            ${i===0 ? '<span style="position:absolute;bottom:2px;left:2px;background:var(--accent);color:#000;font-size:0.55rem;padding:1px 4px;border-radius:3px;font-weight:700">MAIN</span>' : ''}
+          </div>
+        `).join('')}
+      </div>
+      <p style="font-size:0.72rem;color:var(--accent);margin-top:6px">
+        ✅ ${uploadedUrls.length} image${uploadedUrls.length > 1 ? 's' : ''} uploaded. First image is the main display image.
+      </p>
+    `;
+    preview.style.display = 'block';
+
+    // Store all URLs as JSON in a hidden field for saving
+    let hiddenField = document.getElementById('fImagesAll');
+    if (!hiddenField) {
+      hiddenField = document.createElement('input');
+      hiddenField.type = 'hidden';
+      hiddenField.id = 'fImagesAll';
+      document.body.appendChild(hiddenField);
+    }
+    hiddenField.value = JSON.stringify(uploadedUrls);
+
+    toast(`${uploadedUrls.length} image${uploadedUrls.length > 1 ? 's' : ''} uploaded successfully!`);
+  } else {
+    toast('Upload failed. Try again.', 'error');
+  }
 }
 </script>
 </body>
