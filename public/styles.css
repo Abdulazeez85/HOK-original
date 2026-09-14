@@ -31,6 +31,10 @@
   --nav-bg: rgba(246,248,246,0.94);
   --accent-glow: rgba(37,212,102,0.1);
 }
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
 
 /* ── RESET ── */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
@@ -310,9 +314,15 @@ ul{list-style:none;}
 .verified-badge{font-size:0.68rem;color:var(--accent);font-weight:600;display:flex;align-items:center;gap:3px;}
 
 /* ── REPAIR ── */
-.repair-section{padding:88px 0;background:var(--bg);}
-.repair-wrap{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;}
-.repair-list{margin-top:24px;display:flex;flex-direction:column;gap:10px;}
+.repair-section{padding:88px 0;background:var(--bg);   overflow: hidden;}
+.repair-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: start;
+  max-width: 100%;
+  overflow: hidden;
+}.repair-list{margin-top:24px;display:flex;flex-direction:column;gap:10px;}
 .repair-list li{display:flex;align-items:center;gap:10px;font-size:0.88rem;color:var(--text-2);font-weight:300;}
 .repair-list li span{color:var(--accent);font-weight:600;}
 .form-card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--r);padding:28px;display:flex;flex-direction:column;gap:16px;}
