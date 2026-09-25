@@ -49,7 +49,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   tbody.innerHTML = orders.map(o => `
   <tr>
     <td style="font-size:0.75rem;color:var(--text-3)">${o.reference}</td>
-    <td class="td-name">${o.productName || o.metadata?.productName || 'N/A'}</td>
+<td class="td-name">
+  ${o.orderType === 'cart' || o.orderType === 'Cart Order' 
+    ? `<div style="font-size:0.78rem">
+        ${(o.items || o.metadata?.items || []).map(item => 
+          `<div>• ${item.productName || item.name} × ${item.quantity || 1}</div>`
+        ).join('') || 'Cart Order'}
+      </div>`
+    : (o.productName || o.metadata?.productName || 'N/A')
+  }
+</td>
     <td>${o.customerName || o.metadata?.customerName || 'N/A'}</td>
     <td>${o.customerPhone || o.metadata?.customerPhone || 'N/A'}</td>
     <td style="max-width:150px;font-size:0.78rem">${o.customerAddress || o.metadata?.customerAddress || 'N/A'}</td>

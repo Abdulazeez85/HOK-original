@@ -86,7 +86,7 @@ ul{list-style:none;}
   cursor: pointer;
   padding: 6px;
   flex-shrink: 0;
-}.hamburger span{width:20px;height:1.5px;background:var(--text-1);border-radius:2px;transition:all 0.3s;}
+} .hamburger span{width:20px;height:1.5px;background:var(--text-1);border-radius:2px;transition:all 0.3s;}
 .nav-inner   img{
   width: 70px;
   height: 40px;
