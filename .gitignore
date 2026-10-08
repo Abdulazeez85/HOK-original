@@ -4,3 +4,4 @@ data/
 cookies.txt
 scripts/
 reset-admin.js
+.env.example  

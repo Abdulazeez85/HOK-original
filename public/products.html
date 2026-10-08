@@ -144,78 +144,106 @@
 
 <script src="/app.js"></script>
 <script> 
- let activeTier = 'all';
-let allProducts = [];
+
+ let allProducts = [];
+let currentPage = 1;
+const ITEMS_PER_PAGE = 12;
+let totalPages = 1;
+let activeTier = 'all';
 
 document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('navbar-mount').innerHTML = getNavHTML('products');
   document.getElementById('footer-mount').innerHTML = getFooterHTML();
   document.getElementById('modals-mount').innerHTML = getCartDrawerHTML() + getModalsHTML();
   await loadSettings();
-  await loadPaystackConfig();
   initCommon();
 
-  // Read URL param
   const cat = new URLSearchParams(window.location.search).get('cat');
   if (cat) {
     const r = document.querySelector(`input[name="cat"][value="${cat}"]`);
     if (r) r.checked = true;
   }
 
-  const res = await fetch('/api/products');
-  allProducts = await res.json();
-  _allProducts = allProducts;
-  applyFilters();
+  applyFilters(1);
 });
 
 function onPrice(val) {
   document.getElementById('priceVal').textContent = '₦' + parseInt(val).toLocaleString('en-NG');
-  applyFilters();
+  applyFilters(1);
 }
 
-function applyFilters() {
+async function applyFilters(page = 1) {
+  currentPage = Math.max(1, page);
+
   const cat = document.querySelector('input[name="cat"]:checked')?.value || 'all';
   const brand = document.querySelector('input[name="brand"]:checked')?.value || '';
   const cond = document.querySelector('input[name="cond"]:checked')?.value || '';
   const ram = document.querySelector('input[name="ram"]:checked')?.value || '';
   const stor = document.querySelector('input[name="stor"]:checked')?.value || '';
-  const maxPrice = parseInt(document.getElementById('priceRange').value);
-  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  const maxPrice = parseInt(document.getElementById('priceRange').value) || 5000000;
+  const search = document.getElementById('searchInput').value.trim();
   const sort = document.getElementById('sortSelect').value;
-
-  let result = [...allProducts];
-  if (cat !== 'all') result = result.filter(p => p.category === cat);
-  if (brand) result = result.filter(p => p.brand.toLowerCase() === brand.toLowerCase());
-  if (cond) result = result.filter(p => p.specs?.condition === cond);
-  if (ram) result = result.filter(p => p.specs?.ram === ram);
-  if (stor) result = result.filter(p => p.specs?.storage?.includes(stor));
-  result = result.filter(p => p.price <= maxPrice);
-
-if (activeTier === 'bronze') {
-  result = result.filter(p => p.price < 200000);
-} else if (activeTier === 'silver') {
-  result = result.filter(p => p.price >= 200000 && p.price <= 500000);
-} else if (activeTier === 'gold') {
-  result = result.filter(p => p.price > 500000 && p.price <= 1000000);
-}  else if (activeTier === 'diamond') {
-  result = result.filter(p => p.price >= 1000000);
-}
-  if (search) result = result.filter(p =>
-    p.name.toLowerCase().includes(search) ||
-    p.brand.toLowerCase().includes(search) ||
-    Object.values(p.specs || {}).some(v => String(v).toLowerCase().includes(search))
-  );
-  if (sort === 'price-asc') result.sort((a,b) => a.price - b.price);
-  if (sort === 'price-desc') result.sort((a,b) => b.price - a.price);
+  const params = new URLSearchParams({
+    page: String(currentPage),
+    limit: String(ITEMS_PER_PAGE),
+    category: cat === 'all' ? '' : cat,
+    brand,
+    condition: cond,
+    ram,
+    storage: stor,
+    maxPrice: String(maxPrice),
+    search,
+    tier: activeTier
+  });
 
   const grid = document.getElementById('productsGrid');
   const noRes = document.getElementById('noResults');
-  document.getElementById('resultCount').textContent = `${result.length} product${result.length !== 1 ? 's' : ''}`;
+  const countEl = document.getElementById('resultCount');
+  const loading = '<div class="loading">Loading products…</div>';
 
-  if (!result.length) { grid.innerHTML = ''; noRes.style.display = 'block'; return; }
+  grid.innerHTML = loading;
   noRes.style.display = 'none';
-  grid.innerHTML = result.map((p,i) => buildCard(p,i)).join('');
-  requestAnimationFrame(() => grid.querySelectorAll('.reveal').forEach(el => el.classList.add('visible')));
+
+  try {
+    const res = await fetch(`/api/products?${params}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Unable to load products');
+
+    const products = Array.isArray(data.products) ? data.products : [];
+    totalPages = Math.max(1, data.pagination?.totalPages || 1);
+    if (currentPage > totalPages) currentPage = 1;
+
+    if (countEl) countEl.textContent = `${data.pagination?.total || 0} product${(data.pagination?.total || 0) !== 1 ? 's' : ''}`;
+
+    if (!products.length) {
+      grid.innerHTML = '';
+      noRes.style.display = 'block';
+      renderPagination(0);
+      return;
+    }
+
+    noRes.style.display = 'none';
+    grid.innerHTML = products.map((p, i) => buildCard(p, i)).join('');
+    requestAnimationFrame(() => {
+      grid.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+    });
+
+    renderPagination(data.pagination?.total || products.length);
+    if (sort === 'price-asc') {
+      products.sort((a, b) => a.price - b.price);
+    } else if (sort === 'price-desc') {
+      products.sort((a, b) => b.price - a.price);
+    }
+    grid.innerHTML = products.map((p, i) => buildCard(p, i)).join('');
+  } catch (error) {
+    console.error('Unable to load products:', error);
+    grid.innerHTML = '<p class="empty-state">Unable to load products. Please try again.</p>';
+    noRes.style.display = 'none';
+    renderPagination(0);
+    if (countEl) countEl.textContent = '0 products';
+  }
+
+  document.getElementById('productsGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function resetFilters() {
@@ -231,13 +259,60 @@ function resetFilters() {
   document.getElementById('searchInput').value = '';
   document.getElementById('sortSelect').value = 'default';
   document.querySelector('input[name="brand"][value=""]').checked = true;
-  applyFilters();
+  applyFilters(1);
 }
+
 function setTier(tier, btn) {
   activeTier = tier;
   document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  applyFilters();
+  applyFilters(1);
+}
+
+function renderPagination(totalResults) {
+  // Remove existing pagination if any
+  const existing = document.getElementById('paginationWrap');
+  if (existing) existing.remove();
+
+  if (totalPages <= 1) return;
+
+  const wrap = document.createElement('div');
+  wrap.id = 'paginationWrap';
+  wrap.innerHTML = `
+    <div class="pagination-wrap">
+      <button class="page-btn prev-next" 
+        onclick="applyFilters(${currentPage - 1})"
+        ${currentPage === 1 ? 'disabled' : ''}>
+        ← Prev
+      </button>
+
+      ${getPaginationRange(currentPage, totalPages).map(p =>
+        p === '...'
+          ? `<span class="page-btn" style="cursor:default;border:none">…</span>`
+          : `<button class="page-btn ${p === currentPage ? 'active' : ''}"
+              onclick="applyFilters(${p})">${p}</button>`
+      ).join('')}
+
+      <button class="page-btn prev-next"
+        onclick="applyFilters(${currentPage + 1})"
+        ${currentPage === totalPages ? 'disabled' : ''}>
+        Next →
+      </button>
+    </div>
+    <p class="pagination-info">
+      Showing ${((currentPage - 1) * ITEMS_PER_PAGE) + 1}–${Math.min(currentPage * ITEMS_PER_PAGE, totalResults)} of ${totalResults} products
+    </p>
+  `;
+
+  document.getElementById('productsGrid').after(wrap);
+}
+
+function getPaginationRange(current, total) {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+
+  if (current <= 4) return [1, 2, 3, 4, 5, '...', total];
+  if (current >= total - 3) return [1, '...', total-4, total-3, total-2, total-1, total];
+  return [1, '...', current-1, current, current+1, '...', total];
 }
 </script>
 </body>

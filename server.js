@@ -18,6 +18,7 @@ const multer = require('multer');
 const sanitizeHtml = require('sanitize-html');
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const { buildProductQuery } = require('./productQuery');
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -362,9 +363,39 @@ app.get('/admin/settings', (req, res) => res.sendFile(path.join(__dirname, 'admi
 // ════════════════════════════════════
 app.get('/api/products', async (req, res) => {
   try {
-    const products = await Product.find({}).sort({ createdAt: -1 });
-    res.json(products);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.max(1, Math.min(100, parseInt(req.query.limit) || 12));
+    const skip = (page - 1) * limit;
+    const query = buildProductQuery({
+      category: req.query.category,
+      brand: req.query.brand,
+      condition: req.query.condition,
+      ram: req.query.ram,
+      storage: req.query.storage,
+      maxPrice: req.query.maxPrice,
+      search: req.query.search,
+      tier: req.query.tier
+    });
+
+    const total = await Product.countDocuments(query);
+    const products = await Product.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.json({
+      products,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page < Math.ceil(total / limit),
+        hasPrev: page > 1
+      }
+    });
   } catch (err) {
+    console.error('Failed to fetch products:', err);
     res.status(500).json({ error: 'Failed to fetch products' });
   }
 });
