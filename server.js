@@ -1,7 +1,8 @@
 'use strict';
 require('dotenv').config();
+
 const dns = require('dns');
-dns.setServers(['8.8.8.8','8.8.4.4']);
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 const express = require('express');
 const bcrypt = require('bcryptjs');
@@ -17,19 +18,31 @@ const crypto = require('crypto');
 const multer = require('multer');
 const sanitizeHtml = require('sanitize-html');
 const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { buildProductQuery } = require('./productQuery');
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
+
 const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+const { google } = require('googleapis');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+const googleOAuth2Client = new google.auth.OAuth2(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  process.env.GOOGLE_REDIRECT_URI
+);
+
+const GOOGLE_SCOPES = [
+  'https://www.googleapis.com/auth/business.manage'
+];
 
 // ── SECURITY ──────────────────────────────────────────────
 app.use(helmet({ contentSecurityPolicy: false }));
@@ -291,23 +304,35 @@ app.use((req, res, next) => {
 });
 
 // ──CLOUDINARY STORAGE MULTER ────────────────────────────────────────────────
-const cloudinaryStorage = new CloudinaryStorage({
-  cloudinary: cloudinary, 
-  params: {
-    folder: 'hok-computers',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [{ width: 800, quality: 'auto' }]
-  }
-});
-
 const upload = multer({
-  storage: cloudinaryStorage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) cb(null, true);
     else cb(new Error('Only image files allowed'));
   }
 });
+
+const uploadToCloudinary = (buffer) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: 'hok-computers',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+        transformation: [{ width: 800, quality: 'auto' }]
+      },
+      (error, result) => {
+        if (error) {
+          return reject(error);
+        }
+
+        resolve(result);
+      }
+    );
+
+    stream.end(buffer);
+  });
+}; 
 
 // ── SEED DATA ─────────────────────────────────────────────
 async function seedData() {
@@ -342,6 +367,21 @@ function requireAuth(req, res, next) {
   if (req.session && req.session.isAdmin) return next();
   res.status(401).json({ error: 'Unauthorized' });
 }
+
+app.get('/auth/google', requireAuth, (req, res) => {
+  const state = crypto.randomBytes(32).toString('hex');
+
+  req.session.googleOAuthState = state;
+
+  const authorizationUrl = googleOAuth2Client.generateAuthUrl({
+    access_type: 'offline',
+    prompt: 'consent',
+    scope: GOOGLE_SCOPES,
+    state
+  });
+
+  res.redirect(authorizationUrl);
+});
 
 // ── SERVE HTML PAGES ──────────────────────────────────────
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
@@ -457,8 +497,14 @@ app.post('/api/reviews', upload.array('images', 5), async (req, res) => {
     const cleanName = sanitizeHtml(name, { allowedTags: [], allowedAttributes: {} });
     const cleanMessage = sanitizeHtml(message, { allowedTags: [], allowedAttributes: {} });
     const cleanProduct = sanitizeHtml(product, { allowedTags: [], allowedAttributes: {} });
-    const images = req.files ? req.files.map(f => f.path) : [];
-
+const images = req.files
+  ? await Promise.all(
+      req.files.map(async (file) => {
+        const result = await uploadToCloudinary(file.buffer);
+        return result.secure_url;
+      })
+    )
+  : [];
     await Review.create({
       id: 'rev_' + uuidv4().slice(0, 8),
       name: cleanName.trim(),
@@ -546,10 +592,11 @@ if (!name || !phone || !device || !problem) {
 
 const cleanName = sanitizeHtml(name, { allowedTags: [], allowedAttributes: {} });
 const cleanProblem = sanitizeHtml(problem, { allowedTags: [], allowedAttributes: {} });
-    
     let imageUrl = '';
+
 if (req.file) {
-  imageUrl = req.file.path;
+  const result = await uploadToCloudinary(req.file.buffer);
+  imageUrl = result.secure_url;
 }
     await Request.create({
   id: 'rep_' + uuidv4().slice(0, 8),
@@ -1022,8 +1069,16 @@ app.put('/api/adminsettings', requireAuth, async (req, res) => {
 // Admin direct image upload to Cloudinary
 app.post('/api/admin/upload-image', requireAuth, upload.single('image'), async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ error: 'No image provided' });
-    res.json({ success: true, url: req.file.path });
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image provided' });
+    }
+
+    const result = await uploadToCloudinary(req.file.buffer);
+
+    res.json({
+      success: true,
+      url: result.secure_url
+    });
   } catch (err) {
     console.error('Upload error:', err);
     res.status(500).json({ error: 'Upload failed' });
